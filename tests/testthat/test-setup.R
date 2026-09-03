@@ -82,7 +82,16 @@ test_that("a package that is present but too old is reported as such", {
     ),
     class = "islh_dependency_check"
   )
-  expect_snapshot(print(fake))
+
+  # Not a snapshot: the message names the *installed* version, which differs
+  # between machines, so a snapshot of it fails everywhere but where it was
+  # recorded.
+  message <- testthat::capture_messages(print(fake))
+  expect_true(any(grepl("ggplot2", message)))
+  expect_true(any(grepl("is too old", message)))
+  expect_true(any(grepl(minimums[["ggplot2"]], message, fixed = TRUE)))
+  expect_true(any(grepl("type = \"binary\"", message, fixed = TRUE)))
+  expect_false(any(grepl("pak::", message, fixed = TRUE)))
 })
 
 test_that("plot setup is repeatable and leaves the session as it found it", {

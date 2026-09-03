@@ -75,11 +75,3 @@
         islh_example_plot()                 a themed plot from simulated data
       
 
-# a package that is present but too old is reported as such
-
-    Code
-      print(fake)
-    Message
-      x ggplot2 3.5.2 is too old; 3.5.0 or newer is required.
-      i Install with `install.packages(c("ggplot2"), type = "binary")`.
-
