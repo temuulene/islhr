@@ -81,7 +81,8 @@ test_that("complementary suppression does nothing when the sum is already safe",
 
 test_that("a label turns the column into readable text", {
   out <- islh_suppress_table(
-    data.frame(cases = c(3, 42)), "cases", threshold = 5, label = "<5"
+    data.frame(cases = c(3, 42)), "cases", threshold = 5,
+    inclusive = FALSE, label = "<5"
   )
   expect_type(out$cases, "character")
   expect_equal(out$cases, c("<5", "42"))
@@ -137,7 +138,8 @@ test_that("a complementary cell never claims to be small", {
   counts <- data.frame(cases = c(3, 42, 17))
 
   out <- islh_suppress_table(
-    counts, "cases", threshold = 5, complementary = TRUE, label = "<5"
+    counts, "cases", threshold = 5, inclusive = FALSE,
+    complementary = TRUE, label = "<5"
   )
 
   expect_equal(out$cases[1], "<5")        # genuinely small
@@ -198,4 +200,65 @@ test_that("the threshold itself is validated", {
   expect_error(islh_suppress(1:5, threshold = -1), "non-negative")
   expect_error(islh_suppress(1:5, threshold = Inf), "finite")
   expect_error(islh_suppress(1:5, threshold = c(5, 10)), "one non-negative")
+})
+
+test_that("numeric suppression labels must describe the boundary truthfully", {
+  expect_error(
+    islh_suppress(5, threshold = 5, label = "<5"),
+    "does not describe every count"
+  )
+  expect_error(
+    islh_suppress_table(
+      data.frame(cases = 5), "cases", threshold = 5, label = "<5"
+    ),
+    "does not describe every count"
+  )
+
+  expect_equal(
+    islh_suppress(c(4, 5, 6), threshold = 5, label = "<=5"),
+    c("<=5", "<=5", "6")
+  )
+  expect_equal(
+    islh_suppress(
+      c(4, 5, 6), threshold = 5, inclusive = FALSE, label = "<5"
+    ),
+    c("<5", "5", "6")
+  )
+})
+
+test_that("disclosure-control switches fail closed", {
+  counts <- data.frame(cases = c(3, 17, 42))
+
+  expect_error(
+    islh_suppress(3, threshold = 5, inclusive = NA),
+    "single TRUE or FALSE"
+  )
+  expect_error(
+    islh_suppress_table(
+      counts, "cases", threshold = 5, complementary = NA
+    ),
+    "single TRUE or FALSE"
+  )
+  expect_error(
+    islh_suppress_table(
+      counts, "cases", threshold = 5, complementary = 1
+    ),
+    "single TRUE or FALSE"
+  )
+})
+
+test_that("suppression labels are scalar and complementary labels are neutral", {
+  counts <- data.frame(cases = c(3, 17, 42))
+
+  expect_error(
+    islh_suppress(3, threshold = 5, label = c("<5", "Suppressed")),
+    "one non-missing character string"
+  )
+  expect_error(
+    islh_suppress_table(
+      counts, "cases", threshold = 5, inclusive = FALSE,
+      label = "<5", complementary = TRUE, complementary_label = "<5"
+    ),
+    "must not state a numeric bound"
+  )
 })

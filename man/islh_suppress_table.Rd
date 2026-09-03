@@ -23,14 +23,15 @@ islh_suppress_table(
 explicitly because the appropriate rule depends on the data and context.}
 
 \item{inclusive}{Suppress positive counts less than or equal to the
-threshold.}
+threshold. Must be one non-missing \code{TRUE} or \code{FALSE}.}
 
 \item{label}{Display label for cells hidden because they are small. With
 \code{NULL}, they become missing numeric values. See the label section of
 \code{\link[=islh_suppress]{islh_suppress()}}.}
 
 \item{complementary}{Also suppress the smallest surviving value in any
-column where exactly one cell was suppressed.}
+column where exactly one cell was suppressed. Must be one non-missing
+\code{TRUE} or \code{FALSE}.}
 
 \item{complementary_label}{Display label for cells hidden to protect another
 cell. Must not imply a value, since such a cell can be any size. Only used

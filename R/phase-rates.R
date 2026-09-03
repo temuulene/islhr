@@ -67,12 +67,13 @@ islh_ci_poisson <- function(x, conf = 0.95, method = c("byar", "exact")) {
 
 #' Crude rate with a confidence interval
 #'
-#' Divides cases by population and scales to `per`. The interval comes from
-#' [islh_ci_poisson()] on the case count, scaled the same way, which is the
-#' standard approach for counts of events in a fixed population.
+#' Divides event counts by a population or person-time denominator and scales
+#' to `per`. The interval comes from [islh_ci_poisson()] on the event count,
+#' scaled the same way. Counts may exceed the denominator when people can
+#' experience more than one event.
 #'
-#' @param cases Numeric case counts.
-#' @param population Population at risk. Recycled if length 1.
+#' @param cases Non-negative whole event counts.
+#' @param population Population or person-time at risk. Recycled if length 1.
 #' @param per Rate denominator. 100,000 by convention in public health.
 #' @param conf Confidence level.
 #' @param method Interval method passed to [islh_ci_poisson()].
@@ -105,17 +106,6 @@ islh_crude_rate <- function(
   }
   population <- .islh_check_population(population)
 
-  # A count larger than the population it came from means the two do not
-  # belong together, and the rate would be meaningless.
-  bigger <- !is.na(cases) & cases > population
-  if (any(bigger)) {
-    .islh_abort(c(
-      "{.arg cases} cannot exceed {.arg population}.",
-      x = "{cli::qty(sum(bigger))}Found {sum(bigger)} stratum/strata where it
-           does.",
-      i = "Check that the two vectors are in the same order."
-    ))
-  }
 
   ci <- islh_ci_poisson(cases, conf = conf, method = method)
   scale <- per / population
@@ -140,8 +130,9 @@ islh_crude_rate <- function(
 #' normal-approximation interval is too narrow and can fall below zero.
 #' `"normal"` is provided for comparison with published figures that used it.
 #'
-#' @param cases Case counts per stratum.
-#' @param population Population at risk per stratum.
+#' @param cases Non-negative whole event counts per stratum. Counts may exceed
+#'   the corresponding denominator when events can recur.
+#' @param population Population or person-time at risk per stratum.
 #' @param std_population Standard population per stratum. Only the relative
 #'   sizes matter; they are normalised to weights internally.
 #' @param per Rate denominator.
@@ -201,15 +192,6 @@ islh_dsr <- function(
     std_population, "std_population", allow_zero = TRUE
   )
 
-  bigger <- cases > population
-  if (any(bigger)) {
-    .islh_abort(c(
-      "{.arg cases} cannot exceed {.arg population}.",
-      x = "{cli::qty(sum(bigger))}Found {sum(bigger)} stratum/strata where it
-           does.",
-      i = "Check that the vectors are in the same order."
-    ))
-  }
 
   total_standard <- sum(std_population)
   if (total_standard <= 0) {

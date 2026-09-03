@@ -10,8 +10,9 @@
 #' A label is a statement about the data, and it has to be true of every cell
 #' it is applied to. `"<5"` is false for a cell equal to 5, which the default
 #' `inclusive = TRUE` rule suppresses. Either use `inclusive = FALSE` with
-#' `"<5"`, or use a neutral label such as the default `"Suppressed"`, which is
-#' true whatever the rule and whatever the value.
+#' `"<5"`, or use a neutral label such as `"Suppressed"`. Compact numeric
+#' bounds such as `"<5"` and `"<=5"` are checked against the rule and rejected
+#' when they could misstate a suppressed value.
 #'
 #' @param n Count vector. Must be whole, non-negative and finite. Factors are
 #'   rejected rather than converted, because converting one gives its level
@@ -19,10 +20,10 @@
 #' @param threshold Approved disclosure-control threshold. It must be supplied
 #'   explicitly because the appropriate rule depends on the data and context.
 #' @param inclusive Suppress positive counts less than or equal to the
-#'   threshold.
-#' @param label Display label for suppressed cells. With `NULL`, suppressed
-#'   values become missing numeric values; otherwise the result is a character
-#'   vector.
+#'   threshold. Must be one non-missing `TRUE` or `FALSE`.
+#' @param label Display label for suppressed cells. Must be `NULL` or one
+#'   non-missing character string. With `NULL`, suppressed values become
+#'   missing numeric values; otherwise the result is a character vector.
 #'
 #' @return A vector with small positive cell counts suppressed.
 #' @export
@@ -37,6 +38,12 @@
 #' islh_suppress(c(4, 5, 6), threshold = 5, inclusive = FALSE, label = "<5")
 islh_suppress <- function(n, threshold, inclusive = TRUE, label = NULL) {
   threshold <- .islh_check_threshold(threshold)
+  inclusive <- .islh_check_flag(inclusive, "inclusive")
+  label <- .islh_check_suppression_label(
+    label,
+    threshold = threshold,
+    inclusive = inclusive
+  )
   counts <- .islh_check_counts(n, arg = "n")
 
   small <- .islh_small(counts, threshold, inclusive)

@@ -124,3 +124,18 @@ test_that("the install helper never reaches for pak or a source build", {
   expect_match(command, 'type = "binary"', fixed = TRUE)
   expect_false(grepl("pak::", command, fixed = TRUE))
 })
+
+test_that("Word figure captions stay with their figures", {
+  extension <- readLines(file.path(
+    scaffold("docx"),
+    "_extensions", "islh", "islh-report", "_extension.yml"
+  ))
+  docx <- which(trimws(extension) == "docx:")
+
+  expect_length(docx, 1L)
+  expect_true(any(grepl(
+    "fig-cap-location: top",
+    extension[seq.int(docx + 1L, length(extension))],
+    fixed = TRUE
+  )))
+})

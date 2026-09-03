@@ -141,9 +141,19 @@ test_that("rate functions refuse invalid epidemiological inputs", {
   expect_error(islh_crude_rate(5, 0), "must be positive")
   expect_error(islh_crude_rate(5, Inf), "finite")
 
-  # A count bigger than its own denominator means the vectors do not belong
-  # together; the rate would be meaningless.
-  expect_error(islh_crude_rate(5000, 1000), "cannot exceed")
+})
+
+test_that("event counts may exceed population or person-time denominators", {
+  crude <- islh_crude_rate(cases = 1500, population = 1000, per = 1000)
+  expect_equal(crude$rate, 1500)
+
+  standardised <- islh_dsr(
+    cases = c(1500, 400),
+    population = c(1000, 800),
+    std_population = c(1, 1),
+    per = 1000
+  )
+  expect_equal(standardised$rate, 1000)
 })
 
 test_that("a standard population of all zeros is an error, not an NA rate", {

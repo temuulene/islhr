@@ -15,11 +15,11 @@ codes rather than the counts it displays.}
 explicitly because the appropriate rule depends on the data and context.}
 
 \item{inclusive}{Suppress positive counts less than or equal to the
-threshold.}
+threshold. Must be one non-missing \code{TRUE} or \code{FALSE}.}
 
-\item{label}{Display label for suppressed cells. With \code{NULL}, suppressed
-values become missing numeric values; otherwise the result is a character
-vector.}
+\item{label}{Display label for suppressed cells. Must be \code{NULL} or one
+non-missing character string. With \code{NULL}, suppressed values become
+missing numeric values; otherwise the result is a character vector.}
 }
 \value{
 A vector with small positive cell counts suppressed.
@@ -36,8 +36,9 @@ anyone.
 A label is a statement about the data, and it has to be true of every cell
 it is applied to. \code{"<5"} is false for a cell equal to 5, which the default
 \code{inclusive = TRUE} rule suppresses. Either use \code{inclusive = FALSE} with
-\code{"<5"}, or use a neutral label such as the default \code{"Suppressed"}, which is
-true whatever the rule and whatever the value.
+\code{"<5"}, or use a neutral label such as \code{"Suppressed"}. Compact numeric
+bounds such as \code{"<5"} and \code{"<=5"} are checked against the rule and rejected
+when they could misstate a suppressed value.
 }
 
 \examples{

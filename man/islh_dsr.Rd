@@ -14,9 +14,10 @@ islh_dsr(
 )
 }
 \arguments{
-\item{cases}{Case counts per stratum.}
+\item{cases}{Non-negative whole event counts per stratum. Counts may exceed
+the corresponding denominator when events can recur.}
 
-\item{population}{Population at risk per stratum.}
+\item{population}{Population or person-time at risk per stratum.}
 
 \item{std_population}{Standard population per stratum. Only the relative
 sizes matter; they are normalised to weights internally.}

@@ -31,12 +31,13 @@
 #' @param threshold Approved disclosure-control threshold. It must be supplied
 #'   explicitly because the appropriate rule depends on the data and context.
 #' @param inclusive Suppress positive counts less than or equal to the
-#'   threshold.
+#'   threshold. Must be one non-missing `TRUE` or `FALSE`.
 #' @param label Display label for cells hidden because they are small. With
 #'   `NULL`, they become missing numeric values. See the label section of
 #'   [islh_suppress()].
 #' @param complementary Also suppress the smallest surviving value in any
-#'   column where exactly one cell was suppressed.
+#'   column where exactly one cell was suppressed. Must be one non-missing
+#'   `TRUE` or `FALSE`.
 #' @param complementary_label Display label for cells hidden to protect another
 #'   cell. Must not imply a value, since such a cell can be any size. Only used
 #'   when `label` is set; with no `label` every suppressed cell becomes a
@@ -74,6 +75,20 @@ islh_suppress_table <- function(
     .islh_abort("{.arg data} must be a data frame.")
   }
   threshold <- .islh_check_threshold(threshold)
+  inclusive <- .islh_check_flag(inclusive, "inclusive")
+  complementary <- .islh_check_flag(complementary, "complementary")
+  label <- .islh_check_suppression_label(
+    label,
+    threshold = threshold,
+    inclusive = inclusive
+  )
+  if (!is.null(label) && complementary) {
+    complementary_label <- .islh_check_suppression_label(
+      complementary_label,
+      arg = "complementary_label",
+      complementary = TRUE
+    )
+  }
 
   if (is.character(cols)) {
     unknown <- setdiff(cols, names(data))

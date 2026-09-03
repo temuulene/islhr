@@ -26,13 +26,9 @@ contributes:
       code-copy: false
     docx:
       reference-doc: islh-report-reference.docx
-      # Known limitation: Quarto styles a knitr figure's image paragraph
-      # "Compact", which carries no keepNext, so a page break can orphan the
-      # caption from its figure. The reference document sets keepNext on the
-      # "Figure" style, which covers plain pandoc renders, but Quarto does not
-      # use that style here. Setting fig-cap-location: top for docx avoids it;
-      # keepNext on "Compact" is not an option because tight list items share
-      # that style and whole lists would stop breaking across pages.
+      # A caption below a knitr figure can be orphaned by a Word page break.
+      # Putting it first keeps the caption and figure together.
+      fig-cap-location: top
       toc: true
       toc-depth: 2
       number-sections: false

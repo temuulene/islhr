@@ -119,3 +119,85 @@
   }
   threshold
 }
+
+# Disclosure-control switches must fail closed. isTRUE() alone is unsafe here:
+# NA, 1 and other invalid values would silently select FALSE.
+.islh_check_flag <- function(x, arg) {
+  if (!is.logical(x) || length(x) != 1L || is.na(x)) {
+    .islh_abort("{.arg {arg}} must be a single TRUE or FALSE.")
+  }
+  x
+}
+
+# Labels that state a compact numeric upper bound are checked against the rule.
+# Arbitrary text is treated as a neutral/custom label because its semantics
+# cannot be inferred safely.
+.islh_check_suppression_label <- function(
+  label,
+  arg = "label",
+  threshold = NULL,
+  inclusive = NULL,
+  complementary = FALSE
+) {
+  if (is.null(label)) {
+    return(NULL)
+  }
+  if (!is.character(label) || length(label) != 1L ||
+      is.na(label) || !nzchar(trimws(label))) {
+    .islh_abort(
+      "{.arg {arg}} must be NULL or one non-missing character string."
+    )
+  }
+
+  compact <- gsub("[[:space:]]+", "", label)
+  match <- regexec(
+    "^(<=|<|≤)([0-9]+(?:\\.[0-9]+)?)$",
+    compact,
+    perl = TRUE
+  )
+  pieces <- regmatches(compact, match)[[1]]
+
+  if (length(pieces) == 0L) {
+    return(label)
+  }
+
+  if (isTRUE(complementary)) {
+    .islh_abort(c(
+      "{.arg {arg}} must not state a numeric bound.",
+      x = paste0(
+        "A complementary cell can be any size, so \"", label,
+        "\" may be false."
+      ),
+      i = "Use a neutral label such as \"Suppressed\"."
+    ))
+  }
+
+  if (is.null(threshold) || is.null(inclusive)) {
+    return(label)
+  }
+
+  largest <- if (inclusive) floor(threshold) else ceiling(threshold) - 1
+  if (largest < 1) {
+    return(label)
+  }
+
+  operator <- pieces[[2]]
+  bound <- as.numeric(pieces[[3]])
+  truthful <- if (operator == "<") largest < bound else largest <= bound
+
+  if (!truthful) {
+    .islh_abort(c(
+      "{.arg {arg}} does not describe every count the rule suppresses.",
+      x = paste0(
+        "The rule can suppress ", largest, ", which is not described by \"",
+        label, "\"."
+      ),
+      i = paste0(
+        "Use \"<", largest + 1, "\", \"<=", largest,
+        "\", or a neutral label such as \"Suppressed\"."
+      )
+    ))
+  }
+
+  label
+}

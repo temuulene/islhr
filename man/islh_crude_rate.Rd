@@ -13,9 +13,9 @@ islh_crude_rate(
 )
 }
 \arguments{
-\item{cases}{Numeric case counts.}
+\item{cases}{Non-negative whole event counts.}
 
-\item{population}{Population at risk. Recycled if length 1.}
+\item{population}{Population or person-time at risk. Recycled if length 1.}
 
 \item{per}{Rate denominator. 100,000 by convention in public health.}
 
@@ -28,9 +28,10 @@ A data frame with columns \code{cases}, \code{population}, \code{rate}, \code{lo
 and \code{upper}.
 }
 \description{
-Divides cases by population and scales to \code{per}. The interval comes from
-\code{\link[=islh_ci_poisson]{islh_ci_poisson()}} on the case count, scaled the same way, which is the
-standard approach for counts of events in a fixed population.
+Divides event counts by a population or person-time denominator and scales
+to \code{per}. The interval comes from \code{\link[=islh_ci_poisson]{islh_ci_poisson()}} on the event count,
+scaled the same way. Counts may exceed the denominator when people can
+experience more than one event.
 }
 \examples{
 islh_crude_rate(cases = c(12, 45), population = c(50000, 120000))

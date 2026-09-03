@@ -8,9 +8,10 @@ numbers in a published report.
 
 * `islh_suppress_table()` no longer labels a complementary cell with the label
   meant for small cells. With `complementary = TRUE` and `label = "<5"`, a
-  value of 17 was displayed as `<5` — a false statement about the data, and the
-  documentation demonstrated it. Complementary cells now take a separate,
-  neutral `complementary_label`, defaulting to `"Suppressed"`.
+  value of 17 was displayed as `<5`, a false statement about the data.
+  Complementary cells now take a separate neutral `complementary_label`,
+  defaulting to `"Suppressed"`. Compact numeric labels are checked against the
+  threshold rule, and invalid logical policy switches now fail closed.
 * `islh_suppress()` rejects factors instead of converting them. `as.numeric()`
   on a factor returns level codes, so `factor(c("10", "3", "42"))` was read as
   1, 2, 3 and every cell suppressed.
@@ -19,10 +20,11 @@ numbers in a published report.
 * `islh_round_base()` requires `base`. A default silently made a disclosure
   policy decision, which the package elsewhere refuses to do.
 * `islh_ci_poisson()`, `islh_crude_rate()` and `islh_dsr()` validate their
-  inputs: whole counts, positive populations and `per`, matching vector
-  lengths, and a standard population with a positive total. An all-zero
-  standard population returned `NA` rather than an error, and a missing
-  stratum quietly poisoned a standardised rate.
+  inputs: whole counts, positive denominators and `per`, matching vector
+  lengths, and a standard population with a positive total. Event counts may
+  exceed population or person-time denominators when events can recur. An
+  all-zero standard population returned `NA` rather than an error, and a
+  missing stratum quietly poisoned a standardised rate.
 * `islh_install_deps("both")` installs the HTML and Word stacks together. A
   project scaffolded with `format = "both"` was told to install only the HTML
   packages, so its Word render failed at the table.
@@ -42,14 +44,8 @@ numbers in a published report.
 * BC Sans is described as "not shipped" rather than "cannot be shipped": it is
   under the SIL Open Font License 1.1, as the package's own webfont notice says.
 
-### Known limitation
-
-A figure caption can still be orphaned from its figure across a Word page
-break. Quarto styles a knitr figure's image paragraph `Compact`, which carries
-no `keepNext`, and that style is shared with tight list items — so setting
-`keepNext` on it would stop long lists breaking across pages. Setting
-`fig-cap-location: top` for `docx` avoids it. The reference document does set
-`keepNext` on the `Figure` style, which covers plain pandoc renders.
+* Word figure captions now default to the top, preventing a page break from
+  leaving a caption behind on the following page.
 
 First release of `islhr` as an R package.
 
