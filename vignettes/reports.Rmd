@@ -1,0 +1,132 @@
+---
+title: "Writing reports"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Writing reports}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+```
+
+## Start a project
+
+```{r}
+islhr::islh_create_report("flu-season-2026", format = "docx")
+```
+
+That writes a Quarto project that renders as it stands. Open the `.Rproj`
+file, run `islh_install_deps("docx")` once on that machine, then open
+`report.qmd` and click **Render**. Replace the example data with your own.
+
+`format` takes `"html"`, `"docx"` or `"both"`. With `"both"`, the report
+chooses its table engine at render time, so one file produces either output.
+
+## Add the format to a project you already have
+
+```{r}
+islhr::islh_use_quarto()
+islhr::islh_use_brand()
+```
+
+The first copies the Island Health Quarto extension into `_extensions/`; the
+second copies `_brand.yml` alongside it. Quarto only looks for extensions
+inside the project directory, which is why these are copies rather than
+references into your R library. Re-run `islh_use_quarto()` after upgrading
+`islhr` to pick up format changes.
+
+Then name the format:
+
+```yaml
+---
+title: "Respiratory season summary"
+format: islh-report-docx    # or islh-report-html
+---
+```
+
+## The setup chunk
+
+Every Island Health report starts the same way:
+
+````
+```{r}
+#| label: setup
+#| include: false
+library(islhr)
+islh_setup()
+```
+````
+
+## Figures
+
+Give every figure a caption and alt text. Alt text is what a screen-reader
+user gets instead of the picture, so describe what the figure *shows*, not
+that it is a bar chart:
+
+````
+```{r}
+#| label: fig-encounters
+#| fig-cap: "Encounters by programme"
+#| fig-alt: "Primary care had the most encounters at 326, then mental health
+#|   at 184, then public health at 79."
+#| fig-width: 6
+#| fig-height: 3.2
+```
+````
+
+Reference it in prose with `@fig-encounters` so the numbering stays right when
+you move things around.
+
+## Word output
+
+The Word format uses a reference document built from the official Island
+Health letterhead: the logo header, the `Island Health / Page X of Y` footer,
+BC Sans, and headings in the letterhead's dark blue.
+
+Two things to know:
+
+- The table of contents renders empty. Word populates it as a field the first
+  time the document is opened. That is Word's behaviour, not a fault in the
+  template.
+- Word locks a file it has open. Close `report.docx` before re-rendering, or
+  the render fails on a permission error.
+
+## Troubleshooting
+
+**BC Sans is not being used.** It is licensed by the BC government and cannot
+be shipped with the package, so it has to be installed on your machine.
+`islh_font_family()` reports what was found. Without it, output falls back to
+another font; everything else still works.
+
+**Windows plot pane warns about the font database.** Base graphics devices on
+Windows resolve font names through R's own font database rather than through
+`systemfonts`. `islh_setup()` registers the family to stop the warnings. If
+they persist, set the RStudio graphics backend to AGG under
+*Tools > Global Options > General > Graphics*.
+
+**Figures vanish from the rendered document.** On Windows, a path longer than
+260 characters silently drops figures. Keep the project somewhere short, not
+several folders deep in a synced drive.
+
+**A package is missing or too old.** `islh_check()` names it and gives you the
+command. `islh_install_deps()` runs that command for you. Both use base R's
+`install.packages()` with `type = "binary"`, because Island Health laptops
+block installers that unpack with their own helper binary and have no compiler
+for a source build.
+
+## Before anything leaves your team
+
+Reports built this way are ordinary files with no access controls. Never put
+identifiable information in one, and suppress small cells before sharing:
+
+```{r}
+counts$cases <- islh_suppress(counts$cases, threshold = 5)
+```
+
+`islh_suppress_table()` does a whole table, and its `complementary` argument
+handles the case where a visible total would let a reader recover a suppressed
+cell by subtraction. The threshold is yours to set — check the rule your
+release is governed by.

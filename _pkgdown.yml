@@ -1,0 +1,81 @@
+url: https://github.com/temuulene/islhr
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+  components:
+    articles:
+      text: Articles
+      menu:
+        - text: Writing reports
+          href: articles/reports.html
+        - text: Moving from the theme script
+          href: articles/migrating.html
+
+reference:
+  - title: Setting up
+    desc: >
+      Run `islh_setup()` once at the top of a report. It works out whether you
+      are rendering to HTML or Word and configures plots and tables to match.
+    contents:
+      - islh_setup
+      - islh_check
+      - islh_install_deps
+      - islh_help
+      - islh_version
+
+  - title: Starting a report
+    desc: Scaffold a project, or add the Island Health format to one you have.
+    contents:
+      - islh_create_report
+      - islh_use_quarto
+      - islh_use_brand
+
+  - title: Figures
+    desc: The theme and the colour scales.
+    contents:
+      - theme_islh
+      - starts_with("scale_colour_islh")
+      - starts_with("scale_fill_islh")
+      - scale_y_islh_count
+      - islh_save_plot
+      - islh_example_plot
+
+  - title: Colours and assets
+    contents:
+      - islh_brand
+      - islh_hex
+      - islh_font_family
+      - islh_logo
+      - islh_brand_yml
+      - islh_reference_docx
+      - islh_example_data
+
+  - title: Tables
+    contents:
+      - islh_gt
+      - islh_flextable
+      - islh_gtsummary_gt
+      - islh_gtsummary_flex
+
+  - title: Small counts and disclosure control
+    desc: >
+      Mechanics, not policy. The threshold and rounding base depend on the
+      release, so none of these has a default.
+    contents:
+      - islh_suppress
+      - islh_suppress_table
+      - islh_round_base
+
+  - title: Rates
+    desc: >
+      The methods are the published ones each function names. Confirm with
+      PHASE that they match the standard your release is governed by.
+    contents:
+      - islh_age_group
+      - islh_crude_rate
+      - islh_dsr
+      - islh_ci_poisson

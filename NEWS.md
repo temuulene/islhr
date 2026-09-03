@@ -17,6 +17,20 @@ next re-download.
   starter-kit ZIPs.
 * `islh_help()` prints a grouped quick reference.
 
+## Fixes carried over from the script
+
+Three error messages could never be built, because `cli` interpolates in the
+calling frame and the wrappers did not forward it, or because a message held
+two quantities and `cli` could not tell which the plural marker referred to.
+Each failed with a `cli` error instead of saying what was wrong:
+
+* `islh_hex()` with a value that is not a ramp step now names the value and
+  lists the steps that exist.
+* `.islh_require()` now names the missing package and the feature that needed
+  it, with the command to install it.
+* `islh_setup()` now names a package that is installed but too old, rather
+  than printing an empty bullet.
+
 ## Notable changes from the script
 
 * Loading is inert. `library(islhr)` probes no fonts, sets no options and

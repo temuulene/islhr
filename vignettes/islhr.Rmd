@@ -1,0 +1,124 @@
+---
+title: "Getting started with islhr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with islhr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+`islhr` puts Island Health branding on the things a report is made of:
+figures, tables, and the page they sit on. This article covers the parts you
+will use in the first hour.
+
+## Install what your format needs
+
+`islhr` itself has few dependencies. The packages that draw tables are
+different for HTML and Word, and you only need the ones for the format you are
+writing, so they are optional and installed on request:
+
+```r
+islh_install_deps("docx")   # or "html"
+```
+
+`islh_check()` tells you where you stand without installing anything:
+
+```{r}
+library(islhr)
+islh_check("plots", quiet = TRUE)$required
+```
+
+It checks versions as well as presence. Two are worth knowing about because
+the failure without them is confusing: the colour scales need ggplot2 3.5.0 or
+newer, and `islh_flextable()` needs flextable 0.9.10 or newer.
+
+## Set up a report
+
+One call at the top of a Quarto document:
+
+```r
+library(islhr)
+islh_setup()
+```
+
+`islh_setup()` looks at what you are rendering to and configures the rest: the
+ggplot2 theme and default colours, the matching table engine (`gt` for HTML,
+`flextable` for Word), and the BC Sans font if it is installed. Outside a
+render it configures plots only.
+
+Loading the package does none of this. `library(islhr)` only defines
+functions — it sets no options, changes no theme and prints nothing — so
+attaching it can never change how an unrelated plot looks.
+
+## Colours
+
+Use the role names rather than hex values, so a change to the brand reaches
+your report without you editing it:
+
+```{r}
+islh_brand("primary")
+islh_brand(c("success", "warning", "danger"))
+```
+
+The full ramp is there when you need a specific step. Each of the eight
+families has twenty steps, running from 10 (dark) to 98 (light). Ask for a
+step that does not exist and the error lists the ones that do.
+
+```{r}
+islh_hex("blue", c(30, 50, 80))
+islh_hex("grey", 50)
+```
+
+## Figures
+
+`islh_setup()` sets the theme globally, so an ordinary ggplot is already
+branded. The scales are there when you are mapping a variable to colour:
+
+```r
+ggplot2::ggplot(data, ggplot2::aes(month, cases, colour = programme)) +
+  ggplot2::geom_line() +
+  scale_colour_islh() +
+  scale_y_islh_count()
+```
+
+`scale_colour_islh()` is capped at five categories by design — beyond that the
+colours stop being reliably distinguishable. Use `scale_colour_islh_ordinal()`
+for ordered categories and `scale_*_islh_signal()` for good/warning/bad status,
+always paired with a label or shape so the meaning does not depend on colour
+alone.
+
+## Tables
+
+```r
+islh_gt(counts)          # HTML
+islh_flextable(counts)   # Word
+```
+
+Both fill the text width. Pass `width = 0.6` for something narrower.
+
+## Small counts
+
+```{r}
+islh_suppress(c(0, 3, 42), threshold = 5)
+```
+
+There is deliberately no default threshold. The right rule depends on the data
+and on the release, and a default would make that decision silently.
+
+For a whole table, and for the case where a visible total lets a reader
+recover a suppressed cell by subtraction:
+
+```{r}
+counts <- data.frame(area = c("North", "Central", "South"), cases = c(3, 42, 17))
+islh_suppress_table(counts, "cases", threshold = 5, complementary = TRUE)
+```
+
+## Where to go next
+
+`islh_help()` prints a grouped list of the functions you will use most.
+`vignette("reports", package = "islhr")` walks through a full report.

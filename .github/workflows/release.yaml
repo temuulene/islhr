@@ -1,0 +1,62 @@
+# Builds installable copies of the package on every tag and attaches them to
+# the release.
+#
+# Staff who cannot reach GitHub from R install from these instead: download the
+# .zip and run install.packages("path/to/islhr_x.y.z.zip", repos = NULL).
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+name: release
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.config.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: windows-latest, artifact: zip}
+          - {os: ubuntu-latest,  artifact: tar.gz}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - name: Build source package
+        if: matrix.config.artifact == 'tar.gz'
+        run: R CMD build .
+
+      # A Windows binary is what a locked-down laptop can install without a
+      # compiler and without reaching CRAN.
+      - name: Build Windows binary
+        if: matrix.config.artifact == 'zip'
+        run: |
+          R CMD INSTALL --build .
+        shell: bash
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            *.tar.gz
+            *.zip
+          fail_on_unmatched_files: false

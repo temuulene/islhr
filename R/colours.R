@@ -85,11 +85,11 @@ islh_hex <- function(family, value) {
   family <- tolower(family)
 
   if (length(family) != 1L || is.na(family)) {
-    cli::cli_abort("{.arg family} must be one non-missing colour-family name.")
+    .islh_abort("{.arg family} must be one non-missing colour-family name.")
   }
 
   if (!family %in% names(.islh_colours)) {
-    cli::cli_abort(c(
+    .islh_abort(c(
       "{.val {family}} is not an Island Health colour family.",
       i = "Available: {.val {names(.islh_colours)}}."
     ))
@@ -99,8 +99,13 @@ islh_hex <- function(family, value) {
   hex <- .islh_colours[[family]][value]
 
   if (anyNA(hex)) {
-    cli::cli_abort(c(
-      "Value{?s} {.val {value[is.na(hex)]}} {?is/are} not defined for family {.val {family}}.",
+    # cli takes the plural quantity from the surrounding `{}` expressions, and
+    # this message has two, so pin it explicitly with `qty()`. Without that the
+    # message fails to build and the user never learns which value was wrong.
+    unknown <- value[is.na(hex)]
+    .islh_abort(c(
+      "{cli::qty(unknown)}Value{?s} {.val {unknown}} {?is/are} not defined for
+       family {.val {family}}.",
       i = "Available values: {.val {names(.islh_colours[[family]])}}."
     ))
   }
