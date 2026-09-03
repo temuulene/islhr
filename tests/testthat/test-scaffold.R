@@ -147,7 +147,7 @@ test_that("Word figure captions stay with their figures", {
   extracted <- withr::local_tempdir()
   utils::unzip(reference, files = "word/styles.xml", exdir = extracted)
   styles <- paste(
-    readLines(file.path(extracted, "word", "styles.xml")),
+    readLines(file.path(extracted, "word", "styles.xml"), warn = FALSE),
     collapse = ""
   )
 
