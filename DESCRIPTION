@@ -24,7 +24,7 @@ Imports:
     utils
 Suggests:
     base64enc,
-    flextable,
+    flextable (>= 0.9.10),
     gt,
     gtsummary,
     htmltools,
@@ -37,6 +37,5 @@ Suggests:
     withr,
     yaml
 Config/testthat/edition: 3
-VignetteBuilder: knitr
 URL: https://github.com/temuulene/islhr
 BugReports: https://github.com/temuulene/islhr/issues

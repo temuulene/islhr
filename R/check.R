@@ -1,0 +1,157 @@
+# Which output format are we configuring for?
+#
+# Under Quarto and knitr this can be detected. Outside a render there is no
+# document to inspect, so plot-only setup is the honest answer.
+.islh_resolve_format <- function(format = c("auto", "html", "docx", "plots")) {
+  format <- match.arg(format)
+  if (format != "auto") {
+    return(format)
+  }
+
+  if (!requireNamespace("knitr", quietly = TRUE)) {
+    return("plots")
+  }
+
+  if (isTRUE(knitr::is_html_output())) {
+    return("html")
+  }
+
+  if (identical(knitr::pandoc_to(), "docx")) {
+    return("docx")
+  }
+
+  "plots"
+}
+
+# Minimum versions the package actually relies on. Each was found by running
+# the code against an older release, not by caution:
+#
+# * ggplot2 3.5.0 made `discrete_scale()`'s `scale_name` argument optional. The
+#   discrete scales omit it, so an older ggplot2 fails inside ggplot2 itself
+#   with `argument "scale_name" is missing`.
+# * flextable 0.9.10 added the `repeat_headers` Word option that
+#   `islh_flextable()` sets, so an older flextable errors with
+#   `unused argument (repeat_headers = TRUE)`.
+.islh_min_versions <- c(
+  ggplot2 = "3.5.0",
+  flextable = "0.9.10"
+)
+
+# Which of `packages` are installed but older than the package needs?
+.islh_outdated <- function(packages) {
+  pinned <- intersect(packages, names(.islh_min_versions))
+  installed <- pinned[
+    vapply(pinned, requireNamespace, logical(1), quietly = TRUE)
+  ]
+  too_old <- vapply(
+    installed,
+    function(p) utils::packageVersion(p) < .islh_min_versions[[p]],
+    logical(1)
+  )
+  installed[too_old]
+}
+
+#' Check dependencies for an Island Health output format
+#'
+#' Reports which packages the requested output format needs and which are
+#' missing, without installing anything. The required set is deliberately
+#' format-specific: HTML reports need `gt` but not the Word packages, and Word
+#' reports need `flextable` and `officer` but not `gt`.
+#'
+#' @param format Output format. `auto` detects Quarto HTML and DOCX renders;
+#'   outside a render it selects plot-only setup.
+#' @param tables Configure table packages for the selected format.
+#' @param embed_fonts Embed BC Sans in HTML tables.
+#' @param quiet Suppress the human-readable status message.
+#'
+#' @return An object of class `islh_dependency_check`, invisibly.
+#' @export
+#'
+#' @examples
+#' islh_check(format = "plots", quiet = TRUE)
+islh_check <- function(
+  format = c("auto", "html", "docx", "plots"),
+  tables = TRUE,
+  embed_fonts = TRUE,
+  quiet = FALSE
+) {
+  format <- .islh_resolve_format(format)
+  tables <- isTRUE(tables) && format != "plots"
+  embed_fonts <- isTRUE(embed_fonts) && format == "html" && tables
+
+  required <- c("ggplot2", "cli", "scales", "systemfonts")
+  if (tables && format == "html") {
+    required <- c(required, "gt")
+    if (embed_fonts) {
+      required <- c(required, "base64enc")
+    }
+  }
+  if (tables && format == "docx") {
+    required <- c(required, "flextable", "officer")
+  }
+  required <- unique(required)
+  missing <- required[
+    !vapply(required, requireNamespace, logical(1), quietly = TRUE)
+  ]
+
+  outdated <- .islh_outdated(required)
+
+  result <- list(
+    ok = length(missing) == 0L && length(outdated) == 0L,
+    format = format,
+    tables = tables,
+    embed_fonts = embed_fonts,
+    required = required,
+    missing = missing,
+    outdated = outdated,
+    install_command = .islh_install_command(
+      if (length(missing) > 0L || length(outdated) > 0L) {
+        c(missing, outdated)
+      } else {
+        required
+      }
+    )
+  )
+  class(result) <- "islh_dependency_check"
+
+  if (!isTRUE(quiet)) {
+    print(result)
+  }
+
+  invisible(result)
+}
+
+#' @param x An `islh_dependency_check` object.
+#' @param ... Ignored.
+#' @rdname islh_check
+#' @export
+print.islh_dependency_check <- function(x, ...) {
+  if (x$ok) {
+    .islh_inform(c(
+      "v" = paste0(
+        "Island Health theme dependencies are ready for ",
+        toupper(x$format), "."
+      )
+    ))
+    return(invisible(x))
+  }
+
+  bullets <- character()
+  if (length(x$missing) > 0L) {
+    bullets <- c(bullets, "x" = paste0(
+      "Missing packages: ", paste(x$missing, collapse = ", "), "."
+    ))
+  }
+  for (pkg in x$outdated) {
+    bullets <- c(bullets, "x" = paste0(
+      pkg, " ", utils::packageVersion(pkg), " is too old; ",
+      .islh_min_versions[[pkg]], " or newer is required."
+    ))
+  }
+  bullets <- c(bullets, "i" = paste0(
+    "Install with {.code ", x$install_command, "}."
+  ))
+
+  .islh_inform(bullets)
+  invisible(x)
+}
