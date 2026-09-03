@@ -104,9 +104,11 @@ islh_setup <- function(
 
   if (!check$ok) {
     .islh_abort(c(
-      "Island Health theme setup is missing required packages.",
-      x = paste(check$missing, collapse = ", "),
-      i = paste0("Install them with {.code ", check$install_command, "}.")
+      paste0(
+        "Island Health theme setup cannot configure ",
+        toupper(check$format), "."
+      ),
+      .islh_problem_bullets(check)
     ))
   }
 

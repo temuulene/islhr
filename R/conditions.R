@@ -2,22 +2,27 @@
 #
 # Thin wrappers so every message in the package carries consistent formatting
 # and, for errors, names the user-facing function rather than the internal
-# helper that raised it. `cli` is an Import, so there is no fallback path.
+# helper that raised it.
 #
-# `parent.frame()` in the default argument is evaluated lazily inside
-# `.islh_abort()`, so it resolves to whichever function called it.
+# `.envir` is the load-bearing argument. cli interpolates `{...}` in `.envir`,
+# which defaults to the calling frame — and the calling frame of
+# `cli::cli_abort()` here is this wrapper, where a caller's local variables do
+# not exist. Without forwarding it, `{package}` in a caller's message resolves
+# to nothing (or worse, to an unrelated base function such as `dir`), and the
+# message fails to build. `parent.frame()` in the default argument is evaluated
+# lazily inside the wrapper, so it resolves to whoever called it.
 
-.islh_abort <- function(message, call = parent.frame()) {
-  cli::cli_abort(message, call = call)
+.islh_abort <- function(message, call = parent.frame(), .envir = parent.frame()) {
+  cli::cli_abort(message, call = call, .envir = .envir)
 }
 
-.islh_warn <- function(message) {
-  cli::cli_warn(message)
+.islh_warn <- function(message, .envir = parent.frame()) {
+  cli::cli_warn(message, .envir = .envir)
   invisible(NULL)
 }
 
-.islh_inform <- function(message) {
-  cli::cli_inform(message)
+.islh_inform <- function(message, .envir = parent.frame()) {
+  cli::cli_inform(message, .envir = .envir)
   invisible(NULL)
 }
 

@@ -112,8 +112,15 @@ applies style overrides on top.
 
 Gotchas found the hard way, all handled — don't undo them:
 
-- Pandoc's reference doc ships an empty self-closing `<w:sectPr/>`; the script
-  replaces it rather than appending a second one.
+- The script needs `pandoc` and Python's `lxml`.
+- Pandoc's reference doc *used* to ship an empty self-closing `<w:sectPr/>`.
+  Since pandoc 3.8 it ships a populated one carrying footnote settings. The
+  script handles both, and carries `w:footnotePr`/`w:endnotePr` across rather
+  than dropping them. It prints a note if a future pandoc puts something else
+  in there, so a silent change gets noticed.
+- The output tracks whichever pandoc built it. Pandoc 3.1 omits the
+  `FootnoteBlockText` style that later versions emit, so build with a current
+  pandoc or the reference doc quietly loses styles.
 - `Subtitle` is `basedOn` `Title`, so it inherits bold/kerning/colour unless
   explicitly reset.
 - Paragraph tab stops *merge* with the style's rather than replacing them, so a

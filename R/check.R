@@ -121,6 +121,24 @@ islh_check <- function(
   invisible(result)
 }
 
+# Bullets describing what is wrong with a dependency check. Shared by the
+# print method and by `islh_setup()`'s error so the two cannot disagree.
+.islh_problem_bullets <- function(x) {
+  bullets <- character()
+  if (length(x$missing) > 0L) {
+    bullets <- c(bullets, "x" = paste0(
+      "Not installed: ", paste(x$missing, collapse = ", "), "."
+    ))
+  }
+  for (pkg in x$outdated) {
+    bullets <- c(bullets, "x" = paste0(
+      pkg, " ", utils::packageVersion(pkg), " is too old; ",
+      .islh_min_versions[[pkg]], " or newer is required."
+    ))
+  }
+  c(bullets, "i" = paste0("Install with {.code ", x$install_command, "}."))
+}
+
 #' @param x An `islh_dependency_check` object.
 #' @param ... Ignored.
 #' @rdname islh_check
@@ -136,22 +154,6 @@ print.islh_dependency_check <- function(x, ...) {
     return(invisible(x))
   }
 
-  bullets <- character()
-  if (length(x$missing) > 0L) {
-    bullets <- c(bullets, "x" = paste0(
-      "Missing packages: ", paste(x$missing, collapse = ", "), "."
-    ))
-  }
-  for (pkg in x$outdated) {
-    bullets <- c(bullets, "x" = paste0(
-      pkg, " ", utils::packageVersion(pkg), " is too old; ",
-      .islh_min_versions[[pkg]], " or newer is required."
-    ))
-  }
-  bullets <- c(bullets, "i" = paste0(
-    "Install with {.code ", x$install_command, "}."
-  ))
-
-  .islh_inform(bullets)
+  .islh_inform(.islh_problem_bullets(x))
   invisible(x)
 }
