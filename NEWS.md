@@ -44,8 +44,8 @@ numbers in a published report.
 * BC Sans is described as "not shipped" rather than "cannot be shipped": it is
   under the SIL Open Font License 1.1, as the package's own webfont notice says.
 
-* Word figure captions now default to the top, preventing a page break from
-  leaving a caption behind on the following page.
+* Word figure captions now default to the top, and the reference document
+  keeps each caption with the following image across page breaks.
 
 First release of `islhr` as an R package.
 

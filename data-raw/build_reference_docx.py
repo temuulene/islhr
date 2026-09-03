@@ -207,9 +207,12 @@ PARAGRAPH_STYLES: dict[str, str] = {
         '<w:pPr><w:keepNext/><w:spacing w:before="120" w:after="0"/>'
         "</w:pPr>"
     ),
-    # keepLines stops a two-line caption splitting across the break.
+    # Quarto uses ImageCaption before the image when DOCX captions are on top.
+    # keepNext moves both to the next page when the figure no longer fits;
+    # keepLines also stops a two-line caption splitting across a break.
     "ImageCaption": (
-        '<w:pPr><w:keepLines/><w:spacing w:before="80" w:after="200" '
+        '<w:pPr><w:keepNext/><w:keepLines/>'
+        '<w:spacing w:before="80" w:after="200" '
         'w:line="240" w:lineRule="auto"/></w:pPr>'
         f'<w:rPr><w:i/><w:iCs/><w:color w:val="{GREY_20}"/>'
         '<w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>'
