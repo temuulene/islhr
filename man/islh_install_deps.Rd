@@ -4,11 +4,16 @@
 \alias{islh_install_deps}
 \title{Install the packages your output format needs}
 \usage{
-islh_install_deps(format = c("auto", "html", "docx", "plots"), quiet = FALSE)
+islh_install_deps(
+  format = c("auto", "html", "docx", "plots", "both"),
+  quiet = FALSE
+)
 }
 \arguments{
 \item{format}{Output format to install for. \code{auto} detects Quarto HTML and
-DOCX renders; outside a render it selects plot-only setup.}
+DOCX renders; outside a render it selects plot-only setup. \code{"both"}
+installs the HTML and Word stacks together, for a project that renders to
+either.}
 
 \item{quiet}{Suppress the status message.}
 }

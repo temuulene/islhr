@@ -2,17 +2,26 @@
 # properties still matter; how they are checked changes.
 
 test_that("loading the package changes nothing", {
-  # The script's version of this asserted that source() was silent. The rule
-  # is the same and matters more now, because library(islhr) runs in every
-  # report: loading must not probe fonts, set options, or touch the theme.
-  # islh_setup() does all of that, when the user asks.
+  # The script's version of this asserted that source() was silent. The rule is
+  # the same and matters more now, because library(islhr) runs in every report:
+  # loading must not probe fonts, set options, or touch the theme. islh_setup()
+  # does all of that, when the user asks.
   expect_length(grep("^islh\\.", names(options())), 0L)
 
-  # .onLoad must not seed the font slot either. islh_font_family() treats the
-  # slot's existence as "already resolved", so seeding it would make the
-  # package report a font it never looked for.
-  fresh <- new.env(parent = emptyenv())
-  expect_false(exists("font", envir = fresh, inherits = FALSE))
+  # And it must not seed the font slot in the package's own state environment.
+  # islh_font_family() treats that slot's existence as "already resolved", so
+  # seeding it would make the package report a font it never looked for.
+  #
+  # The state has to be inspected in a session that has not run islh_setup(),
+  # so this runs in a fresh R process rather than trusting the current one.
+  script <- "cat(exists('font', envir = islhr:::.islh_state, inherits = FALSE))"
+  result <- system2(
+    file.path(R.home("bin"), "R"),
+    c("--vanilla", "--slave", "-e", shQuote(script)),
+    stdout = TRUE, stderr = FALSE
+  )
+  skip_if(length(result) == 0L, "could not start a fresh R session")
+  expect_equal(trimws(paste(result, collapse = "")), "FALSE")
 })
 
 test_that("only the taught API is exported", {
@@ -106,8 +115,12 @@ test_that("plot setup is repeatable and leaves the session as it found it", {
   old_theme <- ggplot2::theme_get()
   withr::defer(ggplot2::theme_set(old_theme))
 
-  first <- suppressMessages(islh_setup(format = "plots", quiet = TRUE))
-  second <- suppressMessages(islh_setup(format = "plots", quiet = TRUE))
+  first <- expect_only_font_warnings(
+    suppressMessages(islh_setup(format = "plots", quiet = TRUE))
+  )
+  second <- expect_only_font_warnings(
+    suppressMessages(islh_setup(format = "plots", quiet = TRUE))
+  )
 
   expect_equal(getOption("islh.output_format"), "plots")
   expect_equal(first$format, second$format)
@@ -128,7 +141,9 @@ test_that("HTML setup never initialises the Word table engine", {
   )
 
   expect_no_error(
-    suppressMessages(islh_setup(format = "html", quiet = TRUE))
+    expect_only_font_warnings(
+      suppressMessages(islh_setup(format = "html", quiet = TRUE))
+    )
   )
 })
 
@@ -144,8 +159,8 @@ test_that("gt font embedding is configurable and cached", {
   # The base64 blob is expensive to build, so it is cached in .islh_state.
   # Without BC Sans installed the builder warns and caches an empty string;
   # either way the second call must return the first call's answer.
-  first <- suppressWarnings(islhr:::.islh_bc_sans_webfont_css())
-  second <- suppressWarnings(islhr:::.islh_bc_sans_webfont_css())
+  first <- expect_only_font_warnings(islhr:::.islh_bc_sans_webfont_css())
+  second <- expect_only_font_warnings(islhr:::.islh_bc_sans_webfont_css())
   expect_identical(first, second)
   expect_identical(first, islhr:::.islh_state$webfont_css)
 })

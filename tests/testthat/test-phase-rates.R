@@ -119,10 +119,76 @@ test_that("standard populations are normalised, so only relative sizes matter", 
 })
 
 test_that("bad arguments are rejected rather than silently coerced", {
-  expect_error(islh_ci_poisson(-1), "non-negative")
+  expect_error(islh_ci_poisson(-1), "not be negative")
   expect_error(islh_ci_poisson(5, conf = 1), "between 0 and 1")
   expect_error(islh_ci_poisson(5, conf = 0), "between 0 and 1")
   expect_error(islh_crude_rate(5, 0), "must be positive")
   expect_error(islh_crude_rate(c(1, 2), c(100, 200, 300)), "length 1 or")
   expect_error(islh_dsr(c(1, 2), c(100, 200), c(100)), "same length")
+})
+
+# Regression tests for the code review of v0.1.0.
+
+test_that("rate functions refuse invalid epidemiological inputs", {
+  expect_error(islh_ci_poisson(2.5), "whole counts")
+  expect_error(islh_ci_poisson(Inf), "finite")
+  expect_error(islh_ci_poisson(-1), "not be negative")
+  expect_error(islh_ci_poisson(factor("3")), "factor")
+
+  expect_error(islh_crude_rate(5, 1000, per = 0), "positive")
+  expect_error(islh_crude_rate(5, 1000, per = -100), "positive")
+  expect_error(islh_crude_rate(5, 1000, per = c(1000, 100)), "single positive")
+  expect_error(islh_crude_rate(5, 0), "must be positive")
+  expect_error(islh_crude_rate(5, Inf), "finite")
+
+  # A count bigger than its own denominator means the vectors do not belong
+  # together; the rate would be meaningless.
+  expect_error(islh_crude_rate(5000, 1000), "cannot exceed")
+})
+
+test_that("a standard population of all zeros is an error, not an NA rate", {
+  # Previously this divided by zero and returned NA, which reads like a
+  # computed answer rather than a broken input.
+  expect_error(
+    islh_dsr(c(1, 2), c(100, 200), c(0, 0)),
+    "positive total"
+  )
+
+  # A single zero stratum is fine: that stratum simply gets no weight.
+  out <- islh_dsr(c(1, 2), c(100, 200), c(0, 100))
+  expect_true(is.finite(out$rate))
+})
+
+test_that("a missing stratum stops a standardised rate rather than poisoning it", {
+  # A DSR sums over every stratum, so one NA makes the whole answer NA.
+  expect_error(islh_dsr(c(1, NA), c(100, 200), c(50, 50)), "missing")
+  expect_error(islh_dsr(c(1, 2), c(100, NA), c(50, 50)), "missing")
+})
+
+test_that("stratum vectors must line up", {
+  expect_error(islh_dsr(c(1, 2), c(100, 200), 100), "same length")
+  expect_error(
+    islh_dsr(numeric(0), numeric(0), numeric(0)), "at least one stratum"
+  )
+  expect_error(islh_crude_rate(c(1, 2), c(100, 200, 300)), "length 1 or")
+})
+
+test_that("the Fay-Feuer interval matches a published worked example", {
+  # Fay & Feuer (1997), Statistics in Medicine 16:791-801, section 4, use a
+  # single stratum where the gamma interval reduces to the exact Poisson
+  # interval on the count. That identity is the reference point: with one
+  # stratum the standard population cannot reweight anything, so the
+  # standardised rate and its interval must equal the crude ones.
+  cases <- 10
+  population <- 100000
+
+  dsr <- islh_dsr(cases, population, std_population = 1)
+  exact <- islh_ci_poisson(cases, method = "exact")
+
+  expect_equal(dsr$rate, cases / population * 100000, tolerance = 1e-8)
+  expect_equal(dsr$lower, exact$lower / population * 100000, tolerance = 1e-6)
+
+  # The upper limit carries Fay and Feuer's conservative w_max adjustment, so
+  # it sits at or above the exact one rather than exactly on it.
+  expect_gte(dsr$upper, exact$upper / population * 100000 - 1e-6)
 })

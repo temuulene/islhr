@@ -199,6 +199,28 @@ PARAGRAPH_STYLES: dict[str, str] = {
         f'<w:rPr><w:i/><w:iCs/><w:color w:val="{GREY_20}"/>'
         '<w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>'
     ),
+    # Pandoc puts an image in a "Figure" paragraph and its caption in the
+    # "ImageCaption" paragraph that follows. Without keepNext on Figure, a page
+    # break can fall between them and the caption is orphaned at the top of the
+    # next page, describing a figure the reader cannot see.
+    "Figure": (
+        '<w:pPr><w:keepNext/><w:spacing w:before="120" w:after="0"/>'
+        "</w:pPr>"
+    ),
+    # keepLines stops a two-line caption splitting across the break.
+    "ImageCaption": (
+        '<w:pPr><w:keepLines/><w:spacing w:before="80" w:after="200" '
+        'w:line="240" w:lineRule="auto"/></w:pPr>'
+        f'<w:rPr><w:i/><w:iCs/><w:color w:val="{GREY_20}"/>'
+        '<w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>'
+    ),
+    # The caption sits above its table, so it must keep with what follows.
+    "TableCaption": (
+        '<w:pPr><w:keepNext/><w:keepLines/><w:spacing w:before="80" '
+        'w:after="80" w:line="240" w:lineRule="auto"/></w:pPr>'
+        f'<w:rPr><w:i/><w:iCs/><w:color w:val="{GREY_20}"/>'
+        '<w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>'
+    ),
     # Block quotes: a blue rule on the left rather than the brand's discouraged
     # decorative treatments.
     "BlockText": (

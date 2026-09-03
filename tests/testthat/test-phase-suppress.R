@@ -99,7 +99,7 @@ test_that("nearest rounding goes to the closest multiple of the base", {
                c(0, 0, 5, 5, 10, 45))
   expect_equal(islh_round_base(c(4, 6, 14, 15), base = 10),
                c(0, 10, 10, 20))
-  expect_true(is.na(islh_round_base(NA_real_)))
+  expect_true(is.na(islh_round_base(NA_real_, base = 5)))
 })
 
 test_that("random rounding lands on a neighbouring multiple and is unbiased", {
@@ -123,5 +123,79 @@ test_that("random rounding lands on a neighbouring multiple and is unbiased", {
 
 test_that("islh_round_base rejects a nonsensical base", {
   expect_error(islh_round_base(1:5, base = 0), "positive")
-  expect_error(islh_round_base("a"), "must be numeric")
+  expect_error(islh_round_base("a", base = 5), "must be counts")
+
+  # The base is a policy decision, like the threshold, so it has no default.
+  expect_error(islh_round_base(c(2, 7)), "must be supplied")
+})
+
+# Regression tests for the code review of v0.1.0.
+
+test_that("a complementary cell never claims to be small", {
+  # The bug: with label = "<5", the complementary cell (17) was displayed as
+  # "<5" — a false statement about the data, in a published table.
+  counts <- data.frame(cases = c(3, 42, 17))
+
+  out <- islh_suppress_table(
+    counts, "cases", threshold = 5, complementary = TRUE, label = "<5"
+  )
+
+  expect_equal(out$cases[1], "<5")        # genuinely small
+  expect_equal(out$cases[2], "42")        # untouched
+  expect_false(out$cases[3] == "<5")      # hidden to protect the first
+  expect_equal(out$cases[3], "Suppressed")
+})
+
+test_that("the output type is decided by label alone", {
+  counts <- data.frame(cases = c(3, 42, 17))
+
+  # No label: numeric with NA, whether or not a complementary cell is hidden.
+  plain <- islh_suppress_table(counts, "cases", threshold = 5)
+  expect_type(plain$cases, "double")
+
+  comp <- islh_suppress_table(
+    counts, "cases", threshold = 5, complementary = TRUE
+  )
+  expect_type(comp$cases, "double")
+  expect_equal(sum(is.na(comp$cases)), 2L)
+
+  # Nothing suppressed at all must not change the column's type.
+  safe <- islh_suppress_table(
+    data.frame(cases = c(30, 42, 17)), "cases",
+    threshold = 5, complementary = TRUE
+  )
+  expect_type(safe$cases, "double")
+  expect_equal(safe$cases, c(30, 42, 17))
+})
+
+test_that("factors are refused rather than read as level codes", {
+  # as.numeric() on a factor gives the level codes. factor(c("10","3","42"))
+  # would have been read as 1, 2, 3 and suppressed entirely.
+  expect_error(
+    islh_suppress(factor(c("10", "3", "42")), threshold = 5),
+    "factor"
+  )
+  expect_error(
+    islh_suppress_table(
+      data.frame(cases = factor(c("10", "3", "42"))), "cases", threshold = 5
+    ),
+    "factor"
+  )
+})
+
+test_that("counts must be whole, non-negative and finite", {
+  expect_error(islh_suppress(c(1, 2.7), threshold = 5), "whole counts")
+  expect_error(islh_suppress(c(-2, 3), threshold = 5), "not be negative")
+  expect_error(islh_suppress(c(1, Inf), threshold = 5), "finite")
+  expect_error(islh_suppress(TRUE, threshold = 5), "must be numeric")
+
+  # Text that is a number is still a count.
+  expect_equal(islh_suppress(c("3", "42"), threshold = 5), c(NA, 42))
+  expect_error(islh_suppress(c("3", "many"), threshold = 5), "not")
+})
+
+test_that("the threshold itself is validated", {
+  expect_error(islh_suppress(1:5, threshold = -1), "non-negative")
+  expect_error(islh_suppress(1:5, threshold = Inf), "finite")
+  expect_error(islh_suppress(1:5, threshold = c(5, 10)), "one non-negative")
 })

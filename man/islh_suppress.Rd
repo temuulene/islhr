@@ -7,19 +7,45 @@
 islh_suppress(n, threshold, inclusive = TRUE, label = NULL)
 }
 \arguments{
-\item{n}{Count vector.}
+\item{n}{Count vector. Must be whole, non-negative and finite. Factors are
+rejected rather than converted, because converting one gives its level
+codes rather than the counts it displays.}
 
 \item{threshold}{Approved disclosure-control threshold. It must be supplied
 explicitly because the appropriate rule depends on the data and context.}
 
-\item{inclusive}{Suppress positive counts less than or equal to the threshold.}
+\item{inclusive}{Suppress positive counts less than or equal to the
+threshold.}
 
-\item{label}{Optional display label. With \code{NULL}, suppressed values become
-missing numeric values; otherwise the result is a character vector.}
+\item{label}{Display label for suppressed cells. With \code{NULL}, suppressed
+values become missing numeric values; otherwise the result is a character
+vector.}
 }
 \value{
 A vector with small positive cell counts suppressed.
 }
 \description{
-Suppress small cell counts
+Replaces counts at or below an approved threshold, so a small cell is not
+published. Zero is never suppressed: nobody having the thing is a real,
+publishable finding, and hiding it removes information without protecting
+anyone.
+}
+\section{Choosing a label}{
+
+
+A label is a statement about the data, and it has to be true of every cell
+it is applied to. \code{"<5"} is false for a cell equal to 5, which the default
+\code{inclusive = TRUE} rule suppresses. Either use \code{inclusive = FALSE} with
+\code{"<5"}, or use a neutral label such as the default \code{"Suppressed"}, which is
+true whatever the rule and whatever the value.
+}
+
+\examples{
+islh_suppress(c(0, 3, 42), threshold = 5)
+
+# A neutral label is true whatever the rule.
+islh_suppress(c(0, 3, 42), threshold = 5, label = "Suppressed")
+
+# "<5" is only accurate with the exclusive rule.
+islh_suppress(c(4, 5, 6), threshold = 5, inclusive = FALSE, label = "<5")
 }

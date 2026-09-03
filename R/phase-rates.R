@@ -35,11 +35,8 @@
 #' islh_ci_poisson(3, method = "exact")
 islh_ci_poisson <- function(x, conf = 0.95, method = c("byar", "exact")) {
   method <- match.arg(method)
-  .islh_check_conf(conf)
-
-  if (!is.numeric(x) || any(x < 0, na.rm = TRUE)) {
-    .islh_abort("{.arg x} must be non-negative counts.")
-  }
+  conf <- .islh_check_conf(conf)
+  x <- .islh_check_counts(x, arg = "x")
 
   alpha <- 1 - conf
 
@@ -94,7 +91,9 @@ islh_crude_rate <- function(
   method = c("byar", "exact")
 ) {
   method <- match.arg(method)
-  .islh_check_conf(conf)
+  conf <- .islh_check_conf(conf)
+  per <- .islh_check_scalar_positive(per, "per")
+  cases <- .islh_check_counts(cases, arg = "cases")
 
   if (length(population) == 1L) {
     population <- rep(population, length(cases))
@@ -104,8 +103,18 @@ islh_crude_rate <- function(
       "{.arg population} must be length 1 or the same length as {.arg cases}."
     )
   }
-  if (any(population <= 0, na.rm = TRUE)) {
-    .islh_abort("{.arg population} must be positive.")
+  population <- .islh_check_population(population)
+
+  # A count larger than the population it came from means the two do not
+  # belong together, and the rate would be meaningless.
+  bigger <- !is.na(cases) & cases > population
+  if (any(bigger)) {
+    .islh_abort(c(
+      "{.arg cases} cannot exceed {.arg population}.",
+      x = "{cli::qty(sum(bigger))}Found {sum(bigger)} stratum/strata where it
+           does.",
+      i = "Check that the two vectors are in the same order."
+    ))
   }
 
   ci <- islh_ci_poisson(cases, conf = conf, method = method)
@@ -168,23 +177,49 @@ islh_dsr <- function(
   method = c("gamma", "normal")
 ) {
   method <- match.arg(method)
-  .islh_check_conf(conf)
+  conf <- .islh_check_conf(conf)
+  per <- .islh_check_scalar_positive(per, "per")
 
   n <- length(cases)
+  if (n == 0L) {
+    .islh_abort("{.arg cases} must have at least one stratum.")
+  }
   if (length(population) != n || length(std_population) != n) {
-    .islh_abort(
+    .islh_abort(c(
       "{.arg cases}, {.arg population} and {.arg std_population} must be the
-       same length (one entry per stratum)."
-    )
-  }
-  if (any(population <= 0, na.rm = TRUE)) {
-    .islh_abort("{.arg population} must be positive in every stratum.")
-  }
-  if (any(std_population < 0, na.rm = TRUE)) {
-    .islh_abort("{.arg std_population} must be non-negative.")
+       same length (one entry per stratum).",
+      x = "Lengths are {n}, {length(population)} and {length(std_population)}."
+    ))
   }
 
-  weights <- std_population / sum(std_population)
+  # A standardised rate is a single number summed over every stratum, so one
+  # missing stratum makes the whole result missing. Refuse rather than return
+  # an NA that looks like a computed answer.
+  cases <- .islh_check_counts(cases, arg = "cases", allow_na = FALSE)
+  population <- .islh_check_population(population)
+  std_population <- .islh_check_population(
+    std_population, "std_population", allow_zero = TRUE
+  )
+
+  bigger <- cases > population
+  if (any(bigger)) {
+    .islh_abort(c(
+      "{.arg cases} cannot exceed {.arg population}.",
+      x = "{cli::qty(sum(bigger))}Found {sum(bigger)} stratum/strata where it
+           does.",
+      i = "Check that the vectors are in the same order."
+    ))
+  }
+
+  total_standard <- sum(std_population)
+  if (total_standard <= 0) {
+    .islh_abort(c(
+      "{.arg std_population} must have a positive total.",
+      x = "Every stratum is zero, so there are no weights to standardise by."
+    ))
+  }
+
+  weights <- std_population / total_standard
   rate <- sum(weights * cases / population)
   variance <- sum(weights^2 * cases / population^2)
 
@@ -220,11 +255,4 @@ islh_dsr <- function(
     lower = max(lower, 0) * per,
     upper = upper * per
   )
-}
-
-.islh_check_conf <- function(conf) {
-  if (length(conf) != 1L || is.na(conf) || conf <= 0 || conf >= 1) {
-    .islh_abort("{.arg conf} must be a single number between 0 and 1.")
-  }
-  invisible(TRUE)
 }

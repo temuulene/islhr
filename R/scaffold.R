@@ -34,6 +34,16 @@
   ".Ruserdata"
 )
 
+# Quotes a value for YAML double-quoted style. A title containing a quote or a
+# backslash would otherwise close the string early and break the front matter;
+# a newline would end the line.
+.islh_yaml_string <- function(x) {
+  x <- gsub("\\", "\\\\", as.character(x), fixed = TRUE)
+  x <- gsub('"', '\\"', x, fixed = TRUE)
+  x <- gsub("\r\n|\r|\n", " ", x)
+  paste0('"', x, '"')
+}
+
 .islh_quarto_yml <- function(format) {
   formats <- switch(
     format,
@@ -43,34 +53,34 @@
   )
   c(
     "project:",
-    "  title: \"Island Health report\"",
+    paste0("  title: ", .islh_yaml_string("Island Health report")),
     "",
     "format:",
     formats
   )
 }
 
-.islh_report_qmd <- function(title, author, format) {
+.islh_report_qmd <- function(title, author, format, example) {
   # The Word branch uses islh_flextable(); HTML uses islh_gt(). With both
   # formats, pick by what islh_setup() resolved, so one file renders to either.
   table_call <- switch(
     format,
-    html = 'islh_gt(counts, title = "Encounters by programme")',
-    docx = 'islh_flextable(counts, caption = "Encounters by programme")',
+    html = "islh_gt(counts)",
+    docx = "islh_flextable(counts)",
     both = paste0(
       'if (identical(getOption("islh.output_format"), "html")) {\n',
-      '  islh_gt(counts, title = "Encounters by programme")\n',
-      '} else {\n',
-      '  islh_flextable(counts, caption = "Encounters by programme")\n',
-      '}'
+      "  islh_gt(counts)\n",
+      "} else {\n",
+      "  islh_flextable(counts)\n",
+      "}"
     )
   )
 
   c(
     "---",
-    paste0('title: "', title, '"'),
+    paste0("title: ", .islh_yaml_string(title)),
     'subtitle: "Population Health and Surveillance"',
-    if (!is.null(author)) paste0('author: "', author, '"'),
+    if (!is.null(author)) paste0("author: ", .islh_yaml_string(author)),
     "date: today",
     'date-format: "D MMMM YYYY"',
     "---",
@@ -95,44 +105,64 @@
     "",
     "# Results",
     "",
-    "Replace the example data below with your own. Never put identifiable",
-    "information in a report, and suppress small cells with `islh_suppress()`",
-    "before anything leaves your team.",
+    if (example) {
+      c(
+        "Replace the example data below with your own. Never put identifiable",
+        "information in a report, and suppress small cells with",
+        "`islh_suppress()` before anything leaves your team."
+      )
+    } else {
+      c(
+        "Never put identifiable information in a report, and suppress small",
+        "cells with `islh_suppress()` before anything leaves your team."
+      )
+    },
     "",
-    "```{r}",
-    "#| label: fig-encounters",
-    '#| fig-cap: "Encounters by programme"',
-    paste0(
-      '#| fig-alt: "Bar chart of encounters by programme. Primary care is ',
-      'highest at 326, then mental health at 184, then public health at 79."'
-    ),
-    "#| fig-width: 6",
-    "#| fig-height: 3.2",
-    "",
-    "counts <- islh_example_data()",
-    "",
-    "ggplot2::ggplot(",
-    "  counts,",
-    "  ggplot2::aes(x = reorder(program, encounters), y = encounters)",
-    ") +",
-    "  ggplot2::geom_col(fill = islh_brand(\"primary\"), width = 0.7) +",
-    "  ggplot2::coord_flip() +",
-    "  scale_y_islh_count() +",
-    "  ggplot2::labs(x = NULL, y = \"Encounters\")",
-    "```",
-    "",
-    "@fig-encounters shows the distribution across programmes.",
-    "",
-    "```{r}",
-    "#| label: tbl-encounters",
-    '#| tbl-cap: "Encounters and median wait by programme"',
-    "",
-    "# Give columns the names a reader should see, not the ones your data",
-    "# happens to use.",
-    "counts <- setNames(counts, c(\"Programme\", \"Encounters\", \"Median wait (minutes)\"))",
-    "",
-    unlist(strsplit(table_call, "\n")),
-    "```",
+    if (example) {
+      c(
+        "```{r}",
+        "#| label: fig-encounters",
+        '#| fig-cap: "Encounters by programme"',
+        paste0(
+          '#| fig-alt: "Bar chart of encounters by programme. Primary care is ',
+          'highest at 326, then mental health at 184, then public health at 79."'
+        ),
+        "#| fig-width: 6",
+        "#| fig-height: 3.2",
+        "",
+        "counts <- islh_example_data()",
+        "",
+        "ggplot2::ggplot(",
+        "  counts,",
+        "  ggplot2::aes(x = reorder(program, encounters), y = encounters)",
+        ") +",
+        '  ggplot2::geom_col(fill = islh_brand("primary"), width = 0.7) +',
+        "  ggplot2::coord_flip() +",
+        "  scale_y_islh_count() +",
+        '  ggplot2::labs(x = NULL, y = "Encounters")',
+        "```",
+        "",
+        "@fig-encounters shows the distribution across programmes.",
+        "",
+        "```{r}",
+        "#| label: tbl-encounters",
+        '#| tbl-cap: "Encounters and median wait by programme"',
+        "",
+        "# The caption belongs in the chunk option above, not in the table",
+        "# call. Setting both prints it twice, and only the chunk option can",
+        "# be cross-referenced with @tbl-encounters.",
+        "",
+        "# Give columns the names a reader should see, not the ones your data",
+        "# happens to use.",
+        paste0(
+          "counts <- setNames(counts, c(\"Programme\", \"Encounters\", ",
+          "\"Median wait (minutes)\"))"
+        ),
+        "",
+        unlist(strsplit(table_call, "\n")),
+        "```"
+      )
+    },
     "",
     "# Recommendations",
     "",
@@ -156,7 +186,7 @@
     "2. Install what this format needs, once per machine:",
     "",
     "   ```r",
-    paste0('   islhr::islh_install_deps("', if (format == "both") "html" else format, '")'),
+    paste0('   islhr::islh_install_deps("', format, '")'),
     "   ```",
     "",
     "3. Open `report.qmd` and click **Render**.",
@@ -165,9 +195,10 @@
     "",
     "- `islhr::islh_check()` reports what is missing or out of date.",
     "- `islhr::islh_help()` lists the functions you will use most.",
-    "- BC Sans must be installed on your machine; it is licensed by the BC",
-    "  government and cannot be shipped with the package. Without it, output",
-    "  falls back to another font.",
+    "- BC Sans must be installed on your machine. It is not shipped with the",
+    "  package, so install it once from",
+    "  https://github.com/bcgov/bc-sans. Without it, output falls back to",
+    "  another font and everything else still works.",
     "- On Windows, a path longer than 260 characters silently drops figures.",
     "  Keep the project somewhere short.",
     "- Word locks a file it has open. Close `report.docx` before re-rendering."
@@ -218,14 +249,17 @@ islh_create_report <- function(
       i = "Pass {.code overwrite = TRUE} to write into it anyway."
     ))
   }
-  dir.create(path, recursive = TRUE, showWarnings = FALSE)
+  .islh_mkdir(path)
 
   write_lines <- function(lines, file) {
-    writeLines(lines, file.path(path, file))
+    .islh_write_lines(lines, file.path(path, file))
   }
 
   write_lines(.islh_quarto_yml(format), "_quarto.yml")
-  write_lines(.islh_report_qmd(title, author, format), "report.qmd")
+  write_lines(
+    .islh_report_qmd(title, author, format, isTRUE(example_data)),
+    "report.qmd"
+  )
   write_lines(.islh_project_readme(name, format), "README.md")
   write_lines(.islh_project_gitignore, ".gitignore")
   if (isTRUE(rproj)) {
@@ -233,18 +267,16 @@ islh_create_report <- function(
   }
 
   if (isTRUE(example_data)) {
-    dir.create(file.path(path, "data"), showWarnings = FALSE)
-    file.copy(
+    .islh_copy(
       .islh_path("extdata", "example-program-counts.csv"),
-      file.path(path, "data", "example-program-counts.csv"),
-      overwrite = TRUE
+      file.path(path, "data", "example-program-counts.csv")
     )
   }
 
   suppressMessages(islh_use_quarto(path, overwrite = TRUE))
   suppressMessages(islh_use_brand(path, overwrite = TRUE))
 
-  install_for <- if (format == "both") "html" else format
+  install_for <- format
   .islh_inform(c(
     "v" = "Created {.file {path}}.",
     "i" = "Open {.file {paste0(name, '.Rproj')}}, then run

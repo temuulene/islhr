@@ -1,5 +1,57 @@
 # Quarto reads extensions and `_brand.yml` from the project directory, not from
 # an R library, so these helpers copy the shipped files in.
+#
+# Every write is checked. On a managed laptop these run against network shares,
+# synced folders and directories the user may not own, where a copy can fail
+# for reasons R reports only through the return value. Reporting success for a
+# file that was never written is the worst outcome, because the render then
+# fails somewhere else entirely.
+
+.islh_mkdir <- function(path) {
+  if (dir.exists(path)) {
+    return(invisible(path))
+  }
+  ok <- dir.create(path, recursive = TRUE, showWarnings = FALSE)
+  if (!ok || !dir.exists(path)) {
+    .islh_abort(c(
+      "Could not create {.file {path}}.",
+      i = "Check that you have permission to write there and that the path is
+           not too long."
+    ))
+  }
+  invisible(path)
+}
+
+.islh_copy <- function(from, to) {
+  .islh_mkdir(dirname(to))
+  ok <- file.copy(from, to, overwrite = TRUE)
+  if (!ok || !file.exists(to)) {
+    .islh_abort(c(
+      "Could not write {.file {to}}.",
+      i = "The file may be open in another program, or the folder may be
+           read-only."
+    ))
+  }
+  invisible(to)
+}
+
+.islh_write_lines <- function(lines, path) {
+  .islh_mkdir(dirname(path))
+  result <- tryCatch(
+    {
+      writeLines(lines, path)
+      TRUE
+    },
+    error = function(condition) conditionMessage(condition)
+  )
+  if (!isTRUE(result) || !file.exists(path)) {
+    .islh_abort(c(
+      "Could not write {.file {path}}.",
+      x = if (isTRUE(result)) "The file is missing after writing." else result
+    ))
+  }
+  invisible(path)
+}
 
 # Copies a directory tree, reporting each file and refusing to clobber unless
 # asked. Returns the paths written, relative to `dir`.
@@ -14,8 +66,7 @@
       skipped <- c(skipped, file)
       next
     }
-    dir.create(dirname(destination), recursive = TRUE, showWarnings = FALSE)
-    file.copy(file.path(source, file), destination, overwrite = TRUE)
+    .islh_copy(file.path(source, file), destination)
     written <- c(written, destination)
   }
 
@@ -87,34 +138,80 @@ islh_use_quarto <- function(dir = ".", overwrite = FALSE) {
 
 #' Add the Island Health brand file to a project
 #'
-#' Copies `_brand.yml` into `dir`. Quarto 1.6 and later, and Shiny via
-#' `bslib`, read it for the Island Health palette and typography.
+#' Copies `_brand.yml` into `dir`, together with the logo files it references.
+#' Quarto 1.6 and later, and Shiny via `bslib`, read it for the Island Health
+#' palette and typography.
+#'
+#' The logos travel with it by default. `_brand.yml`'s logo paths are relative
+#' to the file itself, so a `_brand.yml` copied on its own would name images
+#' that are not there.
 #'
 #' @param dir Project directory. Defaults to the working directory.
-#' @param overwrite Replace an existing `_brand.yml`.
+#' @param logos Copy the logo files `_brand.yml` references into `dir/logos`.
+#' @param overwrite Replace files that are already there.
 #'
-#' @return The path written, relative to `dir`, invisibly.
+#' @return The paths written, relative to `dir`, invisibly.
 #' @export
 #'
 #' @examples
 #' project <- file.path(tempdir(), "example-brand")
 #' dir.create(project, showWarnings = FALSE)
 #' islh_use_brand(project)
-islh_use_brand <- function(dir = ".", overwrite = FALSE) {
+islh_use_brand <- function(dir = ".", logos = TRUE, overwrite = FALSE) {
   .islh_check_dir(dir)
-  destination <- file.path(dir, "_brand.yml")
+  written <- character()
+  skipped <- character()
 
+  destination <- file.path(dir, "_brand.yml")
   if (file.exists(destination) && !isTRUE(overwrite)) {
-    .islh_inform(c(
-      "i" = "{.file _brand.yml} already exists and was left alone.",
-      "*" = "Pass {.code overwrite = TRUE} to replace it."
-    ))
-    return(invisible(character()))
+    skipped <- "_brand.yml"
+  } else {
+    .islh_copy(islh_brand_yml(), destination)
+    written <- destination
   }
 
-  file.copy(islh_brand_yml(), destination, overwrite = TRUE)
-  .islh_inform(c("v" = "Wrote {.file _brand.yml}."))
-  invisible(.islh_relative(destination, dir))
+  if (isTRUE(logos)) {
+    for (name in .islh_brand_logo_files()) {
+      target <- file.path(dir, "logos", name)
+      if (file.exists(target) && !isTRUE(overwrite)) {
+        skipped <- c(skipped, file.path("logos", name))
+        next
+      }
+      .islh_copy(.islh_path("logos", name), target)
+      written <- c(written, target)
+    }
+  }
+
+  .islh_report_copy(
+    list(written = .islh_relative(written, dir), skipped = skipped),
+    "the Island Health brand file",
+    overwrite
+  )
+}
+
+# The logo files `_brand.yml` names, read out of the file itself so the two
+# cannot drift apart. Falls back to the shipped list when `yaml` is absent.
+.islh_brand_logo_files <- function() {
+  fallback <- paste0(
+    "islh-logo-",
+    c("stacked-full-colour", "stacked-dark-blue", "stacked-white",
+      "horizontal-full-colour", "horizontal-dark-blue", "horizontal-white"),
+    ".svg"
+  )
+
+  if (!requireNamespace("yaml", quietly = TRUE)) {
+    return(fallback)
+  }
+
+  images <- tryCatch(
+    yaml::read_yaml(islh_brand_yml())$logo$images,
+    error = function(condition) NULL
+  )
+  if (is.null(images)) {
+    return(fallback)
+  }
+
+  basename(unlist(images, use.names = FALSE))
 }
 
 .islh_check_dir <- function(dir) {

@@ -68,13 +68,16 @@ typography:
     color: primary
 
 logo:
+  # Paths are relative to this file. islh_use_brand() copies these alongside
+  # it; the originals live in the islh-brand-standard repository under folder
+  # names with spaces and periods that do not travel well.
   images:
-    stacked-full-colour: "logos/1. Stacked Logo (primary)/1. Full-Colour (primary)/Island-Health-Logo-Stacked-Full-Colour-RGB.svg"
-    stacked-dark-blue: "logos/1. Stacked Logo (primary)/2. Dark Blue/Island-Health-Logo-Stacked-DarkBlue-RGB.svg"
-    stacked-white: "logos/1. Stacked Logo (primary)/3. White/Island-Health-Logo-Stacked-White-RGB.svg"
-    horizontal-full-colour: "logos/2. Horizontal Logo/1. Full-Colour (primary)/Island-Health-Logo-Horizontal-Full-Colour-RGB.svg"
-    horizontal-dark-blue: "logos/2. Horizontal Logo/2. Dark Blue (primary)/Island-Health-Logo-Horizontal-Blue-RGB.svg"
-    horizontal-white: "logos/2. Horizontal Logo/3. White/Island-Health-Logo-Horizontal-White-RGB.svg"
+    stacked-full-colour: "logos/islh-logo-stacked-full-colour.svg"
+    stacked-dark-blue: "logos/islh-logo-stacked-dark-blue.svg"
+    stacked-white: "logos/islh-logo-stacked-white.svg"
+    horizontal-full-colour: "logos/islh-logo-horizontal-full-colour.svg"
+    horizontal-dark-blue: "logos/islh-logo-horizontal-dark-blue.svg"
+    horizontal-white: "logos/islh-logo-horizontal-white.svg"
   small: stacked-dark-blue
   medium:
     light: horizontal-full-colour

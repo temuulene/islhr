@@ -4,19 +4,27 @@
 \alias{islh_use_brand}
 \title{Add the Island Health brand file to a project}
 \usage{
-islh_use_brand(dir = ".", overwrite = FALSE)
+islh_use_brand(dir = ".", logos = TRUE, overwrite = FALSE)
 }
 \arguments{
 \item{dir}{Project directory. Defaults to the working directory.}
 
-\item{overwrite}{Replace an existing \verb{_brand.yml}.}
+\item{logos}{Copy the logo files \verb{_brand.yml} references into \code{dir/logos}.}
+
+\item{overwrite}{Replace files that are already there.}
 }
 \value{
-The path written, relative to \code{dir}, invisibly.
+The paths written, relative to \code{dir}, invisibly.
 }
 \description{
-Copies \verb{_brand.yml} into \code{dir}. Quarto 1.6 and later, and Shiny via
-\code{bslib}, read it for the Island Health palette and typography.
+Copies \verb{_brand.yml} into \code{dir}, together with the logo files it references.
+Quarto 1.6 and later, and Shiny via \code{bslib}, read it for the Island Health
+palette and typography.
+}
+\details{
+The logos travel with it by default. \verb{_brand.yml}'s logo paths are relative
+to the file itself, so a \verb{_brand.yml} copied on its own would name images
+that are not there.
 }
 \examples{
 project <- file.path(tempdir(), "example-brand")

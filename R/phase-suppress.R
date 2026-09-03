@@ -8,15 +8,23 @@
 #'
 #' Applies [islh_suppress()] to several columns at once.
 #'
+#' @section Complementary suppression:
+#'
 #' Set `complementary = TRUE` when the table also shows a total, or when the
 #' rows partition a known population. Suppressing a single cell in such a table
 #' does not protect it: a reader subtracts the visible cells from the total and
 #' recovers the value. Complementary suppression hides the next-smallest cell
 #' as well so the arithmetic no longer closes.
 #'
-#' Whether you need it, and how many cells to suppress, is a disclosure policy
-#' question rather than a statistical one. Check the rule your release is
-#' governed by before publishing.
+#' A complementary cell is hidden because of where it sits in the table, not
+#' because it is small — it can be any size at all. It therefore never takes
+#' `label`, which describes a small value. It takes `complementary_label`,
+#' which defaults to a neutral `"Suppressed"`. Labelling a complementary cell
+#' `"<5"` would publish a false statement about the data.
+#'
+#' Whether you need complementary suppression, and how many cells to hide, is a
+#' disclosure policy question rather than a statistical one. Check the rule your
+#' release is governed by before publishing.
 #'
 #' @param data A data frame.
 #' @param cols Columns to suppress. Character names or numeric positions.
@@ -24,10 +32,15 @@
 #'   explicitly because the appropriate rule depends on the data and context.
 #' @param inclusive Suppress positive counts less than or equal to the
 #'   threshold.
-#' @param label Optional display label. With `NULL`, suppressed values become
-#'   missing numeric values; otherwise the column becomes character.
+#' @param label Display label for cells hidden because they are small. With
+#'   `NULL`, they become missing numeric values. See the label section of
+#'   [islh_suppress()].
 #' @param complementary Also suppress the smallest surviving value in any
 #'   column where exactly one cell was suppressed.
+#' @param complementary_label Display label for cells hidden to protect another
+#'   cell. Must not imply a value, since such a cell can be any size. Only used
+#'   when `label` is set; with no `label` every suppressed cell becomes a
+#'   missing value and the column stays numeric.
 #'
 #' @return The data frame, with the named columns suppressed.
 #' @export
@@ -42,9 +55,11 @@
 #' islh_suppress_table(counts, c("cases", "contacts"), threshold = 5)
 #'
 #' # With a total in view, one suppressed cell can be recovered by
-#' # subtraction, so hide a second.
+#' # subtraction, so a second is hidden. Note that the second cell is 17, and
+#' # is labelled as suppressed rather than as small.
 #' islh_suppress_table(
-#'   counts, "cases", threshold = 5, complementary = TRUE, label = "<5"
+#'   counts, "cases", threshold = 5,
+#'   complementary = TRUE, label = "Suppressed"
 #' )
 islh_suppress_table <- function(
   data,
@@ -52,70 +67,62 @@ islh_suppress_table <- function(
   threshold,
   inclusive = TRUE,
   label = NULL,
-  complementary = FALSE
+  complementary = FALSE,
+  complementary_label = "Suppressed"
 ) {
   if (!is.data.frame(data)) {
     .islh_abort("{.arg data} must be a data frame.")
   }
-  if (missing(threshold)) {
-    .islh_abort(c(
-      "{.arg threshold} must be supplied.",
-      i = "The right threshold depends on the data and the release; there is
-           deliberately no default."
-    ))
-  }
+  threshold <- .islh_check_threshold(threshold)
 
   if (is.character(cols)) {
     unknown <- setdiff(cols, names(data))
     if (length(unknown) > 0L) {
       .islh_abort("{.arg data} has no column{?s} named {.field {unknown}}.")
     }
+  } else if (is.numeric(cols)) {
+    if (any(cols < 1L | cols > ncol(data))) {
+      .islh_abort("{.arg cols} must be column positions within {.arg data}.")
+    }
   }
 
   for (col in cols) {
-    values <- data[[col]]
-    hidden <- .islh_small(values, threshold, inclusive)
+    counts <- .islh_check_counts(data[[col]], arg = paste0("data$", col))
+    small <- .islh_small(counts, threshold, inclusive)
 
-    if (isTRUE(complementary) && sum(hidden, na.rm = TRUE) == 1L) {
+    extra <- rep(FALSE, length(counts))
+    if (isTRUE(complementary) && sum(small) == 1L) {
       # Exactly one hidden cell is the recoverable case: a reader subtracts the
       # visible cells from the total and gets it back. Hide the smallest
       # survivor too. Two or more already break that arithmetic.
-      survivors <- values
-      survivors[hidden | is.na(values)] <- NA
+      survivors <- counts
+      survivors[small | is.na(counts)] <- NA
       if (any(!is.na(survivors))) {
-        hidden[which.min(survivors)] <- TRUE
+        extra[which.min(survivors)] <- TRUE
       }
     }
 
-    # Route through islh_suppress() so a suppressed cell looks the same however
-    # it came to be suppressed, then apply the complementary cell the same way.
-    suppressed <- islh_suppress(
-      values,
-      threshold = threshold,
-      inclusive = inclusive,
-      label = label
-    )
-    extra <- hidden & !.islh_small(values, threshold, inclusive)
-    extra[is.na(extra)] <- FALSE
-    suppressed[extra] <- if (is.null(label)) NA_real_ else as.character(label)
+    # `label` alone decides the output type, as it does in islh_suppress().
+    # With no label, every suppressed cell — small or complementary — becomes
+    # a missing value and the column stays numeric.
+    if (is.null(label)) {
+      counts[small | extra] <- NA_real_
+      data[[col]] <- counts
+      next
+    }
 
-    data[[col]] <- suppressed
+    output <- as.character(counts)
+    output[is.na(counts)] <- NA_character_
+    output[small] <- as.character(label)
+    output[extra] <- if (is.null(complementary_label)) {
+      NA_character_
+    } else {
+      as.character(complementary_label)
+    }
+    data[[col]] <- output
   }
 
   data
-}
-
-# Which values does the rule hide? Kept separate so the complementary pass and
-# islh_suppress() cannot disagree about what counts as small.
-.islh_small <- function(n, threshold, inclusive) {
-  n <- suppressWarnings(as.numeric(n))
-  small <- if (isTRUE(inclusive)) {
-    n > 0 & n <= threshold
-  } else {
-    n > 0 & n < threshold
-  }
-  small[is.na(small)] <- FALSE
-  small
 }
 
 #' Round counts to a fixed base
@@ -130,8 +137,9 @@ islh_suppress_table <- function(
 #' Random rounding gives a different answer each run unless you set a seed, so
 #' round once and save the result rather than rounding at render time.
 #'
-#' @param x Numeric counts.
-#' @param base Rounding base. Commonly 5 or 10.
+#' @param x Counts to round. Must be whole, non-negative and finite.
+#' @param base Rounding base. Like the suppression threshold, this is a
+#'   disclosure policy decision, so it must be supplied explicitly.
 #' @param method `"nearest"` for deterministic rounding, `"random"` for
 #'   controlled random rounding.
 #'
@@ -143,19 +151,22 @@ islh_suppress_table <- function(
 #'
 #' set.seed(42)
 #' islh_round_base(c(2, 3, 7, 12), base = 5, method = "random")
-islh_round_base <- function(x, base = 5, method = c("nearest", "random")) {
+islh_round_base <- function(x, base, method = c("nearest", "random")) {
   method <- match.arg(method)
 
-  if (!is.numeric(x)) {
-    .islh_abort("{.arg x} must be numeric.")
+  if (missing(base)) {
+    .islh_abort(c(
+      "{.arg base} must be supplied.",
+      i = "The rounding base is a disclosure policy decision, so there is
+           deliberately no default."
+    ))
   }
-  if (length(base) != 1L || is.na(base) || base <= 0) {
-    .islh_abort("{.arg base} must be a single positive number.")
-  }
+  base <- .islh_check_scalar_positive(base, "base")
+  x <- .islh_check_counts(x, arg = "x")
 
   if (method == "nearest") {
-    # round() breaks .5 ties to even, which is what we want here: it keeps
-    # rounding from drifting a total in one direction.
+    # round() breaks .5 ties to even, which keeps rounding from drifting a
+    # total in one direction.
     return(round(x / base) * base)
   }
 
@@ -165,6 +176,6 @@ islh_round_base <- function(x, base = 5, method = c("nearest", "random")) {
   # expected value is the original number.
   round_up <- stats::runif(length(x)) < (remainder / base)
   result <- ifelse(round_up, lower + base, lower)
-  result[is.na(x)] <- NA
+  result[is.na(x)] <- NA_real_
   result
 }

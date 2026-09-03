@@ -10,7 +10,8 @@ islh_suppress_table(
   threshold,
   inclusive = TRUE,
   label = NULL,
-  complementary = FALSE
+  complementary = FALSE,
+  complementary_label = "Suppressed"
 )
 }
 \arguments{
@@ -24,11 +25,17 @@ explicitly because the appropriate rule depends on the data and context.}
 \item{inclusive}{Suppress positive counts less than or equal to the
 threshold.}
 
-\item{label}{Optional display label. With \code{NULL}, suppressed values become
-missing numeric values; otherwise the column becomes character.}
+\item{label}{Display label for cells hidden because they are small. With
+\code{NULL}, they become missing numeric values. See the label section of
+\code{\link[=islh_suppress]{islh_suppress()}}.}
 
 \item{complementary}{Also suppress the smallest surviving value in any
 column where exactly one cell was suppressed.}
+
+\item{complementary_label}{Display label for cells hidden to protect another
+cell. Must not imply a value, since such a cell can be any size. Only used
+when \code{label} is set; with no \code{label} every suppressed cell becomes a
+missing value and the column stays numeric.}
 }
 \value{
 The data frame, with the named columns suppressed.
@@ -36,17 +43,26 @@ The data frame, with the named columns suppressed.
 \description{
 Applies \code{\link[=islh_suppress]{islh_suppress()}} to several columns at once.
 }
-\details{
+\section{Complementary suppression}{
+
+
 Set \code{complementary = TRUE} when the table also shows a total, or when the
 rows partition a known population. Suppressing a single cell in such a table
 does not protect it: a reader subtracts the visible cells from the total and
 recovers the value. Complementary suppression hides the next-smallest cell
 as well so the arithmetic no longer closes.
 
-Whether you need it, and how many cells to suppress, is a disclosure policy
-question rather than a statistical one. Check the rule your release is
-governed by before publishing.
+A complementary cell is hidden because of where it sits in the table, not
+because it is small — it can be any size at all. It therefore never takes
+\code{label}, which describes a small value. It takes \code{complementary_label},
+which defaults to a neutral \code{"Suppressed"}. Labelling a complementary cell
+\code{"<5"} would publish a false statement about the data.
+
+Whether you need complementary suppression, and how many cells to hide, is a
+disclosure policy question rather than a statistical one. Check the rule your
+release is governed by before publishing.
 }
+
 \examples{
 counts <- data.frame(
   area = c("North", "Central", "South"),
@@ -57,8 +73,10 @@ counts <- data.frame(
 islh_suppress_table(counts, c("cases", "contacts"), threshold = 5)
 
 # With a total in view, one suppressed cell can be recovered by
-# subtraction, so hide a second.
+# subtraction, so a second is hidden. Note that the second cell is 17, and
+# is labelled as suppressed rather than as small.
 islh_suppress_table(
-  counts, "cases", threshold = 5, complementary = TRUE, label = "<5"
+  counts, "cases", threshold = 5,
+  complementary = TRUE, label = "Suppressed"
 )
 }

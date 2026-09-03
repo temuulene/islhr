@@ -96,10 +96,11 @@ Two things to know:
 
 ## Troubleshooting
 
-**BC Sans is not being used.** It is licensed by the BC government and cannot
-be shipped with the package, so it has to be installed on your machine.
-`islh_font_family()` reports what was found. Without it, output falls back to
-another font; everything else still works.
+**BC Sans is not being used.** It is not shipped with the package, so it has to
+be installed on your machine — once, from
+[bcgov/bc-sans](https://github.com/bcgov/bc-sans). `islh_font_family()` reports
+what was found. Without it, output falls back to another font; everything else
+still works.
 
 **Windows plot pane warns about the font database.** Base graphics devices on
 Windows resolve font names through R's own font database rather than through

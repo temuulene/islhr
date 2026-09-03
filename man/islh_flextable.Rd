@@ -4,20 +4,33 @@
 \alias{islh_flextable}
 \title{Apply Island Health styling to a flextable}
 \usage{
-islh_flextable(x, caption = NULL, autofit = TRUE, width = 1)
+islh_flextable(
+  x,
+  caption = NULL,
+  autofit = TRUE,
+  width = 1,
+  text_width = .islh_text_width
+)
 }
 \arguments{
 \item{x}{A flextable or data frame.}
 
 \item{caption}{Optional caption.}
 
-\item{autofit}{Automatically size columns to their contents.}
+\item{autofit}{Size columns in proportion to their contents. With \code{FALSE},
+every column gets an equal share.}
 
 \item{width}{Table width as a fraction of the available text width.}
+
+\item{text_width}{Available text width in inches. The default matches the
+Island Health reference document: Letter paper with 2.5 cm margins.}
 }
 \value{
 A styled flextable.
 }
 \description{
-Apply Island Health styling to a flextable
+Column widths are resolved here and written into the document, rather than
+left for the renderer to work out. An "autofit" table is sized by whichever
+program opens it, so the same file lays out differently in Word and in
+LibreOffice, and differently again on a machine without BC Sans installed.
 }

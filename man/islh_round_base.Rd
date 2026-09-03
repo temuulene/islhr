@@ -4,12 +4,13 @@
 \alias{islh_round_base}
 \title{Round counts to a fixed base}
 \usage{
-islh_round_base(x, base = 5, method = c("nearest", "random"))
+islh_round_base(x, base, method = c("nearest", "random"))
 }
 \arguments{
-\item{x}{Numeric counts.}
+\item{x}{Counts to round. Must be whole, non-negative and finite.}
 
-\item{base}{Rounding base. Commonly 5 or 10.}
+\item{base}{Rounding base. Like the suppression threshold, this is a
+disclosure policy decision, so it must be supplied explicitly.}
 
 \item{method}{\code{"nearest"} for deterministic rounding, \code{"random"} for
 controlled random rounding.}

@@ -36,9 +36,12 @@ jobs:
           extra-packages: local::.
           needs: check
 
-      - name: Scaffold and render both formats
+      - name: Scaffold and render every format
         run: |
-          for fmt in html docx; do
+          # "both" is a distinct path: one report.qmd that picks its table
+          # engine at render time, and a dependency set that is the union of
+          # the two. Rendering html and docx separately does not exercise it.
+          for fmt in html docx both; do
             Rscript -e "islhr::islh_create_report('check-$fmt', format = '$fmt')"
             (cd "check-$fmt" && quarto render report.qmd)
           done
@@ -48,6 +51,14 @@ jobs:
         run: |
           test -s check-html/report.html || { echo "no HTML output"; exit 1; }
           test -s check-docx/report.docx || { echo "no DOCX output"; exit 1; }
+          # "both" must produce both files from the one project.
+          test -s check-both/report.html || { echo "no HTML from both"; exit 1; }
+          test -s check-both/report.docx || { echo "no DOCX from both"; exit 1; }
+          # Every logo _brand.yml names has to exist next to it, or Quarto
+          # silently drops the branding.
+          for svg in $(grep -o 'logos/[a-z-]*\.svg' check-docx/_brand.yml); do
+            test -f "check-docx/$svg" || { echo "missing $svg"; exit 1; }
+          done
           # A branded Word report carries the logo and the header part. If the
           # reference document were ignored, neither would be there.
           unzip -l check-docx/report.docx | grep -q "word/media/" \
@@ -63,3 +74,5 @@ jobs:
           path: |
             check-html/report.html
             check-docx/report.docx
+            check-both/report.html
+            check-both/report.docx

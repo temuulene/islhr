@@ -1,5 +1,56 @@
 # islhr 0.1.0
 
+## Fixes from the pre-release code review
+
+The first release candidate was reviewed before distribution. These are the
+changes that came out of it; the disclosure-control ones could have put wrong
+numbers in a published report.
+
+* `islh_suppress_table()` no longer labels a complementary cell with the label
+  meant for small cells. With `complementary = TRUE` and `label = "<5"`, a
+  value of 17 was displayed as `<5` — a false statement about the data, and the
+  documentation demonstrated it. Complementary cells now take a separate,
+  neutral `complementary_label`, defaulting to `"Suppressed"`.
+* `islh_suppress()` rejects factors instead of converting them. `as.numeric()`
+  on a factor returns level codes, so `factor(c("10", "3", "42"))` was read as
+  1, 2, 3 and every cell suppressed.
+* Counts must now be whole, non-negative and finite everywhere they are
+  accepted. Negative, fractional and infinite values used to pass through.
+* `islh_round_base()` requires `base`. A default silently made a disclosure
+  policy decision, which the package elsewhere refuses to do.
+* `islh_ci_poisson()`, `islh_crude_rate()` and `islh_dsr()` validate their
+  inputs: whole counts, positive populations and `per`, matching vector
+  lengths, and a standard population with a positive total. An all-zero
+  standard population returned `NA` rather than an error, and a missing
+  stratum quietly poisoned a standardised rate.
+* `islh_install_deps("both")` installs the HTML and Word stacks together. A
+  project scaffolded with `format = "both"` was told to install only the HTML
+  packages, so its Word render failed at the table.
+* `_brand.yml`'s logo paths pointed at the old asset repository's folder
+  layout, so every image it named was missing once copied. The paths are
+  rewritten and `islh_use_brand()` now copies the logos alongside the file.
+* Every file copy and directory creation is checked. A failed write on a
+  network share or a read-only folder reported success.
+* Word tables have fixed column widths that sum to the text width, so Word and
+  LibreOffice lay a document out the same way. They were autofit, which left
+  sizing to whichever program opened the file.
+* `islh_create_report()` escapes the title and author into YAML, and
+  `example_data = FALSE` now omits the worked example rather than leaving a
+  report that calls `islh_example_data()` with no data file.
+* The scaffold no longer sets a table caption twice, which printed two
+  headings in HTML.
+* BC Sans is described as "not shipped" rather than "cannot be shipped": it is
+  under the SIL Open Font License 1.1, as the package's own webfont notice says.
+
+### Known limitation
+
+A figure caption can still be orphaned from its figure across a Word page
+break. Quarto styles a knitr figure's image paragraph `Compact`, which carries
+no `keepNext`, and that style is shared with tight list items — so setting
+`keepNext` on it would stop long lists breaking across pages. Setting
+`fig-cap-location: top` for `docx` avoids it. The reference document does set
+`keepNext` on the `Figure` style, which covers plain pandoc renders.
+
 First release of `islhr` as an R package.
 
 The Island Health plot and table themes previously shipped as a single script

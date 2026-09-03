@@ -4,10 +4,11 @@
 # Staff who cannot reach GitHub from R install from these instead: download the
 # .zip and run install.packages("path/to/islhr_x.y.z.zip", repos = NULL).
 
+# Tag-driven only. A manual run has no tag to attach assets to, so the
+# release step would have nowhere to put them.
 on:
   push:
     tags: ['v*']
-  workflow_dispatch:
 
 name: release
 
@@ -30,6 +31,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      # A tag that disagrees with DESCRIPTION produces a release whose assets
+      # are named for a different version than the tag says. Catch it here
+      # rather than after staff have downloaded it.
+      - name: Check the tag matches DESCRIPTION
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag="${GITHUB_REF#refs/tags/v}"
+          described=$(grep '^Version:' DESCRIPTION | sed 's/Version: *//')
+          if [ "$tag" != "$described" ]; then
+            echo "Tag v$tag does not match DESCRIPTION version $described." >&2
+            exit 1
+          fi
+          echo "Tag and DESCRIPTION agree on $described."
+        shell: bash
 
       - uses: r-lib/actions/setup-pandoc@v2
 
