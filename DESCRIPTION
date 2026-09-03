@@ -1,0 +1,42 @@
+Package: islhr
+Title: Island Health Branding for R Figures, Tables and Reports
+Version: 0.1.0
+Authors@R:
+    person("Temuulen", "Enebish", , "temuulen@gmail.com", role = c("aut", "cre"))
+Description: Applies Island Health brand colours, typography and layout to
+    ggplot2 figures, flextable and gt tables, and Quarto HTML and Word
+    reports. Includes project scaffolding and disclosure-control helpers
+    used by the PHASE team.
+License: file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Depends:
+    R (>= 4.1)
+Imports:
+    cli,
+    ggplot2 (>= 3.5.0),
+    grDevices,
+    grid,
+    scales,
+    systemfonts,
+    tools,
+    utils
+Suggests:
+    base64enc,
+    flextable,
+    gt,
+    gtsummary,
+    htmltools,
+    knitr,
+    officer,
+    ragg,
+    rlang,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr,
+    yaml
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+URL: https://github.com/temuulene/islhr
+BugReports: https://github.com/temuulene/islhr/issues
