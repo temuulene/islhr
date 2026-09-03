@@ -7,3 +7,4 @@ inst/doc
 /*.tar.gz
 /*.Rcheck/
 ..Rcheck/
+data-raw/.build-reference-docx.tmp/
