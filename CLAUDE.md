@@ -83,8 +83,6 @@ until 3.5.0.
   glance whether a function is part of the taught API. If you export something
   new, add it to `islh_help()` and to `_pkgdown.yml`; a test snapshots the
   export list.
-- **`islh_suppress()` has no default threshold.** Small-cell suppression rules
-  depend on the dataset and the disclosure context. Do not add one.
 - Errors, warnings and messages route through `.islh_abort()`, `.islh_warn()`
   and `.islh_inform()` so condition classes stay consistent.
 

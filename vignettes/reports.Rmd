@@ -123,11 +123,12 @@ for a source build.
 Reports built this way are ordinary files with no access controls. Never put
 identifiable information in one, and suppress small cells before sharing:
 
-```{r}
-counts$cases <- islh_suppress(counts$cases, threshold = 5)
+```r
+counts$cases <- islhepi::islh_suppress(counts$cases, threshold = 5)
 ```
 
-`islh_suppress_table()` does a whole table, and its `complementary` argument
+`islhepi::islh_suppress_table()` does a whole table, and its `complementary`
+argument
 handles the case where a visible total would let a reader recover a suppressed
 cell by subtraction. The threshold is yours to set — check the rule your
 release is governed by.

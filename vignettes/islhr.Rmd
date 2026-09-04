@@ -101,21 +101,16 @@ islh_flextable(counts)   # Word
 
 Both fill the text width. Pass `width = 0.6` for something narrower.
 
-## Small counts
+## Epidemiological methods
 
-```{r}
+Age grouping, rates, confidence intervals, suppression and count rounding live
+in the separate `islhepi` package. Load it alongside `islhr` when a report needs
+those methods:
+
+```r
+library(islhepi)
 islh_suppress(c(0, 3, 42), threshold = 5)
-```
-
-There is deliberately no default threshold. The right rule depends on the data
-and on the release, and a default would make that decision silently.
-
-For a whole table, and for the case where a visible total lets a reader
-recover a suppressed cell by subtraction:
-
-```{r}
-counts <- data.frame(area = c("North", "Central", "South"), cases = c(3, 42, 17))
-islh_suppress_table(counts, "cases", threshold = 5, complementary = TRUE)
+islh_crude_rate(cases = 12, population = 50000)
 ```
 
 ## Where to go next

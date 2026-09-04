@@ -109,12 +109,12 @@
       c(
         "Replace the example data below with your own. Never put identifiable",
         "information in a report, and suppress small cells with",
-        "`islh_suppress()` before anything leaves your team."
+        "`islhepi::islh_suppress()` before anything leaves your team."
       )
     } else {
       c(
         "Never put identifiable information in a report, and suppress small",
-        "cells with `islh_suppress()` before anything leaves your team."
+        "cells with `islhepi::islh_suppress()` before anything leaves your team."
       )
     },
     "",

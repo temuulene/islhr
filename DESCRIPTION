@@ -1,12 +1,12 @@
 Package: islhr
 Title: Island Health Branding for R Figures, Tables and Reports
-Version: 0.1.0
+Version: 0.2.0
 Authors@R:
     person("Temuulen", "Enebish", , "temuulen@gmail.com", role = c("aut", "cre"))
 Description: Applies Island Health brand colours, typography and layout to
     ggplot2 figures, flextable and gt tables, and Quarto HTML and Word
-    reports. Includes project scaffolding and disclosure-control helpers
-    used by the PHASE team.
+    reports. Includes project scaffolding for reproducible reports used by
+    the PHASE team.
 License: file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

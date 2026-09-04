@@ -4,8 +4,11 @@ Island Health branding for R figures, tables and Quarto reports.
 
 `islhr` applies the Island Health brand colour system, BC Sans typography and
 report layout to ggplot2 plots, `flextable` and `gt` tables, and Quarto HTML and
-Word output. It also scaffolds a ready-to-render report project and carries the
-small-cell suppression helpers the PHASE team uses.
+Word output. It also scaffolds a ready-to-render report project.
+
+Epidemiological calculations and disclosure-control helpers are provided by
+[`islhepi`](https://github.com/temuulene/islhepi). The packages can be loaded
+together in the same report.
 
 It grew out of the theme script in `islh-brand-standard`, which staff used to
 copy into each project by hand.
@@ -30,7 +33,7 @@ your team lead for the built package and install it from the file. No token,
 no GitHub, no compiler required:
 
 ```r
-install.packages("path/to/islhr_0.1.0.zip", repos = NULL)
+install.packages("path/to/islhr_0.2.0.zip", repos = NULL)
 ```
 
 Every tagged release attaches that `.zip` (Windows) and a `.tar.gz`.

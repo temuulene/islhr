@@ -82,5 +82,5 @@ Some machines will not let you. `islh_check()` will tell you what is missing,
 and your team lead can supply a built copy of `islhr` to install from a file:
 
 ```{r}
-install.packages("path/to/islhr_0.1.0.zip", repos = NULL)
+install.packages("path/to/islhr_0.2.0.zip", repos = NULL)
 ```

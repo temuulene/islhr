@@ -1,3 +1,16 @@
+# islhr 0.2.0
+
+## Package scope
+
+* `islhr` now focuses on Island Health branding, figures, tables and Quarto
+  report scaffolding.
+* Analytical methods moved to the separate `islhepi` package. The public
+  interfaces are unchanged there: `islh_age_group()`, `islh_ci_poisson()`,
+  `islh_crude_rate()`, `islh_dsr()`, `islh_suppress()`,
+  `islh_suppress_table()` and `islh_round_base()`.
+* New report scaffolds direct small-cell suppression to
+  `islhepi::islh_suppress()`.
+
 # islhr 0.1.0
 
 ## Fixes from the pre-release code review
