@@ -88,7 +88,7 @@ generated report project instead of duplicated on this HTML page.
 Put one setup call near the top of a Quarto document:
 
 ````
-```{r}
+```r
 #| label: setup
 #| include: false
 library(islhr)

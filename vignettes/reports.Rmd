@@ -61,7 +61,7 @@ format: islh-report-docx    # or islh-report-html
 Every Island Health report starts the same way:
 
 ````
-```{r}
+```r
 #| label: setup
 #| include: false
 library(islhr)

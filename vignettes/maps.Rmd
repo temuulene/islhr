@@ -286,7 +286,7 @@ that it is a map: the geography, the indicator, and the pattern a reader would
 see.
 
 ````
-```{r}
+```r
 #| label: fig-lha-rate
 #| fig-alt: >
 #|   Choropleth of Island Health local health areas showing influenza
