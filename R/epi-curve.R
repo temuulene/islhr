@@ -33,6 +33,7 @@
 #'   the usual way.
 #'
 #' @examples
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 #' curve_data <- data.frame(
 #'   week = seq(as.Date("2026-01-04"), by = "week", length.out = 12),
 #'   cases = c(1, 2, 3, 5, 8, 13, 10, 7, 5, 3, 2, 1),

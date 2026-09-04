@@ -15,6 +15,7 @@ islh_help <- function() {
     "  islh_check()                  list any packages you still need",
     "",
     "FIGURES  islh_setup() already applies the theme, so plot as usual",
+    "  islh_epi_curve(data, date, count)  a routine surveillance curve",
     "  scale_fill_islh()             colours for categories",
     "  scale_colour_islh()           the same, for lines and points",
     "  scale_fill_islh_ordinal()     low to high within one colour",

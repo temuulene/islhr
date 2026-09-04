@@ -16,13 +16,15 @@ test_that("epi curve supports fill, facets and total labels", {
     region = c("North", "South")
   )
   data$count <- rep(c(1, 2, 3), 4)
-  plot <- islh_epi_curve(
-    data,
-    date,
-    count,
-    fill = source,
-    facet = region,
-    labels = "total"
+  plot <- expect_only_font_warnings(
+    islh_epi_curve(
+      data,
+      date,
+      count,
+      fill = source,
+      facet = region,
+      labels = "total"
+    )
   )
   expect_s3_class(plot, "ggplot")
   expect_true(length(plot$layers) >= 2)
