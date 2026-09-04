@@ -8,8 +8,10 @@ navbar:
     left: [intro, reference, articles, news]
   components:
     articles:
-      text: Articles
+      text: Guides
       menu:
+        - text: Getting started
+          href: articles/islhr.html
         - text: Writing reports
           href: articles/reports.html
         - text: Mapping health geographies
@@ -37,7 +39,7 @@ reference:
       - islh_use_brand
 
   - title: Figures
-    desc: The theme and the colour scales.
+    desc: Build branded plots with examples for categories, ordered data and maps.
     contents:
       - theme_islh
       - starts_with("scale_colour_islh")
@@ -47,7 +49,7 @@ reference:
       - islh_example_plot
 
   - title: Maps
-    desc: Choropleths of Island Health geographies.
+    desc: Style choropleths of Island Health geographies and document their sources.
     contents:
       - theme_islh_map
       - coord_islh_map
@@ -64,6 +66,7 @@ reference:
       - islh_example_data
 
   - title: Tables
+    desc: Create consistent HTML and Word tables from ordinary data frames.
     contents:
       - islh_gt
       - islh_flextable

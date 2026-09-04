@@ -7,14 +7,23 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
+```{r setup, include=FALSE}
 #| include: false
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4
+)
+library(islhr)
+islh_setup(format = "html", quiet = TRUE)
 ```
 
 ## Start a project
 
-```{r}
+```{r create-project, eval=FALSE}
 islhr::islh_create_report("flu-season-2026", format = "docx")
 ```
 
@@ -27,7 +36,7 @@ chooses its table engine at render time, so one file produces either output.
 
 ## Add the format to a project you already have
 
-```{r}
+```{r add-format, eval=FALSE}
 islhr::islh_use_quarto()
 islhr::islh_use_brand()
 ```
@@ -79,6 +88,46 @@ that it is a bar chart:
 
 Reference it in prose with `@fig-encounters` so the numbering stays right when
 you move things around.
+
+Here is the complete figure code with package data. This chunk is evaluated
+when the website is built, so the figure below is the actual result.
+
+```{r report-figure, fig.alt="Bar chart of example programme encounters, with Primary care highest."}
+library(ggplot2)
+
+report_data <- islh_example_data()
+
+ggplot(report_data, aes(program, encounters, fill = program)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_islh() +
+  scale_y_islh_count() +
+  labs(
+    title = "Encounters by programme",
+    subtitle = "Illustrative report output",
+    x = NULL,
+    y = "Encounters"
+  )
+```
+
+Tables use the same data. Use `islh_gt()` in HTML:
+
+```{r report-table}
+islh_gt(
+  report_data,
+  title = "Programme activity",
+  source_note = "Source: simulated package data."
+)
+```
+
+In a dual-format report, select the table engine from the output format:
+
+```{r dual-format-table, eval=FALSE}
+if (knitr::is_html_output()) {
+  islh_gt(report_data)
+} else {
+  islh_flextable(report_data, caption = "Programme activity")
+}
+```
 
 ## Word output
 

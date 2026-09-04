@@ -2,6 +2,9 @@
 #'
 #' @return The printed lines, invisibly.
 #'
+#' @examples
+#' islh_help()
+#'
 #' @export
 islh_help <- function() {
   lines <- c(
@@ -57,6 +60,9 @@ islh_help <- function() {
 #' Create a runnable Island Health example plot
 #'
 #' @return A ggplot object.
+#'
+#' @examples
+#' islh_example_plot()
 #'
 #' @export
 islh_example_plot <- function() {

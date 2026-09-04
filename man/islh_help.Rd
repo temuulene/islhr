@@ -12,3 +12,6 @@ The printed lines, invisibly.
 \description{
 Print a short guide to the functions most people need
 }
+\examples{
+islh_help()
+}

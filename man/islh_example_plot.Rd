@@ -12,3 +12,6 @@ A ggplot object.
 \description{
 Create a runnable Island Health example plot
 }
+\examples{
+islh_example_plot()
+}

@@ -7,19 +7,76 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
+```{r setup, include=FALSE}
 #| include: false
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4.8
+)
+library(ggplot2)
+library(islhr)
 ```
 
 The two packages divide mapping work by responsibility. `islhepi` retrieves
 and standardizes population and health-geography data. `islhr` controls the
 visual presentation of the finished map.
 
+## See the map functions work
+
+This first example uses four simple polygons created in the vignette. It does
+not contact the BC Data Catalogue, so the website can display a real map while
+remaining reproducible.
+
+```{r map-example-data}
+demo_map <- data.frame(
+  geography_name = c("North", "Central", "West", "South"),
+  population = c(12000, 34000, 18000, 52000),
+  wkt = c(
+    "POLYGON ((0 1, 1 1, 1 2, 0 2, 0 1))",
+    "POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))",
+    "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
+    "POLYGON ((1 0, 2 0, 2 1, 1 1, 1 0))"
+  )
+)
+demo_map <- sf::st_as_sf(demo_map, wkt = "wkt", crs = 3005)
+demo_map[c("geography_name", "population")]
+```
+
+```{r map-example, fig.alt="Four-area demonstration choropleth, with the southern area darkest because it has the largest illustrative population."}
+ggplot(demo_map, aes(fill = population)) +
+  geom_sf(colour = islh_hex("grey", 80), linewidth = 0.4) +
+  scale_fill_islh_b(
+    n.breaks = 4,
+    labels = scales::label_comma()
+  ) +
+  coord_islh_map() +
+  labs(
+    title = "Population by area",
+    subtitle = "Demonstration geometry and values",
+    fill = "Population",
+    caption = islh_caption(
+      source = "Simulated package example",
+      extracted = "2026-09-04",
+      boundary = "Demonstration polygons"
+    )
+  ) +
+  theme_islh_map()
+```
+
+The same three presentation functions work with downloaded LHA, HSDA, CHSA or
+health-authority boundaries. The next section replaces `demo_map` with real
+catalogue data.
+
 ## Retrieve and join the data
 
 The following example requests total population and LHA boundaries for Island
-Health. The catalogue calls are not evaluated while this vignette is built.
+Health. Catalogue calls are shown but not evaluated during the website build,
+because the upstream service can be unavailable even when the package is
+working correctly.
 
 ```{r, eval=FALSE}
 library(dplyr)
@@ -163,16 +220,18 @@ suppressed areas as their own layer with their own key:
 
 ```{r, eval=FALSE}
 suppressed <- filter(map_data, cases < 5)
+released <- filter(map_data, cases >= 5)
 
-ggplot(map_data, aes(fill = rate)) +
+ggplot(released, aes(fill = rate)) +
   geom_sf(colour = islh_hex("grey", 80), linewidth = 0.25) +
+  scale_fill_islh_b() +
+  ggnewscale::new_scale_fill() +
   geom_sf(
     data = suppressed,
     aes(fill = "Suppressed"),
     colour = islh_hex("grey", 60),
     linewidth = 0.25
   ) +
-  scale_fill_islh_b() +
   ggplot2::scale_fill_manual(
     values = c(Suppressed = islh_hex("grey", 60)),
     name = NULL,
@@ -180,6 +239,7 @@ ggplot(map_data, aes(fill = rate)) +
   )
 ```
 
+This example uses `ggnewscale` to give the suppression layer its own legend.
 For a hatch rather than a flat fill, `ggpattern::geom_sf_pattern()` does the
 same job. Give zero counts their own baseline tint through an explicit lowest
 break so a reader does not read zero cases as uncollected data.

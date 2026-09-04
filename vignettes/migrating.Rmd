@@ -7,13 +7,18 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
+```{r setup, include=FALSE}
 #| include: false
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(islhr)
 ```
 
 If your project has an `R/island-health-ggplot-theme.R` in it, it came from a
 starter-kit ZIP. This is how to move it to the package.
+
+```{r installed-version}
+islh_version()
+```
 
 ## What changes
 
@@ -27,21 +32,21 @@ instead of the next time you download a ZIP.
 
 **1. Install the package.**
 
-```{r}
+```{r install-package, eval=FALSE}
 install.packages("remotes", type = "binary")
 remotes::install_github("temuulene/islhr")
 ```
 
 **2. Change the setup chunk.** Replace:
 
-```{r}
+```{r old-setup, eval=FALSE}
 source("R/island-health-ggplot-theme.R")
 islh_setup()
 ```
 
 with:
 
-```{r}
+```{r new-setup, eval=FALSE}
 library(islhr)
 islh_setup()
 ```
@@ -81,6 +86,6 @@ bring the package up to date.
 Some machines will not let you. `islh_check()` will tell you what is missing,
 and your team lead can supply a built copy of `islhr` to install from a file:
 
-```{r}
-install.packages("path/to/islhr_0.2.0.zip", repos = NULL)
+```{r install-file, eval=FALSE}
+install.packages("path/to/islhr_0.4.0.zip", repos = NULL)
 ```

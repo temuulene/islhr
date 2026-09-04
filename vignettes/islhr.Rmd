@@ -7,113 +7,164 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
-#| include: false
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-```
-
-`islhr` puts Island Health branding on the things a report is made of:
-figures, tables, and the page they sit on. This article covers the parts you
-will use in the first hour.
-
-## Install what your format needs
-
-`islhr` itself has few dependencies. The packages that draw tables are
-different for HTML and Word, and you only need the ones for the format you are
-writing, so they are optional and installed on request:
-
-```r
-islh_install_deps("docx")   # or "html"
-```
-
-`islh_check()` tells you where you stand without installing anything:
-
-```{r}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4
+)
 library(islhr)
-islh_check("plots", quiet = TRUE)$required
+islh_setup(format = "html", quiet = TRUE)
 ```
 
-It checks versions as well as presence. Two are worth knowing about because
-the failure without them is confusing: the colour scales need ggplot2 3.5.0 or
-newer, and `islh_flextable()` needs flextable 0.9.10 or newer.
+`islhr` gives figures, tables and Quarto reports one consistent Island Health
+visual system. This guide starts with working output, then explains which
+function to use for each task.
+
+## Choose a starting point
+
+| I want to... | Start with | What it returns |
+|---|---|---|
+| Configure a report | `islh_setup()` | Plot and table defaults for the current format |
+| Make a branded plot | `theme_islh()` and a `scale_*_islh()` function | A ggplot object |
+| Make an HTML table | `islh_gt()` | A `gt` table |
+| Make a Word table | `islh_flextable()` | A `flextable` object |
+| Start a report project | `islh_create_report()` | A ready-to-render Quarto project |
+| Find a colour | `islh_brand()` or `islh_hex()` | Hex colour values |
+| Draw a health-geography map | `theme_islh_map()` and `coord_islh_map()` | Map theme and coordinates |
+
+## A complete first example
+
+The package includes a small data set so every example can run without a
+network connection.
+
+```{r example-data}
+counts <- islh_example_data()
+counts
+```
+
+An ordinary ggplot becomes an Island Health figure by adding the appropriate
+scale. `islh_setup()` has already applied the theme.
+
+```{r example-figure, fig.alt="Bar chart showing encounters for three example Island Health programmes."}
+library(ggplot2)
+
+encounter_plot <- ggplot(counts, aes(program, encounters, fill = program)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_islh() +
+  scale_y_islh_count() +
+  labs(
+    title = "Encounters by programme",
+    subtitle = "Example data included with islhr",
+    x = NULL,
+    y = "Encounters"
+  )
+
+encounter_plot
+```
+
+For HTML, pass the same data frame to `islh_gt()`. The returned object is still
+a regular `gt` table, so formatting can be added before or after applying the
+theme.
+
+```{r example-table}
+islh_gt(
+  counts,
+  title = "Programme activity",
+  subtitle = "Illustrative values",
+  source_note = "Source: simulated package data."
+)
+```
+
+For Word, replace that call with `islh_flextable(counts)`. The Word table is
+rendered by Word rather than the browser, so it is demonstrated in the
+generated report project instead of duplicated on this HTML page.
 
 ## Set up a report
 
-One call at the top of a Quarto document:
+Put one setup call near the top of a Quarto document:
 
-```r
+````
+```{r}
+#| label: setup
+#| include: false
 library(islhr)
 islh_setup()
 ```
+````
 
-`islh_setup()` looks at what you are rendering to and configures the rest: the
-ggplot2 theme and default colours, the matching table engine (`gt` for HTML,
-`flextable` for Word), and the BC Sans font if it is installed. Outside a
-render it configures plots only.
+With `format = "auto"`, the default, `islh_setup()` detects HTML or Word and
+selects the matching table system. Outside a render it configures plots only.
+Loading the package by itself does not change themes or options.
 
-Loading the package does none of this. `library(islhr)` only defines
-functions — it sets no options, changes no theme and prints nothing — so
-attaching it can never change how an unrelated plot looks.
+Check optional dependencies before rendering a report:
 
-## Colours
+```{r dependency-check}
+check <- islh_check("html", quiet = TRUE)
+check[c("format", "tables", "ok")]
+```
 
-Use the role names rather than hex values, so a change to the brand reaches
-your report without you editing it:
+If `ok` is `FALSE`, run `islh_install_deps("html")`, `"docx"` or `"both"` once
+on that computer.
 
-```{r}
+## Colours and scales
+
+Use role names when the colour has a meaning. This keeps the report aligned if
+the brand tokens change later.
+
+```{r brand-colours}
 islh_brand("primary")
 islh_brand(c("success", "warning", "danger"))
-```
-
-The full ramp is there when you need a specific step. Each of the eight
-families has twenty steps, running from 10 (dark) to 98 (light). Ask for a
-step that does not exist and the error lists the ones that do.
-
-```{r}
 islh_hex("blue", c(30, 50, 80))
-islh_hex("grey", 50)
 ```
 
-## Figures
+Use the scale that matches the data:
 
-`islh_setup()` sets the theme globally, so an ordinary ggplot is already
-branded. The scales are there when you are mapping a variable to colour:
+| Data meaning | Function | Typical use |
+|---|---|---|
+| Unordered categories | `scale_colour_islh()` or `scale_fill_islh()` | Programmes or regions |
+| Ordered categories | `scale_*_islh_ordinal()` | Low, medium and high |
+| Status | `scale_*_islh_signal()` | Good, warning and bad |
+| Continuous values in bands | `scale_fill_islh_b()` | Choropleth maps |
 
-```r
-ggplot2::ggplot(data, ggplot2::aes(month, cases, colour = programme)) +
-  ggplot2::geom_line() +
-  scale_colour_islh() +
-  scale_y_islh_count()
+The qualitative scale is intentionally limited to five categories. If the
+plot has more groups, combine small groups, facet the figure or label lines
+directly instead of asking colour alone to carry the distinction.
+
+## Save output consistently
+
+`islh_save_plot()` applies standard report or slide dimensions and uses a
+high-quality raster device when available.
+
+```{r save-plot, eval=FALSE}
+islh_save_plot("encounters.png", encounter_plot, preset = "report")
 ```
 
-`scale_colour_islh()` is capped at five categories by design — beyond that the
-colours stop being reliably distinguishable. Use `scale_colour_islh_ordinal()`
-for ordered categories and `scale_*_islh_signal()` for good/warning/bad status,
-always paired with a label or shape so the meaning does not depend on colour
-alone.
+The function writes a file, so the call is not run while this website builds.
+It returns the saved path invisibly.
 
-## Tables
+## Start a full report
 
-```r
-islh_gt(counts)          # HTML
-islh_flextable(counts)   # Word
+```{r create-report, eval=FALSE}
+islh_create_report("2026-flu-season", format = "both")
 ```
 
-Both fill the text width. Pass `width = 0.6` for something narrower.
+The project contains a working report, the Island Health Quarto extension,
+brand configuration and example data. Open the generated `.Rproj`, replace the
+example values, and render. See [Writing reports](reports.html) for the complete
+workflow and [Mapping BC health geographies](maps.html) for maps.
 
-## Epidemiological methods
+## Common problems
 
-Age grouping, rates, confidence intervals, suppression and count rounding live
-in the separate `islhepi` package. Load it alongside `islhr` when a report needs
-those methods:
+- A table function reports a missing package: run `islh_check()` and install
+  the dependency set for the output format.
+- A plot uses an unexpected font: run `islh_font_family()` to see which family
+  was selected. BC Sans is not bundled with the package.
+- A Word render cannot replace its output: close the `.docx` file before
+  rendering again.
+- A map looks stretched: add `coord_islh_map()` so it uses BC Albers.
 
-```r
-library(islhepi)
-islh_suppress(c(0, 3, 42), threshold = 5)
-islh_crude_rate(cases = 12, population = 50000)
-```
-
-## Where to go next
-
-`islh_help()` prints a grouped list of the functions you will use most.
-`vignette("reports", package = "islhr")` walks through a full report.
+Run `islh_help()` for a compact console reference when working interactively.

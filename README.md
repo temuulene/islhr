@@ -12,6 +12,10 @@ together in the same report.
 
 Documentation: <https://temuulene.github.io/islhr/>
 
+New users should start with
+[Getting started with islhr](https://temuulene.github.io/islhr/articles/islhr.html).
+It contains evaluated examples, including a rendered figure and HTML table.
+
 It grew out of the theme script in `islh-brand-standard`, which staff used to
 copy into each project by hand.
 
@@ -56,6 +60,14 @@ islh_setup()
 `islh_setup()` detects whether you are rendering to HTML or Word and configures
 ggplot2 and the matching table engine. Run `islh_help()` for the functions you
 will use most.
+
+| Task | Function |
+|---|---|
+| Branded ggplot | `theme_islh()` and `scale_*_islh()` |
+| HTML table | `islh_gt()` |
+| Word table | `islh_flextable()` |
+| Quarto report project | `islh_create_report()` |
+| Health-geography map | `theme_islh_map()` and `coord_islh_map()` |
 
 ## Starting a new report
 

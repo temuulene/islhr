@@ -22,3 +22,13 @@ A ggplot2 discrete scale.
 \description{
 Island Health qualitative colour scale
 }
+\examples{
+ggplot2::ggplot(
+  datasets::mtcars,
+  ggplot2::aes(wt, mpg, colour = factor(cyl))
+) +
+  ggplot2::geom_point(size = 3) +
+  scale_colour_islh() +
+  ggplot2::labs(colour = "Cylinders") +
+  theme_islh()
+}

@@ -17,3 +17,16 @@ A ggplot2 theme object.
 \description{
 Island Health ggplot theme
 }
+\examples{
+ggplot2::ggplot(
+  datasets::mtcars,
+  ggplot2::aes(wt, mpg)
+) +
+  ggplot2::geom_point(colour = islh_brand("primary"), size = 3) +
+  ggplot2::labs(
+    title = "Fuel economy by vehicle weight",
+    x = "Weight (1,000 lb)",
+    y = "Miles per US gallon"
+  ) +
+  theme_islh(grid = "both")
+}

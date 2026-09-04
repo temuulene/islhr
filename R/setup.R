@@ -85,6 +85,10 @@
 #'
 #' @return A description of the active setup, invisibly.
 #'
+#' @examples
+#' setup <- suppressWarnings(islh_setup(format = "plots", quiet = TRUE))
+#' setup[c("format", "tables", "font")]
+#'
 #' @export
 islh_setup <- function(
     format = c("auto", "html", "docx", "plots"),

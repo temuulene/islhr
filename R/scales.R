@@ -9,6 +9,16 @@
 #'
 #' @return A ggplot2 discrete scale.
 #'
+#' @examples
+#' ggplot2::ggplot(
+#'   datasets::mtcars,
+#'   ggplot2::aes(wt, mpg, colour = factor(cyl))
+#' ) +
+#'   ggplot2::geom_point(size = 3) +
+#'   scale_colour_islh() +
+#'   ggplot2::labs(colour = "Cylinders") +
+#'   theme_islh()
+#'
 #' @export
 scale_colour_islh <- function(
     reverse = FALSE,
@@ -32,6 +42,17 @@ scale_color_islh <- scale_colour_islh
 #' @inheritParams scale_colour_islh
 #'
 #' @return A ggplot2 discrete scale.
+#'
+#' @examples
+#' counts <- data.frame(
+#'   programme = c("Community", "Hospital", "Primary care"),
+#'   encounters = c(1860, 3210, 2440)
+#' )
+#'
+#' ggplot2::ggplot(counts, ggplot2::aes(programme, encounters, fill = programme)) +
+#'   ggplot2::geom_col(show.legend = FALSE) +
+#'   scale_fill_islh() +
+#'   theme_islh()
 #'
 #' @export
 scale_fill_islh <- function(
@@ -202,6 +223,16 @@ scale_fill_islh_signal <- function(..., na.value = .islh_unknown()) {
 #'
 #' @return A ggplot2 binned fill scale.
 #'
+#' @examples
+#' grid <- expand.grid(x = 1:5, y = 1:4)
+#' grid$value <- seq_len(nrow(grid)) * 100
+#'
+#' ggplot2::ggplot(grid, ggplot2::aes(x, y, fill = value)) +
+#'   ggplot2::geom_tile() +
+#'   scale_fill_islh_b(n.breaks = 5) +
+#'   ggplot2::coord_equal() +
+#'   theme_islh_map()
+#'
 #' @export
 scale_fill_islh_b <- function(
     ...,
@@ -224,4 +255,3 @@ scale_fill_islh_b <- function(
 }
 
 ## Plot theme -----------------------------------------------------------------
-

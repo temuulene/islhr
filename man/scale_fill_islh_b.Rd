@@ -52,3 +52,13 @@ not read as the lowest band in greyscale. Suppressed cells are a different
 thing again: draw them as their own layer with their own legend key rather
 than letting them share the missing-data colour.
 }
+\examples{
+grid <- expand.grid(x = 1:5, y = 1:4)
+grid$value <- seq_len(nrow(grid)) * 100
+
+ggplot2::ggplot(grid, ggplot2::aes(x, y, fill = value)) +
+  ggplot2::geom_tile() +
+  scale_fill_islh_b(n.breaks = 5) +
+  ggplot2::coord_equal() +
+  theme_islh_map()
+}

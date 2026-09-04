@@ -62,6 +62,19 @@
 #'
 #' @return A ggplot2 theme object.
 #'
+#' @examples
+#' ggplot2::ggplot(
+#'   datasets::mtcars,
+#'   ggplot2::aes(wt, mpg)
+#' ) +
+#'   ggplot2::geom_point(colour = islh_brand("primary"), size = 3) +
+#'   ggplot2::labs(
+#'     title = "Fuel economy by vehicle weight",
+#'     x = "Weight (1,000 lb)",
+#'     y = "Miles per US gallon"
+#'   ) +
+#'   theme_islh(grid = "both")
+#'
 #' @export
 theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
   grid <- match.arg(grid)
@@ -219,4 +232,3 @@ scale_y_islh_count <- function(
     expand = expand
   )
 }
-

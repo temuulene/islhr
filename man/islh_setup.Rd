@@ -37,3 +37,7 @@ A description of the active setup, invisibly.
 \description{
 Configure Island Health themes for the current project or document
 }
+\examples{
+setup <- suppressWarnings(islh_setup(format = "plots", quiet = TRUE))
+setup[c("format", "tables", "font")]
+}

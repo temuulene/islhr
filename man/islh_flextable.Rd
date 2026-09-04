@@ -34,3 +34,12 @@ left for the renderer to work out. An "autofit" table is sized by whichever
 program opens it, so the same file lays out differently in Word and in
 LibreOffice, and differently again on a machine without BC Sans installed.
 }
+\examples{
+if (requireNamespace("flextable", quietly = TRUE) &&
+    requireNamespace("officer", quietly = TRUE)) {
+  islh_flextable(
+    head(islh_example_data()),
+    caption = "Example encounters"
+  )
+}
+}

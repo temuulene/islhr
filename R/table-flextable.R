@@ -15,6 +15,15 @@
 #'
 #' @return A styled flextable.
 #'
+#' @examples
+#' if (requireNamespace("flextable", quietly = TRUE) &&
+#'     requireNamespace("officer", quietly = TRUE)) {
+#'   islh_flextable(
+#'     head(islh_example_data()),
+#'     caption = "Example encounters"
+#'   )
+#' }
+#'
 #' @export
 islh_flextable <- function(
   x,
@@ -195,4 +204,3 @@ islh_flextable <- function(
 }
 
 ## gt theme ------------------------------------------------------------------
-

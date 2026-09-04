@@ -9,6 +9,15 @@
 #'
 #' @return A styled gt table.
 #'
+#' @examples
+#' if (requireNamespace("gt", quietly = TRUE)) {
+#'   islh_gt(
+#'     head(islh_example_data()),
+#'     title = "Example encounters",
+#'     source_note = "Source: simulated package data"
+#'   )
+#' }
+#'
 #' @export
 islh_gt <- function(
     data,
@@ -93,4 +102,3 @@ islh_gt <- function(
 }
 
 ## gtsummary integration -----------------------------------------------------
-

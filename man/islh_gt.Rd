@@ -31,3 +31,12 @@ A styled gt table.
 \description{
 Apply Island Health styling to a gt table
 }
+\examples{
+if (requireNamespace("gt", quietly = TRUE)) {
+  islh_gt(
+    head(islh_example_data()),
+    title = "Example encounters",
+    source_note = "Source: simulated package data"
+  )
+}
+}
