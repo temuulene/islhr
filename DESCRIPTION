@@ -34,6 +34,7 @@ Suggests:
     ragg,
     rlang,
     rmarkdown,
+    sf,
     testthat (>= 3.0.0),
     withr,
     yaml
