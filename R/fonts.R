@@ -62,12 +62,16 @@ islh_font_family <- function(refresh = FALSE, warn = TRUE) {
   if (!nzchar(family) || .Platform$OS.type != "windows") {
     return(invisible(FALSE))
   }
+  if (identical(.islh_state$screen_font, family)) {
+    return(invisible(TRUE))
+  }
 
   registered <- tryCatch(
     {
       faces <- list(grDevices::windowsFont(family))
       names(faces) <- family
       do.call(grDevices::windowsFonts, faces)
+      .islh_state$screen_font <- family
       TRUE
     },
     error = function(condition) FALSE

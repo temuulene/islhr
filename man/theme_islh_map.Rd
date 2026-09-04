@@ -13,9 +13,17 @@ theme_islh_map(base_size = 12)
 A ggplot2 theme object.
 }
 \description{
-Applies the Island Health figure theme while removing axes, ticks and panel
-grids that do not carry meaning on a geographic map. Pair it with
-\code{ggplot2::geom_sf()} and \code{scale_fill_islh_b()} for choropleth maps.
+Applies the Island Health figure theme while removing the axes, ticks,
+axis lines and panel grids that do not carry meaning on a geographic map.
+Pair it with \code{ggplot2::geom_sf()} and \code{scale_fill_islh_b()} for choropleth
+maps.
+}
+\details{
+\code{theme_islh()} sets \code{axis.line.x}, \code{axis.line.y}, \code{axis.ticks.x} and
+\code{axis.ticks.y} directly. A ggplot2 theme element only inherits from its
+parent when the child is unset, so blanking \code{axis.line} and \code{axis.ticks}
+alone leaves the lines and ticks on the plot. This theme blanks the
+children as well.
 }
 \examples{
 ggplot2::ggplot() + theme_islh_map()

@@ -1,3 +1,20 @@
+# islhr 0.3.1
+
+## Fixes
+
+* `scale_fill_islh_b()` now draws a legend wide enough to label. The
+  `coloursteps` guide inherited the qualitative key size from `theme_islh()`,
+  which squeezed the colour bar until its break labels printed on top of each
+  other. The bar is wider, the title sits above it, and counts are abbreviated
+  (`12,500` prints as `12.5K`) unless you pass your own `labels`.
+* `theme_islh()` registers the brand font with the Windows font database, so a
+  plot themed without calling `islh_setup()` first no longer floods the console
+  with "font family not found in Windows font database" warnings.
+* `theme_islh_map()` now removes the axis lines and tick marks that framed a
+  map in a box. `theme_islh()` sets `axis.line.x` and `axis.ticks.x` directly,
+  and a blank parent element does not override a child that is already set, so
+  the map theme blanks the children too.
+
 # islhr 0.3.0
 
 ## Geographic reporting

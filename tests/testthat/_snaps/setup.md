@@ -26,7 +26,7 @@
     Code
       islh_help()
     Output
-      Island Health theme 0.3.0
+      Island Health theme 0.3.1
       
       SETUP  once per document or session
         islh_setup()                  apply the theme; detects HTML or Word

@@ -106,7 +106,7 @@ if (anyNA(map_data$population)) {
 
 ggplot(map_data, aes(fill = population)) +
   geom_sf(colour = islh_hex("grey", 80), linewidth = 0.25) +
-  scale_fill_islh_b(labels = scales::label_comma()) +
+  scale_fill_islh_b() +
   labs(title = "Population by Local Health Area", fill = "Population") +
   theme_islh_map()
 ```

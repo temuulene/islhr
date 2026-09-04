@@ -9,7 +9,9 @@ scale_fill_islh_b(
   reverse = FALSE,
   na.value = .islh_unknown(),
   n.breaks = 5,
-  guide = "coloursteps"
+  labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+  key_width = 10,
+  guide = .islh_guide_coloursteps(key_width = key_width)
 )
 }
 \arguments{
@@ -21,6 +23,11 @@ scale_fill_islh_b(
 
 \item{n.breaks}{Suggested number of bins.}
 
+\item{labels}{Break label function.}
+
+\item{key_width}{Legend bar length in lines of text. Ignored when you pass
+your own \code{guide}.}
+
 \item{guide}{Guide type.}
 }
 \value{
@@ -30,4 +37,11 @@ A ggplot2 binned fill scale.
 The brand standard specifies solid fills and advises against gradients, so
 this scale uses discrete steps rather than a continuous gradient. Use it for
 choropleth maps and other continuous quantities that read better in bands.
+}
+\details{
+Counts are abbreviated by default (\code{12,500} prints as \code{12.5K}) because a
+horizontal bar legend has little room between breaks. Pass \code{labels} to
+override, for example \code{labels = scales::label_comma()} for full numbers or
+\code{labels = scales::label_percent()} for rates. Longer labels need a longer
+bar: raise \code{key_width}, or lower \code{n.breaks} so there are fewer of them.
 }

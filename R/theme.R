@@ -9,6 +9,12 @@
 theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
   grid <- match.arg(grid)
 
+  # Windows base devices, the RStudio plot pane included, resolve family names
+  # through R's own font database rather than systemfonts. Registering here as
+  # well as in `islh_setup()` keeps a plot drawn with the theme alone from
+  # filling the console with "font family not found" warnings.
+  .islh_register_screen_font(.islh_font())
+
   base <- ggplot2::theme_minimal(
     base_size = base_size,
     base_family = .islh_font()

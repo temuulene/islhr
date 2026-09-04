@@ -1,6 +1,6 @@
 Package: islhr
 Title: Island Health Branding for R Figures, Tables and Reports
-Version: 0.3.0
+Version: 0.3.1
 Authors@R:
     person("Temuulen", "Enebish", , "temuulen@gmail.com", role = c("aut", "cre"))
 Description: Applies Island Health brand colours, typography and layout to
