@@ -50,8 +50,7 @@ demo_map[c("geography_name", "population")]
 ggplot(demo_map, aes(fill = population)) +
   geom_sf(colour = islh_hex("grey", 80), linewidth = 0.4) +
   scale_fill_islh_b(
-    n.breaks = 4,
-    labels = scales::label_comma()
+    n.breaks = 4
   ) +
   coord_islh_map() +
   labs(
@@ -59,9 +58,8 @@ ggplot(demo_map, aes(fill = population)) +
     subtitle = "Demonstration geometry and values",
     fill = "Population",
     caption = islh_caption(
-      source = "Simulated package example",
-      extracted = "2026-09-04",
-      boundary = "Demonstration polygons"
+      source = "Simulated",
+      extracted = "2026-09-04"
     )
   ) +
   theme_islh_map()

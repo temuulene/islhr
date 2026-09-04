@@ -36,7 +36,8 @@ if (requireNamespace("gt", quietly = TRUE)) {
   islh_gt(
     head(islh_example_data()),
     title = "Example encounters",
-    source_note = "Source: simulated package data"
+    source_note = "Source: simulated package data",
+    embed_fonts = FALSE
   )
 }
 }
