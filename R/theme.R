@@ -1,3 +1,60 @@
+#' Brand text hierarchy shared by every Island Health theme
+#'
+#' Titles, subtitles, captions, legend text and strip labels read the same on
+#' a bar chart and on a map. Keeping them in one place lets the map theme
+#' start from `ggplot2::theme_void()`, which carries no chart furniture to
+#' remove, and still match the rest of the package.
+#'
+#' @return A ggplot2 theme object.
+#'
+#' @noRd
+.islh_text_theme <- function() {
+  # Windows base devices, the RStudio plot pane included, resolve family names
+  # through R's own font database rather than systemfonts. Registering here as
+  # well as in `islh_setup()` keeps a plot drawn with a theme alone from
+  # filling the console with "font family not found" warnings.
+  .islh_register_screen_font(.islh_font())
+
+  ggplot2::theme(
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    plot.title = ggplot2::element_text(
+      size = ggplot2::rel(1.15),
+      face = "bold",
+      colour = islh_hex("blue", 20),
+      hjust = 0,
+      margin = ggplot2::margin(b = 4)
+    ),
+    plot.subtitle = ggplot2::element_text(
+      size = ggplot2::rel(0.95),
+      colour = islh_hex("grey", 40),
+      hjust = 0,
+      margin = ggplot2::margin(b = 10)
+    ),
+    plot.caption = ggplot2::element_text(
+      size = ggplot2::rel(0.75),
+      hjust = 0,
+      colour = islh_hex("grey", 40),
+      margin = ggplot2::margin(t = 10)
+    ),
+    legend.position = "bottom",
+    legend.text = ggplot2::element_text(
+      size = ggplot2::rel(0.85),
+      colour = islh_hex("grey", 25)
+    ),
+    legend.title = ggplot2::element_text(
+      size = ggplot2::rel(0.9),
+      colour = islh_hex("grey", 25)
+    ),
+    strip.text = ggplot2::element_text(
+      size = ggplot2::rel(0.9),
+      face = "bold",
+      colour = islh_hex("blue", 20),
+      hjust = 0
+    )
+  )
+}
+
 #' Island Health ggplot theme
 #'
 #' @param base_size Base font size in points.
@@ -9,36 +66,12 @@
 theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
   grid <- match.arg(grid)
 
-  # Windows base devices, the RStudio plot pane included, resolve family names
-  # through R's own font database rather than systemfonts. Registering here as
-  # well as in `islh_setup()` keeps a plot drawn with the theme alone from
-  # filling the console with "font family not found" warnings.
-  .islh_register_screen_font(.islh_font())
-
   base <- ggplot2::theme_minimal(
     base_size = base_size,
     base_family = .islh_font()
   ) +
+    .islh_text_theme() +
     ggplot2::theme(
-      plot.title.position = "plot",
-      plot.caption.position = "plot",
-      plot.title = ggplot2::element_text(
-        size = ggplot2::rel(1.15),
-        face = "bold",
-        colour = islh_hex("blue", 20),
-        margin = ggplot2::margin(b = 4)
-      ),
-      plot.subtitle = ggplot2::element_text(
-        size = ggplot2::rel(0.95),
-        colour = islh_hex("grey", 40),
-        margin = ggplot2::margin(b = 10)
-      ),
-      plot.caption = ggplot2::element_text(
-        size = ggplot2::rel(0.75),
-        hjust = 0,
-        colour = islh_hex("grey", 40),
-        margin = ggplot2::margin(t = 10)
-      ),
       axis.title = ggplot2::element_text(
         size = ggplot2::rel(0.9),
         colour = islh_hex("grey", 30)
@@ -52,18 +85,7 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
         linewidth = 0.4
       ),
       panel.grid.minor = ggplot2::element_blank(),
-      legend.position = "bottom",
-      legend.text = ggplot2::element_text(
-        size = ggplot2::rel(0.85),
-        colour = islh_hex("grey", 25)
-      ),
       legend.key.size = grid::unit(0.9, "lines"),
-      strip.text = ggplot2::element_text(
-        size = ggplot2::rel(0.9),
-        face = "bold",
-        colour = islh_hex("blue", 20),
-        hjust = 0
-      ),
       plot.margin = ggplot2::margin(6, 10, 6, 6)
     )
 

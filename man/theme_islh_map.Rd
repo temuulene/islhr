@@ -4,27 +4,39 @@
 \alias{theme_islh_map}
 \title{Island Health map theme}
 \usage{
-theme_islh_map(base_size = 12)
+theme_islh_map(
+  base_size = 12,
+  legend = c("bottom", "inside", "none"),
+  legend_inside = c(0.04, 0.16)
+)
 }
 \arguments{
 \item{base_size}{Base font size in points.}
+
+\item{legend}{Legend placement: \code{"bottom"}, \code{"inside"} the panel, or
+\code{"none"}. The bar stays horizontal either way, so its break labels have
+room to sit side by side.}
+
+\item{legend_inside}{Legend position when \code{legend = "inside"}, as fractions
+of the panel from the bottom left. The default sits in the Pacific, off
+the west coast of Vancouver Island.}
 }
 \value{
 A ggplot2 theme object.
 }
 \description{
-Applies the Island Health figure theme while removing the axes, ticks,
-axis lines and panel grids that do not carry meaning on a geographic map.
-Pair it with \code{ggplot2::geom_sf()} and \code{scale_fill_islh_b()} for choropleth
-maps.
+A map theme built on \code{ggplot2::theme_void()}, so no axis, tick, grid or
+panel element has to be removed one at a time. It keeps the brand text
+hierarchy from \code{\link[=theme_islh]{theme_islh()}} and nothing else. Pair it with
+\code{ggplot2::geom_sf()}, \code{\link[=coord_islh_map]{coord_islh_map()}} and \code{\link[=scale_fill_islh_b]{scale_fill_islh_b()}}.
 }
 \details{
-\code{theme_islh()} sets \code{axis.line.x}, \code{axis.line.y}, \code{axis.ticks.x} and
-\code{axis.ticks.y} directly. A ggplot2 theme element only inherits from its
-parent when the child is unset, so blanking \code{axis.line} and \code{axis.ticks}
-alone leaves the lines and ticks on the plot. This theme blanks the
-children as well.
+Island Health runs northwest to southeast, which leaves open water off the
+west coast. \code{legend = "inside"} puts the legend there and gives the map
+roughly a fifth more room, which matters because \code{coord_sf()} fixes the
+aspect ratio and a wider figure cannot stretch the map to fill it.
 }
 \examples{
 ggplot2::ggplot() + theme_islh_map()
+ggplot2::ggplot() + theme_islh_map(legend = "inside")
 }

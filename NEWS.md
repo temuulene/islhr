@@ -1,3 +1,33 @@
+# islhr 0.4.0
+
+## Maps
+
+* Added `coord_islh_map()`, which locks a map to BC Albers (EPSG:3005), the
+  projection BC Data Catalogue and BC Stats layers already use. Latitude and
+  longitude stretches Vancouver Island sideways and distorts area. It also
+  drops the graticule and the panel expansion.
+* Added `islh_caption()`, which builds a caption from its parts: source,
+  extraction date, boundary vintage, standard population, suppression rule
+  and, where the geography covers First Nations communities, a data
+  governance statement.
+* `scale_fill_islh_b()` now fills areas with no data in a grey lighter than
+  every bin. The categorical unknown grey matched the lightest bin in
+  lightness, so a greyscale print could not tell no data from the lowest
+  band. Suppressed cells still belong in their own layer with their own
+  legend key.
+* `theme_islh_map()` gained `legend = "inside"`, which puts the legend in the
+  open water off the west coast. Island Health runs northwest to southeast,
+  and `coord_sf()` fixes the aspect ratio, so a bottom legend costs map area
+  that a wider figure cannot win back.
+* `islh_caption()` wraps at 100 characters, because ggplot2 draws a caption on
+  one line and lets it run off the side of the figure.
+* `theme_islh()` now styles the legend title alongside the rest of the brand
+  text hierarchy, which the map theme shares.
+* `theme_islh_map()` now starts from `ggplot2::theme_void()` and adds the
+  brand text hierarchy, rather than stripping `theme_islh()` down element by
+  element. It also paints an opaque white background, since a transparent one
+  reads as a broken figure in Word and PowerPoint.
+
 # islhr 0.3.1
 
 ## Fixes

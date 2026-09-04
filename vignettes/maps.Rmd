@@ -59,33 +59,181 @@ contains only Island Health. Extra provincial population rows are expected to
 be discarded. The one-to-one relationship rejects duplicate codes, and the row
 check catches any Island Health boundary without a population match.
 
+## Clip the boundaries to land
+
+Health boundaries extend over water. Drawn unclipped, Island Health becomes a
+blob across the Salish Sea. Clip to a terrestrial layer first, then simplify:
+
+```{r, eval=FALSE}
+map_data <- map_data |>
+  sf::st_intersection(bc_land) |>
+  rmapshaper::ms_simplify(keep = 0.05, keep_shapes = TRUE)
+```
+
+Use `rmapshaper::ms_simplify()` rather than `sf::st_simplify()`. It preserves
+shared borders, so adjacent areas do not end up with slivers between them, and
+`keep_shapes = TRUE` keeps the small islands. Neither package is a dependency
+of `islhr`; install them in the analysis project.
+
 ## Draw the choropleth
 
-`theme_islh_map()` keeps titles, captions and legends from `theme_islh()` but
-removes axes, ticks, axis lines and grids. `scale_fill_islh_b()` places a
-continuous value into branded colour steps.
+Three functions carry the presentation:
+
+* `theme_islh_map()` starts from `ggplot2::theme_void()` and adds the brand
+  text hierarchy, so nothing but the data draws.
+* `coord_islh_map()` locks the map to BC Albers (EPSG:3005) and removes the
+  graticule.
+* `scale_fill_islh_b()` places a continuous value into branded colour steps.
 
 ```{r, eval=FALSE}
 ggplot(map_data, aes(fill = population)) +
   geom_sf(colour = islh_hex("grey", 80), linewidth = 0.25) +
   scale_fill_islh_b() +
+  coord_islh_map() +
   labs(
     title = "Population by Local Health Area",
     subtitle = "Island Health, 2025",
     fill = "Population",
-    caption = "Source: BC Stats and BC Data Catalogue"
+    caption = islh_caption(
+      source = "BC Stats and BC Data Catalogue",
+      extracted = "2026-03-31",
+      boundary = "Local health areas, 2024 boundaries"
+    )
   ) +
   theme_islh_map()
 ```
 
+Always set the projection. Latitude and longitude (EPSG:4326) stretches
+Vancouver Island sideways and misrepresents how large each area is. BC Albers
+is what the provincial layers already use.
+
 The legend abbreviates large counts, so `25000` prints as `25K`. A bottom
 legend has little room between breaks, and full comma-separated numbers
 overlap once a map has more than three or four bins. Pass
-`labels = scales::label_comma()` when a figure needs exact numbers, and give
-the plot more width so the labels have somewhere to sit.
+`labels = scales::label_comma()` when a figure needs exact numbers, along with
+`key_width = 16` to lengthen the bar.
 
 For a categorical map, use `scale_fill_islh()` instead. A map should retain a
 text label or table alternative when colour is the only visual distinction.
+
+## Put the legend in the ocean
+
+Island Health runs northwest to southeast, which leaves open water off the
+west coast and empty mainland in the top right. `coord_sf()` fixes the aspect
+ratio, so a wider figure cannot stretch the map to fill the space a bottom
+legend takes. Moving the legend inside the panel gives the map roughly a fifth
+more room:
+
+```{r, eval=FALSE}
+theme_islh_map(legend = "inside")
+```
+
+Adjust `legend_inside` if the default position covers part of the coast. It
+takes fractions of the panel measured from the bottom left.
+
+## Map rates, and classify on purpose
+
+Map age-standardized rates rather than counts, and name the standard
+population in the caption. A count map of local health areas mostly shows
+where people live.
+
+Choose the bin breaks deliberately. `classInt::classIntervals()` offers
+quantile, Jenks and equal-interval methods; quantile suits comparisons between
+areas, equal interval suits the same indicator across time. Then hard-code the
+breaks when a report maps the same indicator more than once:
+
+```{r, eval=FALSE}
+scale_fill_islh_b(breaks = c(50, 100, 150, 200))
+```
+
+Bins recalculated from each year's data make an unchanged pattern look like a
+change.
+
+Five to seven bins is the ceiling. Beyond that nobody can match a swatch back
+to the map.
+
+## Keep suppressed, zero and missing apart
+
+Suppressed, zero and no data are three different statements and must read as
+three different things.
+
+`scale_fill_islh_b()` fills areas with no data in a grey lighter than every
+bin, so a greyscale print still separates them from the lowest band. Draw
+suppressed areas as their own layer with their own key:
+
+```{r, eval=FALSE}
+suppressed <- filter(map_data, cases < 5)
+
+ggplot(map_data, aes(fill = rate)) +
+  geom_sf(colour = islh_hex("grey", 80), linewidth = 0.25) +
+  geom_sf(
+    data = suppressed,
+    aes(fill = "Suppressed"),
+    colour = islh_hex("grey", 60),
+    linewidth = 0.25
+  ) +
+  scale_fill_islh_b() +
+  ggplot2::scale_fill_manual(
+    values = c(Suppressed = islh_hex("grey", 60)),
+    name = NULL,
+    aesthetics = "fill"
+  )
+```
+
+For a hatch rather than a flat fill, `ggpattern::geom_sf_pattern()` does the
+same job. Give zero counts their own baseline tint through an explicit lowest
+break so a reader does not read zero cases as uncollected data.
+
+## Insets for the urban areas
+
+Mount Waddington and Strathcona dominate the page while Greater Victoria, where
+most of the population lives, shrinks to a few small polygons. Build the dense
+areas as their own panels and combine them:
+
+```{r, eval=FALSE}
+victoria <- base_map +
+  coord_islh_map(xlim = c(1180000, 1230000), ylim = c(360000, 400000)) +
+  labs(title = NULL, subtitle = NULL, caption = NULL) +
+  theme_islh_map(legend = "none")
+
+patchwork::wrap_plots(base_map, victoria, widths = c(2, 1))
+```
+
+`patchwork::inset_element()` places the panel over the main map instead. Draw a
+rectangle on the overview showing the inset extent either way.
+
+If the report is about people rather than land, consider a tile map or a
+population cartogram; a choropleth of rural areas is mostly a map of geography.
+
+## Colour and contrast
+
+The map palette is a single-hue blue ramp whose steps fall about ten points of
+CIE lightness apart. Single hue plus even lightness steps is what keeps a ramp
+readable in greyscale and for colour-blind readers, so the brand colours do not
+need replacing with Viridis here. Check any palette you build yourself with
+`colorspace::specplot()`, view the finished map through `colorspace::deutan()`,
+and print it in greyscale once. Internal readers print.
+
+Use a diverging scale only when the map compares against a baseline, such as a
+standardized ratio against the Island Health average. "Where is this worse than
+expected" is usually the question, and a ratio answers it more directly than a
+rate.
+
+## Alt text
+
+Every map chunk needs `fig-alt` in Quarto. Describe what the map shows, not
+that it is a map: the geography, the indicator, and the pattern a reader would
+see.
+
+````
+```{r}
+#| label: fig-lha-rate
+#| fig-alt: >
+#|   Choropleth of Island Health local health areas showing influenza
+#|   hospitalization rates. Rates are highest in the north Island and
+#|   lowest in Greater Victoria.
+```
+````
 
 ## Reproducibility
 

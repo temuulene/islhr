@@ -69,12 +69,27 @@
   .islh_state$unknown
 }
 
-# Sequential palette for map bins, ordered from lower to higher values.
+# Sequential palette for map bins, ordered from lower to higher values. The
+# five steps fall roughly 10 points of CIE lightness apart, so the ramp still
+# reads in greyscale and for colour-blind readers.
 .islh_pal_map <- function() {
   if (is.null(.islh_state$pal_map)) {
     .islh_state$pal_map <- islh_hex("blue", c(70, 60, 50, 40, 25))
   }
   .islh_state$pal_map
+}
+
+# Colour for areas with no data on a map.
+#
+# `.islh_unknown()` is grey 70, which prints at the same lightness as the
+# lightest map bin. On a choropleth that makes an area with no data
+# indistinguishable from the lowest band in greyscale, so maps use a much
+# lighter grey and leave the darker one to categorical scales.
+.islh_map_missing <- function() {
+  if (is.null(.islh_state$map_missing)) {
+    .islh_state$map_missing <- islh_hex("grey", 90)
+  }
+  .islh_state$map_missing
 }
 
 # Conventional status colours from the brand standard. Keep their meanings

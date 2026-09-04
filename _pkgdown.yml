@@ -40,12 +40,18 @@ reference:
     desc: The theme and the colour scales.
     contents:
       - theme_islh
-      - theme_islh_map
       - starts_with("scale_colour_islh")
       - starts_with("scale_fill_islh")
       - scale_y_islh_count
       - islh_save_plot
       - islh_example_plot
+
+  - title: Maps
+    desc: Choropleths of Island Health geographies.
+    contents:
+      - theme_islh_map
+      - coord_islh_map
+      - islh_caption
 
   - title: Colours and assets
     contents:

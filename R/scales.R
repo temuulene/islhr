@@ -184,10 +184,17 @@ scale_fill_islh_signal <- function(..., na.value = .islh_unknown()) {
 #' `labels = scales::label_percent()` for rates. Longer labels need a longer
 #' bar: raise `key_width`, or lower `n.breaks` so there are fewer of them.
 #'
+#' Areas with no data take a grey that is lighter than every bin, so they do
+#' not read as the lowest band in greyscale. Suppressed cells are a different
+#' thing again: draw them as their own layer with their own legend key rather
+#' than letting them share the missing-data colour.
+#'
 #' @param ... Additional arguments passed to `ggplot2::scale_fill_stepsn()`.
 #' @param reverse Reverse the palette order.
-#' @param na.value Colour for missing values.
-#' @param n.breaks Suggested number of bins.
+#' @param na.value Colour for areas with no data.
+#' @param n.breaks Suggested number of bins. Pass `breaks` instead when a
+#'   report maps the same indicator more than once: bins chosen from each
+#'   year's data make an unchanged pattern look like a change.
 #' @param labels Break label function.
 #' @param key_width Legend bar length in lines of text. Ignored when you pass
 #'   your own `guide`.
@@ -199,7 +206,7 @@ scale_fill_islh_signal <- function(..., na.value = .islh_unknown()) {
 scale_fill_islh_b <- function(
     ...,
     reverse = FALSE,
-    na.value = .islh_unknown(),
+    na.value = .islh_map_missing(),
     n.breaks = 5,
     labels = scales::label_number(scale_cut = scales::cut_short_scale()),
     key_width = 10,

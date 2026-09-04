@@ -7,7 +7,7 @@
 scale_fill_islh_b(
   ...,
   reverse = FALSE,
-  na.value = .islh_unknown(),
+  na.value = .islh_map_missing(),
   n.breaks = 5,
   labels = scales::label_number(scale_cut = scales::cut_short_scale()),
   key_width = 10,
@@ -19,9 +19,11 @@ scale_fill_islh_b(
 
 \item{reverse}{Reverse the palette order.}
 
-\item{na.value}{Colour for missing values.}
+\item{na.value}{Colour for areas with no data.}
 
-\item{n.breaks}{Suggested number of bins.}
+\item{n.breaks}{Suggested number of bins. Pass \code{breaks} instead when a
+report maps the same indicator more than once: bins chosen from each
+year's data make an unchanged pattern look like a change.}
 
 \item{labels}{Break label function.}
 
@@ -44,4 +46,9 @@ horizontal bar legend has little room between breaks. Pass \code{labels} to
 override, for example \code{labels = scales::label_comma()} for full numbers or
 \code{labels = scales::label_percent()} for rates. Longer labels need a longer
 bar: raise \code{key_width}, or lower \code{n.breaks} so there are fewer of them.
+
+Areas with no data take a grey that is lighter than every bin, so they do
+not read as the lowest band in greyscale. Suppressed cells are a different
+thing again: draw them as their own layer with their own legend key rather
+than letting them share the missing-data colour.
 }
