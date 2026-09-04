@@ -3,10 +3,11 @@
 Island Health branding for R figures, tables and Quarto reports.
 
 `islhr` applies the Island Health brand colour system, BC Sans typography and
-report layout to ggplot2 plots, `flextable` and `gt` tables, and Quarto HTML and
-Word output. It also scaffolds a ready-to-render report project.
+report layout to ggplot2 plots, epidemic curves, `flextable` and `gt` tables,
+and Quarto HTML and Word output. It also scaffolds a ready-to-render report
+project.
 
-Epidemiological calculations and disclosure-control helpers are provided by
+Epidemiological calculations and surveillance data preparation are provided by
 [`islhepi`](https://github.com/temuulene/islhepi). The packages can be loaded
 together in the same report.
 
@@ -14,10 +15,8 @@ Documentation: <https://temuulene.github.io/islhr/>
 
 New users should start with
 [Getting started with islhr](https://temuulene.github.io/islhr/articles/islhr.html).
-It contains evaluated examples, including a rendered figure and HTML table.
-
-It grew out of the theme script in `islh-brand-standard`, which staff used to
-copy into each project by hand.
+For routine surveillance plots, see the evaluated
+[surveillance figures guide](https://temuulene.github.io/islhr/articles/surveillance.html).
 
 ## Installing
 
@@ -32,7 +31,7 @@ If your network blocks GitHub, ask your team lead for the built package and
 install it from the file. No token, GitHub account or compiler is required:
 
 ```r
-install.packages("path/to/islhr_0.4.0.zip", repos = NULL)
+install.packages("path/to/islhr_0.5.0.zip", repos = NULL)
 ```
 
 Every tagged release attaches that `.zip` for Windows and a `.tar.gz` source
@@ -44,32 +43,66 @@ Then install the packages your output format needs:
 islhr::islh_install_deps("html")   # "docx", or "both"
 ```
 
-## Using it
-
-In a Quarto report:
-
-````
-```{r}
-#| label: setup
-#| include: false
-library(islhr)
-islh_setup()
-```
-````
-
-`islh_setup()` detects whether you are rendering to HTML or Word and configures
-ggplot2 and the matching table engine. Run `islh_help()` for the functions you
-will use most.
+## Choose the function
 
 | Task | Function |
 |---|---|
+| Routine surveillance or epidemic curve | `islh_epi_curve()` |
 | Branded ggplot | `theme_islh()` and `scale_*_islh()` |
 | HTML table | `islh_gt()` |
 | Word table | `islh_flextable()` |
 | Quarto report project | `islh_create_report()` |
 | Health-geography map | `theme_islh_map()` and `coord_islh_map()` |
 
-## Starting a new report
+## Epidemic curves
+
+```r
+library(islhr)
+
+weekly_counts <- data.frame(
+  period_start = seq(as.Date("2026-01-04"), by = "week", length.out = 8),
+  count = c(1, 2, 4, 8, 6, 4, 2, 1)
+)
+
+islh_epi_curve(
+  weekly_counts,
+  date = period_start,
+  count = count,
+  title = "Reported cases by week"
+)
+```
+
+Use `style = "cases"` to outline individual cases in a small outbreak. Routine
+surveillance defaults to bars for faster rendering. Historical ranges can be
+supplied as a separate reference data frame.
+
+When starting from a line list:
+
+```r
+counts <- islhepi::islh_count_events(
+  events,
+  date = event_date,
+  id = encounter_id,
+  by = region,
+  interval = "epiweek",
+  fill = TRUE
+)
+
+islh_epi_curve(counts, period_start, count, fill = region)
+```
+
+## Using it in a report
+
+```r
+library(islhr)
+islh_setup()
+```
+
+`islh_setup()` detects whether you are rendering to HTML or Word and configures
+ggplot2 and the matching table engine. Run `islh_help()` for the functions you
+will use most.
+
+Start a complete project with:
 
 ```r
 islhr::islh_create_report("2026-flu-season-report", format = "docx")
@@ -119,6 +152,3 @@ ggplot(map_data, aes(fill = population)) +
 The population resource covers all of BC. The boundary helper defaults to
 Island Health, so population rows from other health authorities are expected
 to be discarded by this join.
-
-See `vignette("maps", package = "islhr")` for the package boundary and a
-complete workflow.

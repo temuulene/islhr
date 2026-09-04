@@ -1,3 +1,20 @@
+# islhr 0.5.0
+
+## Surveillance figures
+
+* Added `islh_epi_curve()` for branded routine surveillance and outbreak
+  figures built from prepared period counts.
+* Routine surveillance defaults to efficient stacked bars, with grouped bars,
+  facets, total labels and automatic date spacing available.
+* Small outbreaks can use `style = "cases"` to draw one outlined rectangle per
+  case. A configurable guard prevents accidental expansion of very large
+  counts.
+* Historical lower and upper limits can be drawn as a neutral reference band,
+  with an optional dashed reference mean. The function displays the reference
+  but does not interpret an exceedance as an outbreak.
+* Added an evaluated surveillance guide with rendered bar, case-tile,
+  historical-reference and faceted examples.
+
 # islhr 0.4.0
 
 ## Maps
@@ -115,7 +132,6 @@ numbers in a published report.
   headings in HTML.
 * BC Sans is described as "not shipped" rather than "cannot be shipped": it is
   under the SIL Open Font License 1.1, as the package's own webfont notice says.
-
 * Word figure captions now default to the top, and the reference document
   keeps each caption with the following image across page breaks.
 

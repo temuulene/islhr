@@ -12,12 +12,26 @@ navbar:
       menu:
         - text: Getting started
           href: articles/islhr.html
+        - text: Surveillance figures
+          href: articles/surveillance.html
         - text: Writing reports
           href: articles/reports.html
         - text: Mapping health geographies
           href: articles/maps.html
         - text: Moving from the theme script
           href: articles/migrating.html
+
+articles:
+  - title: Figures
+    contents:
+      - surveillance
+  - title: Reports
+    contents:
+      - reports
+      - migrating
+  - title: Maps
+    contents:
+      - maps
 
 reference:
   - title: Setting up
@@ -39,8 +53,9 @@ reference:
       - islh_use_brand
 
   - title: Figures
-    desc: Build branded plots with examples for categories, ordered data and maps.
+    desc: Build branded plots, including routine surveillance and epi curves.
     contents:
+      - islh_epi_curve
       - theme_islh
       - starts_with("scale_colour_islh")
       - starts_with("scale_fill_islh")
