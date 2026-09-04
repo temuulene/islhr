@@ -18,7 +18,7 @@ A ggplot2 theme object.
 Island Health ggplot theme
 }
 \examples{
-\dontshow{islhr:::.islh_state$font <- ""}
+\dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 ggplot2::ggplot(
   datasets::mtcars,
   ggplot2::aes(wt, mpg)

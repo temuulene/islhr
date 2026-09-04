@@ -10,7 +10,7 @@
 #' @return A ggplot2 discrete scale.
 #'
 #' @examples
-#' \dontshow{islhr:::.islh_state$font <- ""}
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 #' ggplot2::ggplot(
 #'   datasets::mtcars,
 #'   ggplot2::aes(wt, mpg, colour = factor(cyl))
@@ -45,7 +45,7 @@ scale_color_islh <- scale_colour_islh
 #' @return A ggplot2 discrete scale.
 #'
 #' @examples
-#' \dontshow{islhr:::.islh_state$font <- ""}
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 #' counts <- data.frame(
 #'   programme = c("Community", "Hospital", "Primary care"),
 #'   encounters = c(1860, 3210, 2440)
@@ -226,7 +226,7 @@ scale_fill_islh_signal <- function(..., na.value = .islh_unknown()) {
 #' @return A ggplot2 binned fill scale.
 #'
 #' @examples
-#' \dontshow{islhr:::.islh_state$font <- ""}
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 #' grid <- expand.grid(x = 1:5, y = 1:4)
 #' grid$value <- seq_len(nrow(grid)) * 100
 #'

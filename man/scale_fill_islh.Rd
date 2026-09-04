@@ -20,7 +20,7 @@ A ggplot2 discrete scale.
 Island Health qualitative fill scale
 }
 \examples{
-\dontshow{islhr:::.islh_state$font <- ""}
+\dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 counts <- data.frame(
   programme = c("Community", "Hospital", "Primary care"),
   encounters = c(1860, 3210, 2440)

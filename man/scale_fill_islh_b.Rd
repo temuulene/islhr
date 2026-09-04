@@ -53,7 +53,7 @@ thing again: draw them as their own layer with their own legend key rather
 than letting them share the missing-data colour.
 }
 \examples{
-\dontshow{islhr:::.islh_state$font <- ""}
+\dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 grid <- expand.grid(x = 1:5, y = 1:4)
 grid$value <- seq_len(nrow(grid)) * 100
 
