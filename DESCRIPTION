@@ -1,6 +1,6 @@
 Package: islhr
 Title: Island Health Branding for R Figures, Tables and Reports
-Version: 0.4.0
+Version: 0.3.0
 Authors@R:
     person("Temuulen", "Enebish", , "temuulen@gmail.com", role = c("aut", "cre"))
 Description: Applies Island Health brand colours, typography and layout to
@@ -34,11 +34,11 @@ Suggests:
     ragg,
     rlang,
     rmarkdown,
-    sf,
     testthat (>= 3.0.0),
     withr,
     yaml
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-URL: https://github.com/temuulene/islhr
+URL: https://temuulene.github.io/islhr/,
+    https://github.com/temuulene/islhr
 BugReports: https://github.com/temuulene/islhr/issues

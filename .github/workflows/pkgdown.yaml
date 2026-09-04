@@ -6,10 +6,15 @@ on:
 
 name: pkgdown
 
-permissions: read-all
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  pkgdown:
+  build:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -28,9 +33,6 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      # The repo is private during development, so the site is built as an
-      # artefact rather than published. Switch to deploy-pkgdown once the
-      # repository is public and Pages is enabled.
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
@@ -39,7 +41,27 @@ jobs:
         run: pkgdown::check_pkgdown()
         shell: Rscript {0}
 
-      - uses: actions/upload-artifact@v4
+      - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artefact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: pkgdown-site
           path: docs
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

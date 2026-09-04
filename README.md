@@ -10,36 +10,29 @@ Epidemiological calculations and disclosure-control helpers are provided by
 [`islhepi`](https://github.com/temuulene/islhepi). The packages can be loaded
 together in the same report.
 
+Documentation: <https://temuulene.github.io/islhr/>
+
 It grew out of the theme script in `islh-brand-standard`, which staff used to
 copy into each project by hand.
 
 ## Installing
 
-**While this repository is private**, `install_github()` needs a GitHub
-account with access to it and a personal access token. Create a token with the
-`repo` scope at <https://github.com/settings/tokens>, then:
+Install the development version from GitHub:
 
 ```r
 install.packages("remotes", type = "binary")
-
-# Stores the token in ~/.Renviron so you only do this once.
-usethis::edit_r_environ()      # add: GITHUB_PAT=ghp_your_token_here
-# restart R, then:
 remotes::install_github("temuulene/islhr")
 ```
 
-**If you cannot do that** — no GitHub account, or the network blocks it — ask
-your team lead for the built package and install it from the file. No token,
-no GitHub, no compiler required:
+If your network blocks GitHub, ask your team lead for the built package and
+install it from the file. No token, GitHub account or compiler is required:
 
 ```r
 install.packages("path/to/islhr_0.3.0.zip", repos = NULL)
 ```
 
-Every tagged release attaches that `.zip` (Windows) and a `.tar.gz`.
-
-Once the repository is public, the `install_github()` line works on its own
-with no token.
+Every tagged release attaches that `.zip` for Windows and a `.tar.gz` source
+package.
 
 Then install the packages your output format needs:
 
@@ -106,8 +99,7 @@ if (anyNA(map_data$population)) {
 
 ggplot(map_data, aes(fill = population)) +
   geom_sf(colour = islh_hex("grey", 80), linewidth = 0.25) +
-  scale_fill_islh_b() +
-  coord_islh_map() +
+  scale_fill_islh_b(labels = scales::label_comma()) +
   labs(title = "Population by Local Health Area", fill = "Population") +
   theme_islh_map()
 ```
