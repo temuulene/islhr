@@ -33,7 +33,7 @@ your team lead for the built package and install it from the file. No token,
 no GitHub, no compiler required:
 
 ```r
-install.packages("path/to/islhr_0.2.0.zip", repos = NULL)
+install.packages("path/to/islhr_0.3.0.zip", repos = NULL)
 ```
 
 Every tagged release attaches that `.zip` (Windows) and a `.tar.gz`.
@@ -72,3 +72,39 @@ islhr::islh_create_report("2026-flu-season-report", format = "docx")
 
 That writes a Quarto project with the Island Health format extension, brand
 file and a worked example already wired up.
+
+## Mapping BC health geographies
+
+Use `islhepi` to retrieve standardized population and geography data, then
+apply the map presentation layer from `islhr`:
+
+```r
+library(dplyr)
+library(ggplot2)
+library(islhepi)
+library(islhr)
+
+population <- islh_bc_population("lha", years = 2025, sex = "T") |>
+  summarise(
+    population = sum(population),
+    .by = c(geography, geography_code, year, estimate_type)
+  )
+
+map_data <- inner_join(
+  islh_bc_geography("lha"),
+  population,
+  by = join_by(geography, geography_code),
+  relationship = "one-to-one",
+  unmatched = "error",
+  na_matches = "never"
+)
+
+ggplot(map_data, aes(fill = population)) +
+  geom_sf(colour = islh_hex("grey", 80), linewidth = 0.25) +
+  scale_fill_islh_b(labels = scales::label_comma()) +
+  labs(title = "Population by Local Health Area", fill = "Population") +
+  theme_islh_map()
+```
+
+See `vignette("maps", package = "islhr")` for the package boundary and a
+complete workflow.

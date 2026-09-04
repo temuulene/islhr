@@ -1,0 +1,84 @@
+---
+title: "Mapping BC health geographies"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mapping BC health geographies}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+The two packages divide mapping work by responsibility. `islhepi` retrieves
+and standardizes population and health-geography data. `islhr` controls the
+visual presentation of the finished map.
+
+## Retrieve and join the data
+
+The following example requests total population and LHA boundaries for Island
+Health. The catalogue calls are not evaluated while this vignette is built.
+
+```{r, eval=FALSE}
+library(dplyr)
+library(ggplot2)
+library(islhepi)
+library(islhr)
+
+population_extract <- islh_bc_population(
+  geography = "lha",
+  years = 2025,
+  sex = "T"
+)
+
+population <- population_extract |>
+  summarise(
+    population = sum(population),
+    .by = c(geography, geography_code, year, estimate_type)
+  )
+
+boundaries <- islh_bc_geography("lha")
+
+map_data <- inner_join(
+  boundaries,
+  population,
+  by = join_by(geography, geography_code),
+  relationship = "one-to-one",
+  unmatched = "error",
+  na_matches = "never"
+)
+```
+
+The strict join is intentional. A duplicated or unmatched geography should be
+investigated instead of becoming a misleading blank or duplicated shape.
+
+## Draw the choropleth
+
+`theme_islh_map()` keeps titles, captions and legends from `theme_islh()` but
+removes axes, ticks and grids. `scale_fill_islh_b()` places a continuous value
+into branded colour steps.
+
+```{r, eval=FALSE}
+ggplot(map_data, aes(fill = population)) +
+  geom_sf(colour = islh_hex("grey", 80), linewidth = 0.25) +
+  scale_fill_islh_b(labels = scales::label_comma()) +
+  labs(
+    title = "Population by Local Health Area",
+    subtitle = "Island Health, 2025",
+    fill = "Population",
+    caption = "Source: BC Stats and BC Data Catalogue"
+  ) +
+  theme_islh_map()
+```
+
+For a categorical map, use `scale_fill_islh()` instead. A map should retain a
+text label or table alternative when colour is the only visual distinction.
+
+## Reproducibility
+
+Capture `attr(population_extract, "bcdata_source")` and the corresponding
+attribute on `boundaries` before transforming them. Save a dated extract in
+the analysis project when a report must reproduce the exact population or
+boundary version used for publication.

@@ -18,6 +18,7 @@ islh_help <- function() {
     "  scale_fill_islh_signal()      red, orange, green for status",
     "  scale_y_islh_count()          count axis with thousands separators",
     "  theme_islh(base_size = 12)    the theme on its own, for one plot",
+    "  theme_islh_map()              map theme without axes or grids",
     "",
     "COLOURS",
     '  islh_brand("primary")         the main Island Health blue',

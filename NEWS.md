@@ -1,3 +1,13 @@
+# islhr 0.3.0
+
+## Geographic reporting
+
+* Added `theme_islh_map()` for branded maps without axes, ticks or panel grids.
+* Added a map workflow that combines `islhepi` BC Data Catalogue retrieval
+  with `islhr` choropleth scales and presentation styling.
+* Kept population and boundary retrieval out of `islhr`, preserving its scope
+  as the branding and reporting package.
+
 # islhr 0.2.0
 
 ## Package scope

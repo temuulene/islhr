@@ -12,6 +12,8 @@ navbar:
       menu:
         - text: Writing reports
           href: articles/reports.html
+        - text: Mapping health geographies
+          href: articles/maps.html
         - text: Moving from the theme script
           href: articles/migrating.html
 
@@ -38,6 +40,7 @@ reference:
     desc: The theme and the colour scales.
     contents:
       - theme_islh
+      - theme_islh_map
       - starts_with("scale_colour_islh")
       - starts_with("scale_fill_islh")
       - scale_y_islh_count
