@@ -13,5 +13,6 @@ A ggplot object.
 Create a runnable Island Health example plot
 }
 \examples{
+\dontshow{islhr:::.islh_state$font <- ""}
 islh_example_plot()
 }

@@ -63,6 +63,7 @@
 #' @return A ggplot2 theme object.
 #'
 #' @examples
+#' \dontshow{islhr:::.islh_state$font <- ""}
 #' ggplot2::ggplot(
 #'   datasets::mtcars,
 #'   ggplot2::aes(wt, mpg)

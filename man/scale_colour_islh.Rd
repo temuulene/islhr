@@ -23,6 +23,7 @@ A ggplot2 discrete scale.
 Island Health qualitative colour scale
 }
 \examples{
+\dontshow{islhr:::.islh_state$font <- ""}
 ggplot2::ggplot(
   datasets::mtcars,
   ggplot2::aes(wt, mpg, colour = factor(cyl))

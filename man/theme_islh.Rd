@@ -18,6 +18,7 @@ A ggplot2 theme object.
 Island Health ggplot theme
 }
 \examples{
+\dontshow{islhr:::.islh_state$font <- ""}
 ggplot2::ggplot(
   datasets::mtcars,
   ggplot2::aes(wt, mpg)

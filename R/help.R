@@ -62,6 +62,7 @@ islh_help <- function() {
 #' @return A ggplot object.
 #'
 #' @examples
+#' \dontshow{islhr:::.islh_state$font <- ""}
 #' islh_example_plot()
 #'
 #' @export
