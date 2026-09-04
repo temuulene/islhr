@@ -7,6 +7,8 @@
   with `islhr` choropleth scales and presentation styling.
 * Kept population and boundary retrieval out of `islhr`, preserving its scope
   as the branding and reporting package.
+* Corrected the mapping example for provincial population data joined to the
+  default Island Health boundary subset.
 
 # islhr 0.2.0
 

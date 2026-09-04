@@ -41,18 +41,23 @@ population <- population_extract |>
 
 boundaries <- islh_bc_geography("lha")
 
-map_data <- inner_join(
+map_data <- left_join(
   boundaries,
   population,
   by = join_by(geography, geography_code),
   relationship = "one-to-one",
-  unmatched = "error",
   na_matches = "never"
 )
+
+if (anyNA(map_data$population)) {
+  stop("One or more Island Health boundaries did not match population data.")
+}
 ```
 
-The strict join is intentional. A duplicated or unmatched geography should be
-investigated instead of becoming a misleading blank or duplicated shape.
+The population resource covers all of BC, while the default boundary object
+contains only Island Health. Extra provincial population rows are expected to
+be discarded. The one-to-one relationship rejects duplicate codes, and the row
+check catches any Island Health boundary without a population match.
 
 ## Draw the choropleth
 

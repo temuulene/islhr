@@ -90,14 +90,19 @@ population <- islh_bc_population("lha", years = 2025, sex = "T") |>
     .by = c(geography, geography_code, year, estimate_type)
   )
 
-map_data <- inner_join(
-  islh_bc_geography("lha"),
+boundaries <- islh_bc_geography("lha")
+
+map_data <- left_join(
+  boundaries,
   population,
   by = join_by(geography, geography_code),
   relationship = "one-to-one",
-  unmatched = "error",
   na_matches = "never"
 )
+
+if (anyNA(map_data$population)) {
+  stop("One or more Island Health boundaries did not match population data.")
+}
 
 ggplot(map_data, aes(fill = population)) +
   geom_sf(colour = islh_hex("grey", 80), linewidth = 0.25) +
@@ -105,6 +110,10 @@ ggplot(map_data, aes(fill = population)) +
   labs(title = "Population by Local Health Area", fill = "Population") +
   theme_islh_map()
 ```
+
+The population resource covers all of BC. The boundary helper defaults to
+Island Health, so population rows from other health authorities are expected
+to be discarded by this join.
 
 See `vignette("maps", package = "islhr")` for the package boundary and a
 complete workflow.
