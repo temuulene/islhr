@@ -53,12 +53,8 @@ test_that("the binned fill scale accepts a caller's labels and guide", {
 })
 
 test_that("areas with no data cannot be mistaken for the lowest bin", {
-  lightness <- function(x) {
-    farver::convert_colour(t(grDevices::col2rgb(x)), "rgb", "lab")[, 1]
-  }
-
-  bins <- lightness(.islh_pal_map())
-  missing <- lightness(.islh_map_missing())
+  bins <- .islh_lightness(.islh_pal_map())
+  missing <- .islh_lightness(.islh_map_missing())
 
   # The categorical unknown grey matches the lightest bin in lightness, so a
   # greyscale print cannot tell no data from the lowest band. The map colour
@@ -71,12 +67,7 @@ test_that("areas with no data cannot be mistaken for the lowest bin", {
 })
 
 test_that("the map palette steps evenly in lightness", {
-  lab <- farver::convert_colour(
-    t(grDevices::col2rgb(.islh_pal_map())),
-    "rgb",
-    "lab"
-  )
-  steps <- abs(diff(lab[, 1]))
+  steps <- abs(diff(.islh_lightness(.islh_pal_map())))
 
   # Even lightness steps are what keep a single-hue ramp readable in
   # greyscale and for colour-blind readers.

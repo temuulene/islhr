@@ -67,6 +67,23 @@
   abs(foreground_value - background_value) >= threshold
 }
 
+#' Perceptual lightness of a colour
+#'
+#' CIE L*, from 0 for black to 100 for white. It is what a greyscale print
+#' leaves of a colour, so it is the measure that says whether a sequential
+#' ramp still reads without hue, and whether a missing-data fill can be told
+#' apart from the bins around it.
+#'
+#' @param colour A character vector of colours.
+#'
+#' @return A numeric vector of L* values.
+#'
+#' @noRd
+.islh_lightness <- function(colour) {
+  rgb <- t(grDevices::col2rgb(colour)) / 255
+  grDevices::convertColor(rgb, from = "sRGB", to = "Lab")[, "L"]
+}
+
 #' Calculate a WCAG contrast ratio
 #'
 #' @param foreground Foreground colour as a name or hexadecimal value.
