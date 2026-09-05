@@ -34,7 +34,7 @@ test_that("only the taught API is exported", {
   # Internals stay internal.
   expect_length(grep("^\\.islh_", exports), 0L)
 
-  expect_snapshot(exports)
+  expect_snapshot(cat(exports, sep = "\n"))
 })
 
 test_that("islh_help prints a grouped quick reference", {
@@ -105,6 +105,7 @@ test_that("a package that is present but too old is reported as such", {
 
 test_that("plot setup is repeatable and leaves the session as it found it", {
   skip_if_not_installed("ggplot2")
+  skip_if_not_installed("ragg")
   withr::local_options(list(
     islh.output_format = NULL,
     islh.embed_fonts = NULL,
