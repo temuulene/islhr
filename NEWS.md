@@ -1,3 +1,21 @@
+# islhr 0.6.1
+
+* Freeze returned ggplot themes, geom defaults and scales in with_islh(), so
+  plots retain their appearance after session settings are restored.
+* Roll back failed setup and restore gtsummary themes without retaining new
+  keys. Register webfont dependencies for each document render.
+* Use an explicit reporting timezone in epidemic curves, defaulting to
+  America/Vancouver.
+* Keep branding separate from statistical display choices. The former
+  gtsummary summary/precision/missing-label defaults are now available through
+  the explicit islh_gtsummary_statistics() preset.
+* Preserve body text/background colours when styling an existing flextable;
+  set preserve_body = FALSE for full recolouring.
+* Fix the help snapshot and .data namespace declaration, add semantic
+  regression checks and Windows R 4.4.1 coverage, gate release publication on
+  passing builds, and document base-R Windows installation.
+* Remove tracked Python bytecode and update public-repository guidance.
+
 # islhr 0.6.0
 
 ## Undoing setup

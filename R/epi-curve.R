@@ -4,6 +4,8 @@
 #' figure. It deliberately keeps counting separate from plotting: use
 #' `islhepi::islh_count_events()` first when starting from event-level data.
 #'
+#' @param timezone IANA reporting timezone for timestamps; defaults to
+#'   America/Vancouver. Date inputs retain their calendar date.
 #' @param data A data frame containing one row per plotted group and period.
 #' @param date Date column.
 #' @param count Whole-count column.
@@ -68,31 +70,33 @@
 #'
 #' @export
 islh_epi_curve <- function(
-    data,
-    date,
-    count,
-    fill = NULL,
-    facet = NULL,
-    style = c("bars", "cases"),
-    position = c("stack", "dodge"),
-    labels = c("none", "total"),
-    reference = NULL,
-    reference_date = NULL,
-    lower = "lower_limit",
-    upper = "upper_limit",
-    reference_mean = "reference_mean",
-    show_year_lines = TRUE,
-    bar_width = NULL,
-    date_breaks = NULL,
-    date_labels = NULL,
-    max_cases = 50000L,
-    title = NULL,
-    subtitle = NULL,
-    caption = NULL,
-    x = NULL,
-    y = "Cases",
-    facet_scales = "fixed",
-    aggregate = FALSE) {
+  data,
+  date,
+  count,
+  fill = NULL,
+  facet = NULL,
+  style = c("bars", "cases"),
+  position = c("stack", "dodge"),
+  labels = c("none", "total"),
+  reference = NULL,
+  reference_date = NULL,
+  lower = "lower_limit",
+  upper = "upper_limit",
+  reference_mean = "reference_mean",
+  show_year_lines = TRUE,
+  bar_width = NULL,
+  date_breaks = NULL,
+  date_labels = NULL,
+  max_cases = 50000L,
+  title = NULL,
+  subtitle = NULL,
+  caption = NULL,
+  x = NULL,
+  y = "Cases",
+  facet_scales = "fixed",
+  aggregate = FALSE,
+  timezone = "America/Vancouver"
+) {
   if (!is.data.frame(data)) {
     .islh_abort("{.arg data} must be a data frame.")
   }
@@ -121,7 +125,11 @@ islh_epi_curve <- function(
   )
 
   plot_data <- as.data.frame(data)
-  plot_data[[date_name]] <- .islh_plot_dates(plot_data[[date_name]], date_name)
+  plot_data[[date_name]] <- .islh_plot_dates(
+    plot_data[[date_name]],
+    date_name,
+    timezone
+  )
   plot_data[[count_name]] <- .islh_plot_counts(
     plot_data[[count_name]],
     count_name
@@ -144,8 +152,13 @@ islh_epi_curve <- function(
     }
   }
   # A bar width is measured in days along the date axis, not in inches.
-  if (!is.numeric(bar_width) || length(bar_width) != 1L ||
-      is.na(bar_width) || !is.finite(bar_width) || bar_width <= 0) {
+  if (
+    !is.numeric(bar_width) ||
+      length(bar_width) != 1L ||
+      is.na(bar_width) ||
+      !is.finite(bar_width) ||
+      bar_width <= 0
+  ) {
     .islh_abort("{.arg bar_width} must be one positive finite number of days.")
   }
   max_cases <- .islh_check_count(max_cases, "max_cases")
@@ -158,7 +171,8 @@ islh_epi_curve <- function(
     reference_date = reference_date,
     lower = lower,
     upper = upper,
-    reference_mean = reference_mean
+    reference_mean = reference_mean,
+    timezone = timezone
   )
   if (!is.null(reference_layers$ribbon)) {
     plot <- plot + reference_layers$ribbon
@@ -172,13 +186,17 @@ islh_epi_curve <- function(
     first_year <- as.integer(format(date_range[1], "%Y"))
     last_year <- as.integer(format(date_range[2], "%Y"))
     if (last_year > first_year) {
-      year_starts <- as.Date(paste0(seq.int(first_year + 1L, last_year), "-01-01"))
-      plot <- plot + ggplot2::geom_vline(
-        xintercept = as.numeric(year_starts),
-        colour = islh_hex("grey", 40),
-        linewidth = 0.35,
-        linetype = "dashed"
-      )
+      year_starts <- as.Date(paste0(
+        seq.int(first_year + 1L, last_year),
+        "-01-01"
+      ))
+      plot <- plot +
+        ggplot2::geom_vline(
+          xintercept = as.numeric(year_starts),
+          colour = islh_hex("grey", 40),
+          linewidth = 0.35,
+          linetype = "dashed"
+        )
     }
   }
 
@@ -262,15 +280,16 @@ islh_epi_curve <- function(
       y = .data$.islh_total,
       label = .data$.islh_total
     )
-    plot <- plot + ggplot2::geom_text(
-      data = totals,
-      mapping = label_mapping,
-      inherit.aes = FALSE,
-      vjust = -0.35,
-      size = 3,
-      family = islh_font_family(),
-      colour = islh_brand("black")
-    )
+    plot <- plot +
+      ggplot2::geom_text(
+        data = totals,
+        mapping = label_mapping,
+        inherit.aes = FALSE,
+        vjust = -0.35,
+        size = 3,
+        family = islh_font_family(),
+        colour = islh_brand("black")
+      )
   }
 
   if (is.null(date_breaks)) {
@@ -284,7 +303,11 @@ islh_epi_curve <- function(
     }
   }
   if (is.null(date_labels)) {
-    date_labels <- if (as.numeric(diff(date_range)) <= 370) "%b %d" else "%b\n%Y"
+    date_labels <- if (as.numeric(diff(date_range)) <= 370) {
+      "%b %d"
+    } else {
+      "%b\n%Y"
+    }
   }
 
   plot <- plot +
@@ -305,10 +328,11 @@ islh_epi_curve <- function(
     theme_islh()
 
   if (!is.null(facet_name)) {
-    plot <- plot + ggplot2::facet_wrap(
-      ggplot2::vars(!!rlang::sym(facet_name)),
-      scales = facet_scales
-    )
+    plot <- plot +
+      ggplot2::facet_wrap(
+        ggplot2::vars(!!rlang::sym(facet_name)),
+        scales = facet_scales
+      )
   }
 
   plot
@@ -330,7 +354,9 @@ islh_epi_curve <- function(
     .islh_abort("{.arg {arg}} must be a bare column name or one string.")
   }
   if (!name %in% names(data)) {
-    .islh_abort("Column {.field {name}} selected by {.arg {arg}} was not found.")
+    .islh_abort(
+      "Column {.field {name}} selected by {.arg {arg}} was not found."
+    )
   }
   name
 }
@@ -342,12 +368,13 @@ islh_epi_curve <- function(
 # that looks finished and is wrong, so duplicates stop here unless the caller
 # asks for them to be summed.
 .islh_plot_grain <- function(
-    data,
-    date_name,
-    count_name,
-    fill_name,
-    facet_name,
-    aggregate) {
+  data,
+  date_name,
+  count_name,
+  fill_name,
+  facet_name,
+  aggregate
+) {
   keys <- c(date_name, fill_name, facet_name)
   repeated <- duplicated(data[keys])
   if (!any(repeated)) {
@@ -382,11 +409,19 @@ islh_epi_curve <- function(
   out
 }
 
-.islh_plot_dates <- function(x, arg) {
+.islh_plot_dates <- function(x, arg, timezone = "America/Vancouver") {
+  if (
+    !is.character(timezone) ||
+      length(timezone) != 1L ||
+      is.na(timezone) ||
+      !timezone %in% c("UTC", OlsonNames())
+  ) {
+    .islh_abort("{.arg timezone} must be a valid IANA timezone.")
+  }
   if (inherits(x, "Date")) {
     out <- as.Date(x)
   } else if (inherits(x, "POSIXt")) {
-    out <- as.Date(x)
+    out <- as.Date(as.POSIXct(x), tz = timezone)
   } else if (is.character(x) || is.factor(x)) {
     text <- trimws(as.character(x))
     shape_ok <- grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", text)
@@ -396,7 +431,7 @@ islh_epi_curve <- function(
   } else {
     .islh_abort("{.arg {arg}} must contain dates, not {.cls {class(x)[1]}}.")
   }
-  if (anyNA(out)) {
+  if (anyNA(out) || any(!is.finite(as.numeric(out)))) {
     .islh_abort(c(
       "{.arg {arg}} must not contain missing or invalid dates.",
       i = "Use Date values or ISO dates written as YYYY-MM-DD."
@@ -406,20 +441,28 @@ islh_epi_curve <- function(
 }
 
 .islh_plot_counts <- function(x, arg) {
-  if (is.factor(x) || !is.numeric(x) || anyNA(x) || any(!is.finite(x)) ||
-      any(x < 0) || any(abs(x - round(x)) > .Machine$double.eps^0.5)) {
+  if (
+    is.factor(x) ||
+      !is.numeric(x) ||
+      anyNA(x) ||
+      any(!is.finite(x)) ||
+      any(x < 0) ||
+      any(abs(x - round(x)) > .Machine$double.eps^0.5)
+  ) {
     .islh_abort("{.arg {arg}} must contain non-negative finite whole counts.")
   }
   as.numeric(x)
 }
 
 .islh_plot_reference <- function(
-    reference,
-    data_date_name,
-    reference_date,
-    lower,
-    upper,
-    reference_mean) {
+  reference,
+  data_date_name,
+  reference_date,
+  lower,
+  upper,
+  reference_mean,
+  timezone = "America/Vancouver"
+) {
   empty <- list(ribbon = NULL, line = NULL)
   if (is.null(reference)) {
     return(empty)
@@ -439,13 +482,17 @@ islh_epi_curve <- function(
       )
     }
   }
-  if (!is.character(reference_date) || length(reference_date) != 1L ||
-      !reference_date %in% names(reference)) {
+  if (
+    !is.character(reference_date) ||
+      length(reference_date) != 1L ||
+      !reference_date %in% names(reference)
+  ) {
     .islh_abort("{.arg reference_date} must name a column in {.arg reference}.")
   }
   reference[[reference_date]] <- .islh_plot_dates(
     reference[[reference_date]],
-    "reference_date"
+    "reference_date",
+    timezone
   )
 
   fields <- list(
@@ -455,8 +502,10 @@ islh_epi_curve <- function(
   )
   for (field in names(fields)) {
     value <- fields[[field]]
-    if (!is.null(value) &&
-        (!is.character(value) || length(value) != 1L || is.na(value))) {
+    if (
+      !is.null(value) &&
+        (!is.character(value) || length(value) != 1L || is.na(value))
+    ) {
       .islh_abort("{.arg {field}} must be NULL or one column name.")
     }
   }
@@ -478,9 +527,15 @@ islh_epi_curve <- function(
   ribbon <- NULL
   if (has_lower && has_upper) {
     limits <- c(reference[[lower]], reference[[upper]])
-    if (!is.numeric(limits) || anyNA(limits) || any(!is.finite(limits)) ||
-        any(reference[[lower]] > reference[[upper]])) {
-      .islh_abort("Reference limits must be finite and lower must not exceed upper.")
+    if (
+      !is.numeric(limits) ||
+        anyNA(limits) ||
+        any(!is.finite(limits)) ||
+        any(reference[[lower]] > reference[[upper]])
+    ) {
+      .islh_abort(
+        "Reference limits must be finite and lower must not exceed upper."
+      )
     }
     ribbon <- ggplot2::geom_ribbon(
       data = reference,
@@ -497,9 +552,11 @@ islh_epi_curve <- function(
 
   line <- NULL
   if (has_mean) {
-    if (!is.numeric(reference[[reference_mean]]) ||
+    if (
+      !is.numeric(reference[[reference_mean]]) ||
         anyNA(reference[[reference_mean]]) ||
-        any(!is.finite(reference[[reference_mean]]))) {
+        any(!is.finite(reference[[reference_mean]]))
+    ) {
       .islh_abort("The reference mean must be finite and non-missing.")
     }
     line <- ggplot2::geom_line(
@@ -520,11 +577,12 @@ islh_epi_curve <- function(
 }
 
 .islh_expand_cases <- function(
-    data,
-    date_name,
-    count_name,
-    facet_name,
-    max_cases) {
+  data,
+  date_name,
+  count_name,
+  facet_name,
+  max_cases
+) {
   total <- sum(data[[count_name]])
   if (total > max_cases) {
     .islh_abort(c(

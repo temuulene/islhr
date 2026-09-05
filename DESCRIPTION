@@ -1,6 +1,6 @@
 Package: islhr
 Title: Island Health Branding for R Figures, Tables and Reports
-Version: 0.6.0
+Version: 0.6.1
 Authors@R:
     person("Temuulen", "Enebish", , "temuulen@gmail.com", role = c("aut", "cre"))
 Description: Applies Island Health brand colours, typography and layout to
@@ -25,6 +25,7 @@ Imports:
     tools,
     utils
 Suggests:
+    islhepi,
     base64enc,
     flextable (>= 0.9.10),
     gt,
@@ -43,3 +44,4 @@ VignetteBuilder: knitr
 URL: https://temuulene.github.io/islhr/,
     https://github.com/temuulene/islhr
 BugReports: https://github.com/temuulene/islhr/issues
+Remotes: temuulene/islhepi

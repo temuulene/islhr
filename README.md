@@ -20,28 +20,19 @@ For routine surveillance plots, see the evaluated
 
 ## Installing
 
-Install the development version from GitHub:
+For staff, use a checked Windows binary from the team's approved release,
+with its dependencies preinstalled in a writable user library. Run installation
+outside a report render. See [the supported installation guide](inst/INSTALL.md)
+and `inst/scripts/install-phase.R` for the base-R bootstrap.
 
-```r
-install.packages("remotes", type = "binary")
-remotes::install_github("temuulene/islhr")
-```
+Release assets are created only after release checks pass. A version number in
+DESCRIPTION does not mean its ZIP has been published. Download the exact
+approved ZIP from GitHub Releases or obtain it from the team lead; the installer
+checks the package name and version against your requested version.
 
-If your network blocks GitHub, ask your team lead for the built package and
-install it from the file. No token, GitHub account or compiler is required:
-
-```r
-install.packages("path/to/islhr_0.6.0.zip", repos = NULL)
-```
-
-Every tagged release attaches that `.zip` for Windows and a `.tar.gz` source
-package.
-
-Then install the packages your output format needs:
-
-```r
-islhr::islh_install_deps("html")   # "docx", or "both"
-```
+Developers can install a reviewed commit using `remotes::install_github()` with
+an explicit `ref`. Record both package versions and `sessionInfo()` with every
+report.
 
 ## Choose the function
 

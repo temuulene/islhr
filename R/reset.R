@@ -154,8 +154,10 @@
     )
   }
 
-  if (!is.null(state$flextable) &&
-      requireNamespace("flextable", quietly = TRUE)) {
+  if (
+    !is.null(state$flextable) &&
+      requireNamespace("flextable", quietly = TRUE)
+  ) {
     attempt(
       "the flextable defaults",
       tryCatch(
@@ -165,14 +167,17 @@
     )
   }
 
-  if (!is.null(state$gtsummary) &&
-      requireNamespace("gtsummary", quietly = TRUE)) {
+  if (
+    !is.null(state$gtsummary) &&
+      requireNamespace("gtsummary", quietly = TRUE)
+  ) {
     theme <- state$gtsummary$theme
     attempt(
       "the gtsummary theme",
       if (length(theme) == 0L) {
         suppressMessages(gtsummary::reset_gtsummary_theme())
       } else {
+        suppressMessages(gtsummary::reset_gtsummary_theme())
         suppressMessages(gtsummary::set_gtsummary_theme(theme))
       }
     )
@@ -269,5 +274,30 @@ with_islh <- function(code, ..., quiet = TRUE) {
   on.exit(.islh_restore_state(state), add = TRUE)
 
   islh_setup(..., quiet = quiet)
-  force(code)
+  result <- withVisible(force(code))
+  value <- .islh_freeze_plots(result$value)
+  if (result$visible) value else invisible(value)
+}
+
+# Resolve delayed plot styling before session defaults are restored.
+.islh_freeze_plots <- function(value) {
+  if (inherits(value, "ggplot")) {
+    value$theme <- ggplot2::theme_get() + value$theme
+    value$layers <- lapply(value$layers, function(layer) {
+      ggplot2::ggproto(
+        NULL,
+        layer,
+        geom = ggplot2::ggproto(
+          NULL,
+          layer$geom,
+          default_aes = layer$geom$default_aes
+        )
+      )
+    })
+    return(ggplot2::ggplot_build(value)$plot)
+  }
+  if (is.list(value) && !is.object(value)) {
+    return(lapply(value, .islh_freeze_plots))
+  }
+  value
 }

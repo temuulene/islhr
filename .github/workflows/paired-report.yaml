@@ -1,0 +1,48 @@
+name: Paired PHASE report
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-report:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: temuulene/islhepi
+          ref: 82060a8637488a834d58491934a98ca71dc2c31b
+          path: .phase-epi
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.1'
+          use-public-rspm: true
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: '1.10.18'
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::dplyr
+            any::tidyr
+            any::lubridate
+            any::gtsummary
+          needs: check
+      - name: Install both packages
+        shell: bash
+        run: |
+          R CMD INSTALL .phase-epi
+          R CMD INSTALL .
+      - name: Render both reporting formats
+        shell: bash
+        run: |
+          quarto render inst/examples/phase-report.qmd --to html
+          quarto render inst/examples/phase-report.qmd --to docx
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase-paired-report-windows-r441
+          path: |
+            inst/examples/phase-report.html
+            inst/examples/phase-report.docx
+          if-no-files-found: error
