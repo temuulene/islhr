@@ -40,4 +40,5 @@ if (requireNamespace("gt", quietly = TRUE)) {
     embed_fonts = FALSE
   )
 }
+
 }

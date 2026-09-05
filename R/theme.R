@@ -79,6 +79,7 @@
 #' @export
 theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
   grid <- match.arg(grid)
+  base_size <- .islh_check_size(base_size)
 
   base <- ggplot2::theme_minimal(
     base_size = base_size,
@@ -183,6 +184,8 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
     grid = c("y", "x", "both", "none"),
     set_knitr = TRUE) {
   grid <- match.arg(grid)
+  base_size <- .islh_check_size(base_size)
+  set_knitr <- .islh_check_flag(set_knitr, "set_knitr")
 
   .islh_register_screen_font(.islh_font())
   old_theme <- ggplot2::theme_set(

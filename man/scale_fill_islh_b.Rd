@@ -41,7 +41,7 @@ this scale uses discrete steps rather than a continuous gradient. Use it for
 choropleth maps and other continuous quantities that read better in bands.
 }
 \details{
-Counts are abbreviated by default (\code{12,500} prints as \code{12.5K}) because a
+Counts are abbreviated by default (\verb{12,500} prints as \verb{12.5K}) because a
 horizontal bar legend has little room between breaks. Pass \code{labels} to
 override, for example \code{labels = scales::label_comma()} for full numbers or
 \code{labels = scales::label_percent()} for rates. Longer labels need a longer
@@ -62,4 +62,5 @@ ggplot2::ggplot(grid, ggplot2::aes(x, y, fill = value)) +
   scale_fill_islh_b(n.breaks = 5) +
   ggplot2::coord_equal() +
   theme_islh_map()
+
 }

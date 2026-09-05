@@ -6,11 +6,12 @@
 \alias{islhr-package}
 \title{islhr: Island Health Branding for R Figures, Tables and Reports}
 \description{
-Applies Island Health brand colours, typography and layout to ggplot2 figures, flextable and gt tables, and Quarto HTML and Word reports. Includes project scaffolding for reproducible reports used by the PHASE team.
+Applies Island Health brand colours, typography and layout to ggplot2 figures, including epidemic curves and surveillance graphics, flextable and gt tables, and Quarto HTML and Word reports. Includes project scaffolding for reproducible reports used by the PHASE team.
 }
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://temuulene.github.io/islhr/}
   \item \url{https://github.com/temuulene/islhr}
   \item Report bugs at \url{https://github.com/temuulene/islhr/issues}
 }

@@ -43,6 +43,8 @@ reference:
       are rendering to HTML or Word and configures plots and tables to match.
     contents:
       - islh_setup
+      - islh_reset
+      - with_islh
       - islh_check
       - islh_install_deps
       - islh_help
@@ -54,6 +56,14 @@ reference:
       - islh_create_report
       - islh_use_quarto
       - islh_use_brand
+
+  - title: Keeping a report up to date
+    desc: >
+      Bring an existing project's Quarto extension and brand files forward to
+      the installed version of the package, without losing local edits.
+    contents:
+      - islh_check_project
+      - islh_update_project
 
   - title: Figures
     desc: Build branded plots, including routine surveillance and epi curves.

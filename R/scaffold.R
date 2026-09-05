@@ -27,6 +27,10 @@
   "*_files/",
   "/.quarto/",
   "",
+  "# Backups written by islh_update_project(). Re-runnable, so not worth",
+  "# committing; the manifest beside them is.",
+  "/_islh-backup/",
+  "",
   "# RStudio",
   ".Rproj.user",
   ".Rhistory",
@@ -211,6 +215,10 @@
 #' extension, the brand file, an RStudio project file, and a `report.qmd`
 #' with a worked example.
 #'
+#' It also records which version of each shipped file it installed, so
+#' [islh_check_project()] and [islh_update_project()] can bring the project
+#' forward later without overwriting anything you have edited.
+#'
 #' This replaces the starter-kit ZIPs. Those carried a copy of the theme script
 #' in every project, so a theme fix reached nobody until they downloaded a new
 #' ZIP. A scaffolded project carries no copy: `report.qmd` calls
@@ -275,6 +283,11 @@ islh_create_report <- function(
 
   suppressMessages(islh_use_quarto(path, overwrite = TRUE))
   suppressMessages(islh_use_brand(path, overwrite = TRUE))
+
+  # Record what was installed, so islh_check_project() can later tell a file
+  # that is merely out of date from one somebody has edited.
+  assets <- .islh_project_assets()
+  .islh_write_manifest(path, .islh_manifest_entries(assets, assets$path))
 
   install_for <- format
   .islh_inform(c(

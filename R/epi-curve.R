@@ -9,6 +9,9 @@
 #' @param count Whole-count column.
 #' @param fill Optional categorical column used to stack or dodge bars.
 #' @param facet Optional column used to create small multiples.
+#' @param aggregate Sum counts that share a date, fill group and facet. With
+#'   `FALSE`, the default, duplicated combinations are an error. See the input
+#'   grain section.
 #' @param style `"bars"` for routine surveillance or `"cases"` to draw one
 #'   outlined rectangle per case. Case tiles are intended for small outbreaks.
 #' @param position Stack or dodge grouped bars. Case tiles require stacking.
@@ -31,6 +34,21 @@
 #'
 #' @return A ggplot object. Additional ggplot2 layers and scales can be added in
 #'   the usual way.
+#'
+#' @section Input grain:
+#'
+#' The function expects at most one row for each combination of date, fill
+#' group and facet. Two rows for the same combination are not drawn as two
+#' rows: `geom_col()` stacks them into a single taller bar, and `style =
+#' "cases"` draws overlapping tiles. Either way the figure is wrong and nothing
+#' in it says so, which is why duplicates stop rather than plot.
+#'
+#' Duplicates usually mean the data has not been counted yet, so the fix is
+#' normally to count it: `islhepi::islh_count_events()` returns one row per
+#' period and group, and fills in the periods with no events, which a plot
+#' cannot infer. Use `aggregate = TRUE` when the rows really are separate
+#' counts of the same period that should be added together. Columns outside the
+#' date, fill and facet keep the first row's value.
 #'
 #' @examples
 #' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
@@ -73,7 +91,8 @@ islh_epi_curve <- function(
     caption = NULL,
     x = NULL,
     y = "Cases",
-    facet_scales = "fixed") {
+    facet_scales = "fixed",
+    aggregate = FALSE) {
   if (!is.data.frame(data)) {
     .islh_abort("{.arg data} must be a data frame.")
   }
@@ -83,7 +102,8 @@ islh_epi_curve <- function(
   style <- match.arg(style)
   position <- match.arg(position)
   labels <- match.arg(labels)
-  show_year_lines <- .islh_plot_flag(show_year_lines, "show_year_lines")
+  show_year_lines <- .islh_check_flag(show_year_lines, "show_year_lines")
+  aggregate <- .islh_check_flag(aggregate, "aggregate")
 
   date_name <- .islh_plot_column(data, rlang::enquo(date), "date")
   count_name <- .islh_plot_column(data, rlang::enquo(count), "count")
@@ -106,6 +126,14 @@ islh_epi_curve <- function(
     plot_data[[count_name]],
     count_name
   )
+  plot_data <- .islh_plot_grain(
+    plot_data,
+    date_name = date_name,
+    count_name = count_name,
+    fill_name = fill_name,
+    facet_name = facet_name,
+    aggregate = aggregate
+  )
 
   if (is.null(bar_width)) {
     unique_dates <- sort(unique(plot_data[[date_name]]))
@@ -115,14 +143,12 @@ islh_epi_curve <- function(
       bar_width <- 0.9 * min(as.numeric(diff(unique_dates)))
     }
   }
+  # A bar width is measured in days along the date axis, not in inches.
   if (!is.numeric(bar_width) || length(bar_width) != 1L ||
       is.na(bar_width) || !is.finite(bar_width) || bar_width <= 0) {
-    .islh_abort("{.arg bar_width} must be one positive finite number.")
+    .islh_abort("{.arg bar_width} must be one positive finite number of days.")
   }
-  if (!is.numeric(max_cases) || length(max_cases) != 1L ||
-      is.na(max_cases) || max_cases != round(max_cases) || max_cases < 1L) {
-    .islh_abort("{.arg max_cases} must be one positive whole number.")
-  }
+  max_cases <- .islh_check_count(max_cases, "max_cases")
 
   plot <- ggplot2::ggplot()
 
@@ -309,11 +335,51 @@ islh_epi_curve <- function(
   name
 }
 
-.islh_plot_flag <- function(x, arg) {
-  if (!is.logical(x) || length(x) != 1L || is.na(x)) {
-    .islh_abort("{.arg {arg}} must be a single TRUE or FALSE.")
+# One row per date, fill group and facet.
+#
+# geom_col() stacks two rows for the same combination into one taller bar, and
+# the case style draws its tiles on top of each other. Both produce a figure
+# that looks finished and is wrong, so duplicates stop here unless the caller
+# asks for them to be summed.
+.islh_plot_grain <- function(
+    data,
+    date_name,
+    count_name,
+    fill_name,
+    facet_name,
+    aggregate) {
+  keys <- c(date_name, fill_name, facet_name)
+  repeated <- duplicated(data[keys])
+  if (!any(repeated)) {
+    return(data)
   }
-  x
+
+  if (!isTRUE(aggregate)) {
+    n <- sum(repeated)
+    .islh_abort(c(
+      "{.arg data} has more than one row for the same period.",
+      x = "Found {n} repeated combination{?s} of {.field {keys}}.",
+      i = "Count the events first with
+           {.code islhepi::islh_count_events()}, which also fills in periods
+           with no events, or pass {.code aggregate = TRUE} to add the
+           duplicated rows together."
+    ))
+  }
+
+  key <- do.call(
+    interaction,
+    c(
+      lapply(data[keys], function(x) addNA(as.factor(x))),
+      list(drop = TRUE, lex.order = TRUE)
+    )
+  )
+  totals <- tapply(data[[count_name]], key, sum)
+  first <- !duplicated(key)
+
+  out <- data[first, , drop = FALSE]
+  out[[count_name]] <- as.numeric(totals[as.character(key[first])])
+  rownames(out) <- NULL
+  out
 }
 
 .islh_plot_dates <- function(x, arg) {

@@ -37,11 +37,26 @@ A description of the active setup, invisibly.
 \description{
 Configure Island Health themes for the current project or document
 }
+\section{Undoing it}{
+
+
+Setup changes the session, not just the next plot, which is what a report
+render wants and what an interactive session usually does not. The first
+call records what it found, so \code{\link[=islh_reset]{islh_reset()}} can put it back, and
+\code{\link[=with_islh]{with_islh()}} applies the theme around one block of code and restores the
+session afterwards even if that code fails.
+
+Only the first call of a session takes the record, so repeated setup calls
+followed by one \code{\link[=islh_reset]{islh_reset()}} return to the state before the first of them.
+}
+
 \examples{
 check <- islh_check("plots", quiet = TRUE)
 check[c("format", "tables", "ok")]
 
 \dontrun{
 islh_setup()
+islh_reset()
 }
+
 }

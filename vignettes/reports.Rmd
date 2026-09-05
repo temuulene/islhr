@@ -44,8 +44,7 @@ islhr::islh_use_brand()
 The first copies the Island Health Quarto extension into `_extensions/`; the
 second copies `_brand.yml` alongside it. Quarto only looks for extensions
 inside the project directory, which is why these are copies rather than
-references into your R library. Re-run `islh_use_quarto()` after upgrading
-`islhr` to pick up format changes.
+references into your R library.
 
 Then name the format:
 
@@ -55,6 +54,43 @@ title: "Respiratory season summary"
 format: islh-report-docx    # or islh-report-html
 ---
 ```
+
+## Keeping a project up to date
+
+Because those files are copies, they age. A fix to the Word reference document
+reaches your report only when the copy in your project is replaced. Re-copying
+blindly is not the answer either, since people edit `_brand.yml` for a
+programme's own colours and lose that work without warning.
+
+`islh_check_project()` reports where a project stands. It reads only.
+
+```{r check-project, eval=FALSE}
+islhr::islh_check_project()
+```
+
+Each file is up to date, out of date, missing, or edited here. A project
+created by `islh_create_report()` records which version of each file it
+installed, in `_islh-manifest.csv`, and that record is what separates a file
+that is merely old from one you have changed. Commit it with the rest of the
+project.
+
+`islh_update_project()` brings the out-of-date and missing files forward.
+Anything you have edited is left alone, and whatever it replaces is copied
+into a timestamped folder under `_islh-backup` first.
+
+```{r update-project, eval=FALSE}
+# See what would change without changing anything.
+islhr::islh_update_project(dry_run = TRUE)
+
+islhr::islh_update_project()
+```
+
+If you meant to discard your own edits, `force = TRUE` replaces those files
+too. The backup is what makes that recoverable.
+
+A project scaffolded before this feature existed has no manifest, so a file
+that differs from the installed version is reported as unverifiable rather than
+guessed at, and is left alone until you replace it with `force = TRUE`.
 
 ## The setup chunk
 

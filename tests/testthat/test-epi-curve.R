@@ -105,3 +105,76 @@ test_that("epi curve validates reference inputs", {
     "lower must not exceed"
   )
 })
+
+test_that("duplicated periods stop rather than stacking into one bar", {
+  # geom_col() would add these into a single taller bar and the figure would
+  # look finished while showing the wrong height.
+  doubled <- data.frame(
+    week = rep(as.Date("2026-01-05") + c(0, 7), each = 2),
+    cases = c(1, 2, 3, 4)
+  )
+
+  expect_error(
+    islh_epi_curve(doubled, week, cases),
+    "more than one row for the same period"
+  )
+  expect_error(islh_epi_curve(doubled, week, cases), "islh_count_events")
+})
+
+test_that("aggregate = TRUE adds duplicated rows together", {
+  doubled <- data.frame(
+    week = rep(as.Date("2026-01-05") + c(0, 7), each = 2),
+    cases = c(1, 2, 3, 4)
+  )
+
+  plot <- islh_epi_curve(doubled, week, cases, aggregate = TRUE)
+  drawn <- plot$layers[[1]]$data
+
+  expect_equal(nrow(drawn), 2L)
+  expect_equal(drawn$cases, c(3, 7))
+  expect_equal(drawn$week, as.Date("2026-01-05") + c(0, 7))
+})
+
+test_that("the grain is date, fill and facet together", {
+  grain <- .islh_plot_grain
+
+  # The same date in two fill groups is not a duplicate.
+  by_fill <- data.frame(
+    week = rep(as.Date("2026-01-05") + c(0, 7), each = 2),
+    cases = c(1, 2, 3, 4),
+    source = rep(c("A", "B"), 2)
+  )
+  expect_equal(
+    nrow(grain(by_fill, "week", "cases", "source", NULL, FALSE)),
+    4L
+  )
+
+  # Nor is the same date in two facets.
+  by_facet <- data.frame(
+    week = as.Date("2026-01-05"),
+    cases = c(1, 2),
+    site = c("North", "South")
+  )
+  expect_equal(
+    nrow(grain(by_facet, "week", "cases", NULL, "site", FALSE)),
+    2L
+  )
+
+  # Repeating one of those is.
+  repeated <- rbind(by_facet, by_facet)
+  expect_error(
+    grain(repeated, "week", "cases", NULL, "site", FALSE),
+    "more than one row"
+  )
+  summed <- grain(repeated, "week", "cases", NULL, "site", TRUE)
+  expect_equal(summed$site, c("North", "South"))
+  expect_equal(summed$cases, c(2, 4))
+})
+
+test_that("aggregate is checked like any other switch", {
+  counts <- data.frame(week = as.Date("2026-01-05"), cases = 1)
+  expect_error(
+    islh_epi_curve(counts, week, cases, aggregate = NA),
+    "single TRUE or FALSE"
+  )
+})

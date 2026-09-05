@@ -42,4 +42,5 @@ if (requireNamespace("flextable", quietly = TRUE) &&
     caption = "Example encounters"
   )
 }
+
 }

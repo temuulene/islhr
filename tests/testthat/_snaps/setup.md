@@ -5,33 +5,37 @@
     Output
        [1] "coord_islh_map"            "islh_brand"               
        [3] "islh_brand_yml"            "islh_caption"             
-       [5] "islh_check"                "islh_create_report"       
-       [7] "islh_epi_curve"            "islh_example_data"        
-       [9] "islh_example_plot"         "islh_flextable"           
-      [11] "islh_font_family"          "islh_gt"                  
-      [13] "islh_gtsummary_flex"       "islh_gtsummary_gt"        
-      [15] "islh_help"                 "islh_hex"                 
-      [17] "islh_install_deps"         "islh_logo"                
-      [19] "islh_reference_docx"       "islh_save_plot"           
-      [21] "islh_setup"                "islh_use_brand"           
-      [23] "islh_use_quarto"           "islh_version"             
-      [25] "scale_color_islh"          "scale_color_islh_ordinal" 
-      [27] "scale_color_islh_signal"   "scale_colour_islh"        
-      [29] "scale_colour_islh_ordinal" "scale_colour_islh_signal" 
-      [31] "scale_fill_islh"           "scale_fill_islh_b"        
-      [33] "scale_fill_islh_ordinal"   "scale_fill_islh_signal"   
-      [35] "scale_y_islh_count"        "theme_islh"               
-      [37] "theme_islh_map"           
+       [5] "islh_check"                "islh_check_project"       
+       [7] "islh_create_report"        "islh_epi_curve"           
+       [9] "islh_example_data"         "islh_example_plot"        
+      [11] "islh_flextable"            "islh_font_family"         
+      [13] "islh_gt"                   "islh_gtsummary_flex"      
+      [15] "islh_gtsummary_gt"         "islh_help"                
+      [17] "islh_hex"                  "islh_install_deps"        
+      [19] "islh_logo"                 "islh_reference_docx"      
+      [21] "islh_reset"                "islh_save_plot"           
+      [23] "islh_setup"                "islh_update_project"      
+      [25] "islh_use_brand"            "islh_use_quarto"          
+      [27] "islh_version"              "scale_color_islh"         
+      [29] "scale_color_islh_ordinal"  "scale_color_islh_signal"  
+      [31] "scale_colour_islh"         "scale_colour_islh_ordinal"
+      [33] "scale_colour_islh_signal"  "scale_fill_islh"          
+      [35] "scale_fill_islh_b"         "scale_fill_islh_ordinal"  
+      [37] "scale_fill_islh_signal"    "scale_y_islh_count"       
+      [39] "theme_islh"                "theme_islh_map"           
+      [41] "with_islh"                
 
 # islh_help prints a grouped quick reference
 
     Code
       islh_help()
     Output
-      Island Health theme 0.5.0
+      Island Health theme 0.6.0
       
       SETUP  once per document or session
         islh_setup()                  apply the theme; detects HTML or Word
+        islh_reset()                  put the session back as it was
+        with_islh({ ... })            apply it around one block only
         islh_check()                  list any packages you still need
       
       FIGURES  islh_setup() already applies the theme, so plot as usual
@@ -67,6 +71,9 @@
         islh_create_report("my-report", format = "docx")
         islh_install_deps("docx")           install what the format needs
       
+      KEEPING A REPORT UP TO DATE
+        islh_check_project()                what is out of date or edited
+        islh_update_project()               bring in the current files
+      
       SEE IT WORK
         islh_example_plot()                 a themed plot from simulated data
-      

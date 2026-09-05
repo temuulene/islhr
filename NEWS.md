@@ -1,3 +1,57 @@
+# islhr 0.6.0
+
+## Undoing setup
+
+* `islh_setup()` now records the session as it found it, so it can be undone.
+  It previously changed ggplot2's active theme, the discrete scale options, six
+  geom defaults, knitr's graphics device, the `islh.*` options, the `flextable`
+  defaults and the `gtsummary` theme with no way back short of restarting R.
+* Added `islh_reset()`, which puts all of that back. Only the first
+  `islh_setup()` call of a session takes the record, so repeated setup calls
+  followed by one reset return to the state before the first of them.
+* Added `with_islh()`, which applies the theme around one block of code and
+  restores the session afterwards, including when that code fails. It takes its
+  own record rather than reading the one `islh_setup()` leaves, so it nests
+  correctly inside a session where setup is already active.
+
+## Keeping a report project up to date
+
+* Added `islh_check_project()`, which compares a project's Quarto extension,
+  `_brand.yml` and logos against the versions this package ships and reports
+  each as up to date, out of date, missing, edited locally, or unverifiable.
+* Added `islh_update_project()`, so an existing report can pick up a format fix
+  without being scaffolded again. It leaves locally edited files alone, copies
+  anything it replaces into a timestamped folder under `_islh-backup` first,
+  and takes `dry_run = TRUE` to report the work without doing it. `force =
+  TRUE` replaces edited files too; the backup is what makes that recoverable.
+* `islh_create_report()` now writes `_islh-manifest.csv`, recording which
+  version of each shipped file it installed. That record is what separates a
+  file that is merely out of date from one somebody has edited. A project
+  scaffolded before this release has no manifest, so a changed file is reported
+  as `"unverified"` and protected until it is replaced with `force = TRUE`.
+* The scaffolded `.gitignore` ignores `_islh-backup/`. The manifest beside it
+  is meant to be committed.
+
+## Figures
+
+* `islh_epi_curve()` requires at most one row for each combination of date,
+  fill group and facet. Two rows for the same combination were silently stacked
+  by `geom_col()` into a single taller bar, or drawn as overlapping case tiles,
+  producing a figure that looked finished and was wrong. Pass
+  `aggregate = TRUE` to add such rows together, or count the data first with
+  `islhepi::islh_count_events()`, which also fills in periods with no events.
+
+## Input validation
+
+* Plot dimensions, output resolution, table widths, theme font sizes, panel
+  positions and every logical switch now go through one shared set of checks,
+  so the message names the argument and says what it expects.
+* Several of these previously resolved to something unintended rather than
+  failing. `islh_check()` read `tables = NA` as `FALSE` through `isTRUE()`,
+  quietly configuring plots only. A width of `60` was accepted where a share of
+  the text width between 0 and 1 was meant. A figure width given in pixels
+  reached the graphics device before failing.
+
 # islhr 0.5.0
 
 ## Surveillance figures

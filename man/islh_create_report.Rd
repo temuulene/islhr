@@ -38,6 +38,10 @@ extension, the brand file, an RStudio project file, and a \code{report.qmd}
 with a worked example.
 }
 \details{
+It also records which version of each shipped file it installed, so
+\code{\link[=islh_check_project]{islh_check_project()}} and \code{\link[=islh_update_project]{islh_update_project()}} can bring the project
+forward later without overwriting anything you have edited.
+
 This replaces the starter-kit ZIPs. Those carried a copy of the theme script
 in every project, so a theme fix reached nobody until they downloaded a new
 ZIP. A scaffolded project carries no copy: \code{report.qmd} calls

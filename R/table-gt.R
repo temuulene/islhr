@@ -28,6 +28,8 @@ islh_gt <- function(
     width = 1,
     embed_fonts = getOption("islh.embed_fonts", TRUE)) {
   .islh_require("gt", "Island Health HTML tables")
+  width <- .islh_check_fraction(width, "width")
+  embed_fonts <- .islh_check_flag(embed_fonts, "embed_fonts")
 
   if (!inherits(data, "gt_tbl")) {
     data <- gt::gt(data)

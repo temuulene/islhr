@@ -33,9 +33,13 @@ islh_save_plot <- function(
     half_width = c(width = 3.15, height = 3.5, dpi = 300)
   )[[preset]]
 
-  if (is.null(width)) width <- settings[["width"]]
-  if (is.null(height)) height <- settings[["height"]]
-  if (is.null(dpi)) dpi <- settings[["dpi"]]
+  width <- .islh_check_dimension(
+    if (is.null(width)) settings[["width"]] else width, "width"
+  )
+  height <- .islh_check_dimension(
+    if (is.null(height)) settings[["height"]] else height, "height"
+  )
+  dpi <- .islh_check_dpi(if (is.null(dpi)) settings[["dpi"]] else dpi)
 
   ggplot2::ggsave(
     filename = filename,

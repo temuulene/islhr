@@ -85,12 +85,24 @@
 #'
 #' @return A description of the active setup, invisibly.
 #'
+#' @section Undoing it:
+#'
+#' Setup changes the session, not just the next plot, which is what a report
+#' render wants and what an interactive session usually does not. The first
+#' call records what it found, so [islh_reset()] can put it back, and
+#' [with_islh()] applies the theme around one block of code and restores the
+#' session afterwards even if that code fails.
+#'
+#' Only the first call of a session takes the record, so repeated setup calls
+#' followed by one [islh_reset()] return to the state before the first of them.
+#'
 #' @examples
 #' check <- islh_check("plots", quiet = TRUE)
 #' check[c("format", "tables", "ok")]
 #'
 #' \dontrun{
 #' islh_setup()
+#' islh_reset()
 #' }
 #'
 #' @export
@@ -103,6 +115,14 @@ islh_setup <- function(
     set_knitr = TRUE,
     quiet = FALSE) {
   grid <- match.arg(grid)
+  base_size <- .islh_check_size(base_size)
+  set_knitr <- .islh_check_flag(set_knitr, "set_knitr")
+  quiet <- .islh_check_flag(quiet, "quiet")
+
+  # Take the record before anything is changed, and only once. A second setup
+  # call would otherwise record the first one's settings as the way back.
+  restore_point <- .islh_capture_state()
+
   check <- islh_check(
     format = format,
     tables = tables,
@@ -142,6 +162,10 @@ islh_setup <- function(
       islh.embed_fonts = FALSE,
       islh.document_webfont = FALSE
     )
+  }
+
+  if (is.null(.islh_slot("setup"))) {
+    .islh_state$setup <- restore_point
   }
 
   result <- list(

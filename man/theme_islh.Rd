@@ -30,4 +30,5 @@ ggplot2::ggplot(
     y = "Miles per US gallon"
   ) +
   theme_islh(grid = "both")
+
 }

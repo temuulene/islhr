@@ -29,10 +29,8 @@ theme_islh_map <- function(
     legend = c("bottom", "inside", "none"),
     legend_inside = c(0.04, 0.16)) {
   legend <- match.arg(legend)
-
-  if (!is.numeric(legend_inside) || length(legend_inside) != 2L) {
-    .islh_abort("{.arg legend_inside} must be two fractions between 0 and 1.")
-  }
+  base_size <- .islh_check_size(base_size)
+  legend_inside <- .islh_check_position(legend_inside, "legend_inside")
 
   base <- ggplot2::theme_void(
     base_size = base_size,

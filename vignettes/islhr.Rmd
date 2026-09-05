@@ -100,6 +100,38 @@ With `format = "auto"`, the default, `islh_setup()` detects HTML or Word and
 selects the matching table system. Outside a render it configures plots only.
 Loading the package by itself does not change themes or options.
 
+### Putting the session back
+
+`islh_setup()` changes the session, not just the next plot: the active ggplot2
+theme, the geom defaults, knitr's graphics device and the table settings. That
+is what a report render wants, since the session exists to produce one
+document. It is rarely what you want at the console.
+
+`islh_reset()` undoes it:
+
+```{r reset, eval=FALSE}
+islh_setup()
+# ... make some figures ...
+islh_reset()
+```
+
+`with_islh()` applies the theme around one block and restores the session
+afterwards, including when the block fails. Use it inside a function, in a
+test, or whenever the theme should not outlive the code that wanted it:
+
+```{r with-islh}
+before <- ggplot2::theme_get()
+
+plot <- with_islh(
+  ggplot2::ggplot(datasets::mtcars, ggplot2::aes(wt, mpg)) +
+    ggplot2::geom_point(),
+  format = "plots"
+)
+
+# The theme travelled with the plot; the session did not keep it.
+identical(ggplot2::theme_get(), before)
+```
+
 Check optional dependencies before rendering a report:
 
 ```{r dependency-check}

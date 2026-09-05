@@ -34,6 +34,9 @@ islh_flextable <- function(
 ) {
   .islh_require("flextable", "Word-ready Island Health tables")
   .islh_require("officer", "Island Health table borders")
+  autofit <- .islh_check_flag(autofit, "autofit")
+  width <- .islh_check_fraction(width, "width")
+  text_width <- .islh_check_dimension(text_width, "text_width")
 
   created_from_data <- !inherits(x, "flextable")
   if (created_from_data) {

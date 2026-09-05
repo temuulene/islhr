@@ -31,7 +31,7 @@ If your network blocks GitHub, ask your team lead for the built package and
 install it from the file. No token, GitHub account or compiler is required:
 
 ```r
-install.packages("path/to/islhr_0.5.0.zip", repos = NULL)
+install.packages("path/to/islhr_0.6.0.zip", repos = NULL)
 ```
 
 Every tagged release attaches that `.zip` for Windows and a `.tar.gz` source

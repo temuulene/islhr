@@ -15,4 +15,5 @@ Create a runnable Island Health example plot
 \examples{
 \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 islh_example_plot()
+
 }

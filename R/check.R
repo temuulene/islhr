@@ -76,8 +76,10 @@ islh_check <- function(
   quiet = FALSE
 ) {
   format <- .islh_resolve_format(format)
-  tables <- isTRUE(tables) && format != "plots"
-  embed_fonts <- isTRUE(embed_fonts) && format == "html" && tables
+  tables <- .islh_check_flag(tables, "tables") && format != "plots"
+  embed_fonts <- .islh_check_flag(embed_fonts, "embed_fonts") &&
+    format == "html" && tables
+  quiet <- .islh_check_flag(quiet, "quiet")
 
   required <- c("ggplot2", "cli", "scales", "systemfonts")
   if (tables && format == "html") {

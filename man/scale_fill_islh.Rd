@@ -30,4 +30,5 @@ ggplot2::ggplot(counts, ggplot2::aes(programme, encounters, fill = programme)) +
   ggplot2::geom_col(show.legend = FALSE) +
   scale_fill_islh() +
   theme_islh()
+
 }
