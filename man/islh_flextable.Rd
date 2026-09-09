@@ -9,8 +9,7 @@ islh_flextable(
   caption = NULL,
   autofit = TRUE,
   width = 1,
-  text_width = .islh_text_width,
-  preserve_body = inherits(x, "flextable")
+  text_width = .islh_text_width
 )
 }
 \arguments{
@@ -25,9 +24,6 @@ every column gets an equal share.}
 
 \item{text_width}{Available text width in inches. The default matches the
 Island Health reference document: Letter paper with 2.5 cm margins.}
-
-\item{preserve_body}{Preserve existing body text and background colours.
-Defaults to TRUE for an existing flextable, FALSE for a data frame.}
 }
 \value{
 A styled flextable.

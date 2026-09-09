@@ -6,8 +6,6 @@
 #' LibreOffice, and differently again on a machine without BC Sans installed.
 #'
 #' @param x A flextable or data frame.
-#' @param preserve_body Preserve existing body text and background colours.
-#'   Defaults to TRUE for an existing flextable, FALSE for a data frame.
 #' @param caption Optional caption.
 #' @param autofit Size columns in proportion to their contents. With `FALSE`,
 #'   every column gets an equal share.
@@ -32,8 +30,7 @@ islh_flextable <- function(
   caption = NULL,
   autofit = TRUE,
   width = 1,
-  text_width = .islh_text_width,
-  preserve_body = inherits(x, "flextable")
+  text_width = .islh_text_width
 ) {
   .islh_require("flextable", "Word-ready Island Health tables")
   .islh_require("officer", "Island Health table borders")
@@ -41,7 +38,6 @@ islh_flextable <- function(
   width <- .islh_check_fraction(width, "width")
   text_width <- .islh_check_dimension(text_width, "text_width")
 
-  preserve_body <- .islh_check_flag(preserve_body, "preserve_body")
   created_from_data <- !inherits(x, "flextable")
   if (created_from_data) {
     x <- flextable::flextable(x)
@@ -60,6 +56,8 @@ islh_flextable <- function(
     flextable::border_remove() |>
     flextable::font(fontname = .islh_table_font(), part = "all") |>
     flextable::fontsize(size = 10, part = "all") |>
+    flextable::color(color = islh_brand("black"), part = "body") |>
+    flextable::bg(bg = islh_brand("white"), part = "body") |>
     flextable::bg(bg = islh_hex("blue", 20), part = "header") |>
     flextable::color(color = islh_brand("white"), part = "header") |>
     flextable::bold(bold = TRUE, part = "header") |>
@@ -79,11 +77,6 @@ islh_flextable <- function(
       opts_word = list(split = FALSE, repeat_headers = TRUE)
     ) |>
     flextable::paginate(init = FALSE, hdr_ftr = TRUE)
-
-  if (!preserve_body) {
-    x <- flextable::color(x, color = islh_brand("black"), part = "body")
-    x <- flextable::bg(x, bg = islh_brand("white"), part = "body")
-  }
 
   if (created_from_data) {
     x <- x |>
@@ -105,12 +98,8 @@ islh_flextable <- function(
     x <- flextable::set_caption(x, caption = caption)
   }
 
-  x <- .islh_fix_widths(
-    x,
-    autofit = autofit,
-    width = width,
-    text_width = text_width
-  )
+  x <- .islh_fix_widths(x, autofit = autofit, width = width,
+                        text_width = text_width)
 
   x
 }
@@ -133,12 +122,8 @@ islh_flextable <- function(
       dim(flextable::autofit(x))$widths,
       error = function(condition) NULL
     )
-    if (
-      is.null(measured) ||
-        length(measured) != columns ||
-        !all(is.finite(measured)) ||
-        sum(measured) <= 0
-    ) {
+    if (is.null(measured) || length(measured) != columns ||
+        !all(is.finite(measured)) || sum(measured) <= 0) {
       rep(1 / columns, columns)
     } else {
       measured / sum(measured)
