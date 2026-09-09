@@ -58,7 +58,6 @@ islh_help <- function() {
   )
 
   cat(lines, sep = "\n")
-  cat("\n")
   invisible(lines)
 }
 

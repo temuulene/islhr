@@ -1,4 +1,5 @@
 #' @keywords internal
+#' @importFrom rlang .data
 #' @importFrom utils packageVersion
 "_PACKAGE"
 
