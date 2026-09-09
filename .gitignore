@@ -8,3 +8,6 @@ inst/doc
 /*.Rcheck/
 ..Rcheck/
 data-raw/.build-reference-docx.tmp/
+
+__pycache__/
+*.pyc

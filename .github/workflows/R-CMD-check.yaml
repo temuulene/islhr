@@ -20,6 +20,7 @@ jobs:
         config:
           # Windows is the platform Island Health staff actually use.
           - {os: windows-latest, r: 'release'}
+          - {os: windows-latest, r: '4.4.1'}
           - {os: macos-latest,   r: 'release'}
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'release'}

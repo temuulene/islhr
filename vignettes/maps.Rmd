@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 )
 library(ggplot2)
 library(islhr)
+islh_setup(format = "plots", quiet = TRUE)
 ```
 
 The two packages divide mapping work by responsibility. `islhepi` retrieves

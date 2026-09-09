@@ -9,3 +9,5 @@
 ^CLAUDE\.md$
 ^\.claude$
 ^LICENSE\.md$
+
+^\.phase-epi$

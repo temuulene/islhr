@@ -100,3 +100,4 @@ reference:
       - islh_flextable
       - islh_gtsummary_gt
       - islh_gtsummary_flex
+      - islh_gtsummary_statistics

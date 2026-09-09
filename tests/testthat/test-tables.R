@@ -118,19 +118,31 @@ test_that("islh_gt copes with awkward tables", {
   )
 })
 
-test_that("the gtsummary converters produce the right object per format", {
-  skip_if_not_installed("gtsummary")
-  skip_if_not_installed("gt")
-  skip_if_not_installed("flextable")
-
+gtsummary_example <- function() {
   data <- data.frame(
     group = rep(c("a", "b"), each = 10),
     value = as.numeric(1:20)
   )
-  summary <- quietly(gtsummary::tbl_summary(data, by = "group"))
+  quietly(gtsummary::tbl_summary(data, by = "group"))
+}
 
-  expect_s3_class(quietly(islh_gtsummary_gt(summary)), "gt_tbl")
-  expect_s3_class(quietly(islh_gtsummary_flex(summary)), "flextable")
+test_that("the gtsummary gt converter produces a gt table", {
+  skip_if_not_installed("gtsummary")
+  skip_if_not_installed("gt")
+
+  expect_s3_class(quietly(islh_gtsummary_gt(gtsummary_example())), "gt_tbl")
+})
+
+test_that("the gtsummary flextable converter produces a flextable", {
+  skip_if_not_installed("gtsummary")
+  # The package itself needs flextable 0.9.10, but this path runs through
+  # gtsummary::as_flex_table(), which raised its own floor to 0.9.11 after
+  # that. Gate on gtsummary's floor rather than lifting the package's.
+  skip_if_not_installed("flextable", "0.9.11")
+
+  expect_s3_class(
+    quietly(islh_gtsummary_flex(gtsummary_example())), "flextable"
+  )
 })
 
 test_that("both table engines use the same brand colours", {

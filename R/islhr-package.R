@@ -1,5 +1,6 @@
 #' @keywords internal
 #' @importFrom utils packageVersion
+#' @importFrom rlang .data
 "_PACKAGE"
 
 # Column names used inside `ggplot2::aes()` in the example and gallery

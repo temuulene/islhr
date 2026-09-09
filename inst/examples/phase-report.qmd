@@ -1,0 +1,58 @@
+---
+title: "PHASE paired-package validation"
+format:
+  html: default
+  docx: default
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(islhepi)
+library(islhr)
+is_html <- knitr::is_html_output()
+islh_setup(format = if (is_html) "html" else "docx", embed_fonts = FALSE)
+# Synthetic daily data with known, complete coverage; no patient information.
+events <- data.frame(day = rep(as.Date("2026-06-01") + 0:41, c(rep(2, 35), rep(3, 7))))
+daily <- islh_count_events(events, day, from = "2026-06-01", to = "2026-07-12")
+weekly <- islh_count_events(daily, period_start, count = count, interval = "week")
+baseline <- islh_surveillance_baseline(weekly[1:5, ], period_start, count)
+snapshot <- islh_surveillance_snapshot(daily, period_start, count,
+  end = "2026-07-12", baseline = baseline)
+stopifnot(snapshot$total == 21, snapshot$exceeds_reference, snapshot$complete)
+islh_epi_curve(daily, period_start, count)
+if (is_html) islh_gt(snapshot, embed_fonts = FALSE) else islh_flextable(snapshot)
+```
+
+These are descriptive reference limits, using five complete Monday-start weeks.
+The current window has 21 events against a historical weekly count of 14.
+
+```{r}
+# Preserve a semantic warning through branding, including in a long Word table.
+tab <- data.frame(group = paste("Synthetic group with a long label", 1:70),
+  status = rep(c("Review", "Routine"), 35))
+if (is_html) {
+  islh_gt(tab, embed_fonts = FALSE)
+} else {
+  ft <- flextable::flextable(tab)
+  ft <- flextable::bg(ft, i = seq(1, 69, 2), bg = "yellow", part = "body")
+  islh_flextable(ft)
+}
+```
+
+```{r}
+# Branding leaves summary choices explicit.
+summary <- gtsummary::tbl_summary(data.frame(
+  group = rep(c("A", "B"), 10), value = c(NA, 2:20)),
+  by = group, statistic = list(gtsummary::all_continuous() ~ "{mean} ({sd})"),
+  missing_text = "Not recorded")
+if (is_html) islh_gtsummary_gt(summary, embed_fonts = FALSE) else islh_gtsummary_flex(summary)
+```
+
+```{r}
+data.frame(package = c("islhr", "islhepi"),
+  version = c(as.character(packageVersion("islhr")), as.character(packageVersion("islhepi"))))
+sessionInfo()
+islh_reset(quiet = TRUE)
+```

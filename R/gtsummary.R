@@ -8,9 +8,10 @@
 #'
 #' @noRd
 .islh_gtsummary_theme <- function(
-    print_engine = c("flextable", "gt"),
-    set_theme = TRUE,
-    quiet = FALSE) {
+  print_engine = c("flextable", "gt"),
+  set_theme = TRUE,
+  quiet = FALSE
+) {
   .islh_require("gtsummary", "Island Health gtsummary tables")
   .islh_require("rlang", "gtsummary conversion hooks")
   print_engine <- match.arg(print_engine)
@@ -18,22 +19,6 @@
   theme <- list(
     "pkgwide-str:theme_name" = "Island Health",
     "pkgwide-str:print_engine" = print_engine,
-    "pkgwide-fn:pvalue_fun" = gtsummary::label_style_pvalue(digits = 2),
-    "pkgwide-fn:prependpvalue_fun" =
-      gtsummary::label_style_pvalue(digits = 2, prepend_p = TRUE),
-    "style_number-arg:big.mark" = ",",
-    "style_number-arg:decimal.mark" = ".",
-    "tbl_summary-fn:percent_fun" =
-      gtsummary::label_style_percent(digits = 1),
-    "tbl_summary-arg:statistic" = list(
-      gtsummary::all_continuous() ~ "{median} ({p25}, {p75})",
-      gtsummary::all_categorical() ~ "{n} ({p}%)"
-    ),
-    "tbl_summary-arg:digits" = list(
-      gtsummary::all_continuous() ~ 1,
-      gtsummary::all_categorical() ~ c(0, 1)
-    ),
-    "tbl_summary-arg:missing_text" = "Unknown",
     "as_flex_table-lst:addl_cmds" = list(
       autofit = rlang::expr(islh_flextable())
     ),
@@ -119,9 +104,10 @@ islh_gtsummary_flex <- function(x, ...) {
 #'
 #' @export
 islh_gtsummary_gt <- function(
-    x,
-    ...,
-    embed_fonts = getOption("islh.embed_fonts", TRUE)) {
+  x,
+  ...,
+  embed_fonts = getOption("islh.embed_fonts", TRUE)
+) {
   .islh_require("gtsummary", "gtsummary conversion")
 
   x |>
@@ -131,3 +117,38 @@ islh_gtsummary_gt <- function(
 
 ## Quick reference ------------------------------------------------------------
 
+#' Explicit statistical display preset for gtsummary
+#'
+#' This opt-in preset uses median (quartiles), counts (percent), one decimal
+#' for continuous summaries, and the missing label "Unknown". Branding setup
+#' does not choose these analytical display conventions.
+#' @param set_theme Apply the preset to the current session.
+#' @return The preset list invisibly.
+#' @export
+islh_gtsummary_statistics <- function(set_theme = TRUE) {
+  .islh_require("gtsummary", "statistical display presets")
+  set_theme <- .islh_check_flag(set_theme, "set_theme")
+  preset <- list(
+    "pkgwide-fn:pvalue_fun" = gtsummary::label_style_pvalue(digits = 2),
+    "pkgwide-fn:prependpvalue_fun" = gtsummary::label_style_pvalue(
+      digits = 2,
+      prepend_p = TRUE
+    ),
+    "style_number-arg:big.mark" = ",",
+    "style_number-arg:decimal.mark" = ".",
+    "tbl_summary-fn:percent_fun" = gtsummary::label_style_percent(digits = 1),
+    "tbl_summary-arg:statistic" = list(
+      gtsummary::all_continuous() ~ "{median} ({p25}, {p75})",
+      gtsummary::all_categorical() ~ "{n} ({p}%)"
+    ),
+    "tbl_summary-arg:digits" = list(
+      gtsummary::all_continuous() ~ 1,
+      gtsummary::all_categorical() ~ c(0, 1)
+    ),
+    "tbl_summary-arg:missing_text" = "Unknown"
+  )
+  if (set_theme) {
+    gtsummary::set_gtsummary_theme(preset)
+  }
+  invisible(preset)
+}

@@ -23,9 +23,9 @@ footers. This overrides any default attribution behaviour.
 Conventional-commit subjects: `feat:`, `fix:`, `docs:`, `test:`, `chore:`,
 `refactor:`. Breaking changes get `!`.
 
-The repository is private during development and goes public at the first
-release, so that `remotes::install_github()` works without a personal access
-token on staff laptops.
+The repository is public. Staff installations should use approved Windows
+release binaries and preinstalled dependencies; developer installs may pin a
+reviewed commit with `remotes::install_github()`.
 
 ## Commands
 
