@@ -29,8 +29,7 @@ islh_epi_curve(
   x = NULL,
   y = "Cases",
   facet_scales = "fixed",
-  aggregate = FALSE,
-  timezone = "America/Vancouver"
+  aggregate = FALSE
 )
 }
 \arguments{
@@ -78,9 +77,6 @@ Useful defaults are selected when omitted.}
 \item{aggregate}{Sum counts that share a date, fill group and facet. With
 \code{FALSE}, the default, duplicated combinations are an error. See the input
 grain section.}
-
-\item{timezone}{IANA reporting timezone for timestamps; defaults to
-America/Vancouver. Date inputs retain their calendar date.}
 }
 \value{
 A ggplot object. Additional ggplot2 layers and scales can be added in

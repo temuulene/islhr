@@ -10,11 +10,9 @@
   .islh_require("gt", "Island Health HTML tables")
 
   document_webfont <- FALSE
-  if (
-    isTRUE(embed_fonts) &&
+  if (isTRUE(embed_fonts) &&
       requireNamespace("knitr", quietly = TRUE) &&
-      isTRUE(knitr::is_html_output())
-  ) {
+      isTRUE(knitr::is_html_output())) {
     document_webfont <- .islh_register_webfont_dependency()
   }
 
@@ -24,10 +22,8 @@
     islh.document_webfont = document_webfont
   )
   gtsummary_theme <- NULL
-  if (
-    requireNamespace("gtsummary", quietly = TRUE) &&
-      requireNamespace("rlang", quietly = TRUE)
-  ) {
+  if (requireNamespace("gtsummary", quietly = TRUE) &&
+      requireNamespace("rlang", quietly = TRUE)) {
     gtsummary_theme <- .islh_gtsummary_theme(
       print_engine = "gt",
       quiet = quiet
@@ -60,10 +56,8 @@
   )
   previous_flextable <- .islh_set_flextable_defaults()
   gtsummary_theme <- NULL
-  if (
-    requireNamespace("gtsummary", quietly = TRUE) &&
-      requireNamespace("rlang", quietly = TRUE)
-  ) {
+  if (requireNamespace("gtsummary", quietly = TRUE) &&
+      requireNamespace("rlang", quietly = TRUE)) {
     gtsummary_theme <- .islh_gtsummary_theme(
       print_engine = "flextable",
       quiet = quiet
@@ -113,14 +107,13 @@
 #'
 #' @export
 islh_setup <- function(
-  format = c("auto", "html", "docx", "plots"),
-  tables = TRUE,
-  embed_fonts = TRUE,
-  base_size = 12,
-  grid = c("y", "x", "both", "none"),
-  set_knitr = TRUE,
-  quiet = FALSE
-) {
+    format = c("auto", "html", "docx", "plots"),
+    tables = TRUE,
+    embed_fonts = TRUE,
+    base_size = 12,
+    grid = c("y", "x", "both", "none"),
+    set_knitr = TRUE,
+    quiet = FALSE) {
   grid <- match.arg(grid)
   base_size <- .islh_check_size(base_size)
   set_knitr <- .islh_check_flag(set_knitr, "set_knitr")
@@ -129,8 +122,6 @@ islh_setup <- function(
   # Take the record before anything is changed, and only once. A second setup
   # call would otherwise record the first one's settings as the way back.
   restore_point <- .islh_capture_state()
-  completed <- FALSE
-  on.exit(if (!completed) .islh_restore_state(restore_point), add = TRUE)
 
   check <- islh_check(
     format = format,
@@ -143,8 +134,7 @@ islh_setup <- function(
     .islh_abort(c(
       paste0(
         "Island Health theme setup cannot configure ",
-        toupper(check$format),
-        "."
+        toupper(check$format), "."
       ),
       .islh_problem_bullets(check)
     ))
@@ -178,7 +168,6 @@ islh_setup <- function(
     .islh_state$setup <- restore_point
   }
 
-  completed <- TRUE
   result <- list(
     version = islh_version(),
     format = check$format,
@@ -197,12 +186,8 @@ islh_setup <- function(
     }
     .islh_inform(c(
       "v" = paste0(
-        "Island Health theme ",
-        islh_version(),
-        " is ready for ",
-        toupper(check$format),
-        table_note,
-        "."
+        "Island Health theme ", islh_version(), " is ready for ",
+        toupper(check$format), table_note, "."
       ),
       "i" = paste0("Font: ", result$font, "."),
       "i" = "Run {.code islh_help()} for the functions you need most."

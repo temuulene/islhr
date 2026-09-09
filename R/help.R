@@ -39,7 +39,6 @@ islh_help <- function() {
     "TABLES",
     "  islh_gt(data)                 HTML",
     "  islh_flextable(data)          Word",
-    "  islh_gtsummary_statistics()   opt in to summary display defaults",
     "  both fill the text width; use width = 0.6 for a narrower table",
     "",
     "SAVING A FIGURE",
@@ -59,6 +58,7 @@ islh_help <- function() {
   )
 
   cat(lines, sep = "\n")
+  cat("\n")
   invisible(lines)
 }
 
