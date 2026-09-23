@@ -15,16 +15,6 @@ islh_font_family <- function(refresh = FALSE, warn = TRUE) {
     return(.islh_state$font)
   }
 
-  if (!requireNamespace("systemfonts", quietly = TRUE)) {
-    if (isTRUE(warn)) {
-      .islh_warn(c(
-        "Package {.pkg systemfonts} is not installed.",
-        i = "BC Sans availability cannot be checked; using the device font."
-      ))
-    }
-    return("")
-  }
-
   if (isTRUE(refresh)) {
     systemfonts::reset_font_cache()
   }

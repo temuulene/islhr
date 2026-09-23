@@ -256,5 +256,3 @@ scale_fill_islh_b <- function(
     guide = guide
   )
 }
-
-## Plot theme -----------------------------------------------------------------

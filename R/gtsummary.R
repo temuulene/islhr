@@ -12,7 +12,6 @@
     set_theme = TRUE,
     quiet = FALSE) {
   .islh_require("gtsummary", "Island Health gtsummary tables")
-  .islh_require("rlang", "gtsummary conversion hooks")
   print_engine <- match.arg(print_engine)
 
   theme <- list(
@@ -66,32 +65,6 @@
   invisible(theme)
 }
 
-#' Apply Island Health table defaults for the current R session
-#'
-#' @param print_engine Default gtsummary output engine.
-#'
-#' @return Previous flextable defaults and the active gtsummary theme,
-#'   invisibly.
-#'
-#' @noRd
-.islh_use_table_themes <- function(print_engine = c("flextable", "gt")) {
-  print_engine <- match.arg(print_engine)
-
-  if (print_engine == "flextable") {
-    config <- .islh_use_docx_theme()
-  } else {
-    config <- .islh_use_html_theme(
-      embed_fonts = getOption("islh.embed_fonts", TRUE)
-    )
-  }
-
-  invisible(list(
-    flextable = config$flextable,
-    gtsummary = config$gtsummary
-  ))
-}
-
-
 #' Convert a gtsummary table to a styled flextable
 #'
 #' @param x A gtsummary object.
@@ -128,6 +101,3 @@ islh_gtsummary_gt <- function(
     gtsummary::as_gt(...) |>
     islh_gt(embed_fonts = embed_fonts)
 }
-
-## Quick reference ------------------------------------------------------------
-

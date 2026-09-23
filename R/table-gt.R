@@ -103,5 +103,3 @@ islh_gt <- function(
 
   data
 }
-
-## gtsummary integration -----------------------------------------------------

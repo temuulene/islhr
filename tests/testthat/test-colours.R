@@ -52,3 +52,19 @@ test_that("the missing-package message can actually be built", {
     "a made-up feature"
   )
 })
+
+test_that("categorical colours stand out from a white page", {
+  # WCAG 2.1 asks 3:1 for graphical objects. The qualitative palette carries
+  # meaning through colour, so every category has to clear it on white.
+  ratios <- .islh_contrast_ratio(.islh_pal_qualitative(5), "#FFFFFF")
+  expect_true(all(ratios >= 3), label = paste(round(ratios, 2), collapse = ", "))
+})
+
+test_that("table header text is readable on the header band", {
+  # Both table engines print white bold text on blue 20. Body-size text needs
+  # 4.5:1 under WCAG 2.1 AA.
+  expect_gte(
+    .islh_contrast_ratio(islh_brand("white"), islh_hex("blue", 20)),
+    4.5
+  )
+})

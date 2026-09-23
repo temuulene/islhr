@@ -1,3 +1,5 @@
+## Plot theme -----------------------------------------------------------------
+
 #' Brand text hierarchy shared by every Island Health theme
 #'
 #' Titles, subtitles, captions, legend text and strip labels read the same on
@@ -104,68 +106,26 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
       plot.margin = ggplot2::margin(6, 10, 6, 6)
     )
 
-  base + switch(
-    grid,
-    y = ggplot2::theme(
-      panel.grid.major.x = ggplot2::element_blank(),
-      axis.line.x = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      ),
-      axis.ticks.x = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      )
-    ),
-    x = ggplot2::theme(
-      panel.grid.major.y = ggplot2::element_blank(),
-      axis.line.y = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      ),
-      axis.ticks.y = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      )
-    ),
-    both = ggplot2::theme(
-      axis.line.x = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      ),
-      axis.ticks.x = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      ),
-      axis.line.y = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      ),
-      axis.ticks.y = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      )
-    ),
-    none = ggplot2::theme(
-      panel.grid.major = ggplot2::element_blank(),
-      axis.line.x = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      ),
-      axis.ticks.x = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      ),
-      axis.line.y = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      ),
-      axis.ticks.y = ggplot2::element_line(
-        colour = islh_hex("grey", 60),
-        linewidth = 0.3
-      )
-    )
+  # Every axis that shows a line and ticks draws them the same way.
+  axis_rule <- ggplot2::element_line(
+    colour = islh_hex("grey", 60),
+    linewidth = 0.3
   )
+  x_axis <- ggplot2::theme(axis.line.x = axis_rule, axis.ticks.x = axis_rule)
+  y_axis <- ggplot2::theme(axis.line.y = axis_rule, axis.ticks.y = axis_rule)
+
+  base +
+    switch(
+      grid,
+      y = ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
+        x_axis,
+      x = ggplot2::theme(panel.grid.major.y = ggplot2::element_blank()) +
+        y_axis,
+      both = x_axis + y_axis,
+      none = ggplot2::theme(panel.grid.major = ggplot2::element_blank()) +
+        x_axis +
+        y_axis
+    )
 }
 
 ## Plot helpers ---------------------------------------------------------------

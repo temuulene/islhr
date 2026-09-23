@@ -22,8 +22,7 @@
     islh.document_webfont = document_webfont
   )
   gtsummary_theme <- NULL
-  if (requireNamespace("gtsummary", quietly = TRUE) &&
-      requireNamespace("rlang", quietly = TRUE)) {
+  if (requireNamespace("gtsummary", quietly = TRUE)) {
     gtsummary_theme <- .islh_gtsummary_theme(
       print_engine = "gt",
       quiet = quiet
@@ -56,8 +55,7 @@
   )
   previous_flextable <- .islh_set_flextable_defaults()
   gtsummary_theme <- NULL
-  if (requireNamespace("gtsummary", quietly = TRUE) &&
-      requireNamespace("rlang", quietly = TRUE)) {
+  if (requireNamespace("gtsummary", quietly = TRUE)) {
     gtsummary_theme <- .islh_gtsummary_theme(
       print_engine = "flextable",
       quiet = quiet

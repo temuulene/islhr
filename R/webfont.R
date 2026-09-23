@@ -4,7 +4,6 @@
     return(.islh_state$webfont_css)
   }
 
-  .islh_require("systemfonts", "locating BC Sans webfont files")
   .islh_require("base64enc", "embedding BC Sans in HTML tables")
 
   if (isTRUE(refresh)) {

@@ -61,7 +61,7 @@ islh_help <- function() {
   invisible(lines)
 }
 
-## Runnable examples and smoke test ------------------------------------------
+## Runnable example ----------------------------------------------------------
 
 #' Create a runnable Island Health example plot
 #'
@@ -87,59 +87,4 @@ islh_example_plot <- function() {
       colour = "Cylinders"
     ) +
     theme_islh(grid = "both")
-}
-
-#' Build a gallery that exercises plot and table themes
-#'
-#' @return A list containing example plots and available table outputs.
-#'
-#' @noRd
-.islh_theme_gallery <- function() {
-  base_plot <- islh_example_plot()
-  plots <- lapply(
-    c("y", "x", "both", "none"),
-    function(grid) base_plot + theme_islh(grid = grid)
-  )
-  names(plots) <- c("grid_y", "grid_x", "grid_both", "grid_none")
-
-  map_data <- expand.grid(x = seq_len(5), y = seq_len(5))
-  map_data$value <- seq_len(nrow(map_data))
-  plots$binned <- ggplot2::ggplot(
-    map_data,
-    ggplot2::aes(x = x, y = y, fill = value)
-  ) +
-    ggplot2::geom_tile() +
-    scale_fill_islh_b(n.breaks = 5) +
-    ggplot2::coord_equal() +
-    theme_islh(grid = "none")
-
-  tables <- list()
-  example_data <- utils::head(datasets::mtcars[c("mpg", "cyl", "wt")])
-
-  if (requireNamespace("flextable", quietly = TRUE) &&
-      requireNamespace("officer", quietly = TRUE)) {
-    tables$flextable <- islh_flextable(example_data)
-  }
-
-  if (requireNamespace("gt", quietly = TRUE)) {
-    tables$gt <- islh_gt(example_data)
-  }
-
-  if (requireNamespace("gtsummary", quietly = TRUE)) {
-    summary_table <- gtsummary::tbl_summary(
-      gtsummary::trial,
-      include = c("age", "grade")
-    )
-
-    if (requireNamespace("flextable", quietly = TRUE) &&
-        requireNamespace("officer", quietly = TRUE)) {
-      tables$gtsummary_flextable <- islh_gtsummary_flex(summary_table)
-    }
-
-    if (requireNamespace("gt", quietly = TRUE)) {
-      tables$gtsummary_gt <- islh_gtsummary_gt(summary_table)
-    }
-  }
-
-  list(plots = plots, tables = tables)
 }
