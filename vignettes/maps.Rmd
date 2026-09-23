@@ -18,6 +18,10 @@ knitr::opts_chunk$set(
 )
 library(ggplot2)
 library(islhr)
+# Resolve the brand font first, as the other articles do. Unresolved, the
+# theme names BC Sans, and where it is not installed the PDF device that
+# R CMD check runs this code on stops with "invalid font type".
+islh_setup(format = "plots", quiet = TRUE)
 ```
 
 The two packages divide mapping work by responsibility. `islhepi` retrieves
