@@ -181,3 +181,30 @@ test_that("islh_version reads DESCRIPTION rather than a second copy", {
     as.character(utils::packageVersion("islhr"))
   )
 })
+
+test_that("BC Sans is registered with every HTML render, not once a session", {
+  skip_if_not_installed("knitr")
+  skip_if_not_installed("htmltools")
+  local_mocked_bindings(
+    .islh_bc_sans_webfont_css = function(...) "/* BC Sans */"
+  )
+
+  registered <- function() {
+    meta <- knitr::knit_meta(clean = TRUE)
+    any(vapply(
+      meta,
+      function(x) inherits(x, "html_dependency") && x$name == "islh-bc-sans",
+      logical(1)
+    ))
+  }
+  withr::defer(knitr::knit_meta(clean = TRUE))
+
+  # Two renders in one session each start with empty knitr metadata. The
+  # second must get the font too, or its tables fall back to another face.
+  invisible(knitr::knit_meta(clean = TRUE))
+  expect_true(.islh_register_webfont_dependency())
+  expect_true(registered())
+
+  expect_true(.islh_register_webfont_dependency())
+  expect_true(registered())
+})

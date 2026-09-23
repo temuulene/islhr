@@ -51,11 +51,11 @@
   .islh_state$webfont_css
 }
 
+# Adds BC Sans to the document being knitted. knitr's metadata belongs to one
+# render, so this runs every time: a session that renders two reports must
+# register the font in both. Rendering removes duplicates by name, so a
+# second call within one document costs nothing.
 .islh_register_webfont_dependency <- function() {
-  if (isTRUE(.islh_state$document_webfont_registered)) {
-    return(TRUE)
-  }
-
   .islh_require("htmltools", "registering BC Sans with a Quarto HTML document")
   .islh_require("knitr", "registering BC Sans with a Quarto HTML document")
 
@@ -80,7 +80,6 @@
     all_files = FALSE
   )
   knitr::knit_meta_add(list(dependency))
-  .islh_state$document_webfont_registered <- TRUE
   TRUE
 }
 
