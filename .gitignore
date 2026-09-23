@@ -8,3 +8,6 @@ inst/doc
 /*.Rcheck/
 ..Rcheck/
 data-raw/.build-reference-docx.tmp/
+
+# Python bytecode from data-raw/build_reference_docx.py
+__pycache__/
