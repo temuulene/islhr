@@ -58,21 +58,23 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      # Build the source package on both runners. R CMD build knits the
+      # vignettes into inst/doc; installing straight from the checkout would
+      # leave the Windows binary without them.
       - name: Build source package
-        if: matrix.config.artifact == 'tar.gz'
         run: R CMD build .
+        shell: bash
 
       # A Windows binary is what a locked-down laptop can install without a
       # compiler and without reaching CRAN.
       - name: Build Windows binary
         if: matrix.config.artifact == 'zip'
-        run: |
-          R CMD INSTALL --build .
+        run: R CMD INSTALL --build islhr_*.tar.gz
         shell: bash
 
+      # Each runner uploads only its own kind of file, so the two jobs never
+      # attach the same file name to the release.
       - uses: softprops/action-gh-release@v2
         with:
-          files: |
-            *.tar.gz
-            *.zip
-          fail_on_unmatched_files: false
+          files: '*.${{ matrix.config.artifact }}'
+          fail_on_unmatched_files: true
