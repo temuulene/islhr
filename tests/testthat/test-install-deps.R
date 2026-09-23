@@ -22,9 +22,14 @@ test_that("only what the check reports as missing is installed", {
     islh_check = function(format, ...) {
       structure(
         list(
-          ok = FALSE, format = format, tables = TRUE, embed_fonts = FALSE,
-          required = c("ggplot2", "gt"), missing = "gt",
-          outdated = character(), install_command = ""
+          ok = FALSE,
+          format = format,
+          tables = TRUE,
+          embed_fonts = FALSE,
+          required = c("ggplot2", "gt"),
+          missing = "gt",
+          outdated = character(),
+          install_command = ""
         ),
         class = "islh_dependency_check"
       )
@@ -44,8 +49,12 @@ test_that("nothing is installed when the format is ready", {
   local_mocked_bindings(
     islh_check = function(format, ...) {
       structure(
-        list(ok = TRUE, format = format, missing = character(),
-             outdated = character()),
+        list(
+          ok = TRUE,
+          format = format,
+          missing = character(),
+          outdated = character()
+        ),
         class = "islh_dependency_check"
       )
     }
@@ -61,8 +70,13 @@ test_that("upgrading a loaded package asks for a restart", {
     islh_check = function(format, ...) {
       structure(
         list(
-          ok = FALSE, format = format, tables = FALSE, embed_fonts = FALSE,
-          required = "ggplot2", missing = character(), outdated = "ggplot2",
+          ok = FALSE,
+          format = format,
+          tables = FALSE,
+          embed_fonts = FALSE,
+          required = "ggplot2",
+          missing = character(),
+          outdated = "ggplot2",
           install_command = ""
         ),
         class = "islh_dependency_check"

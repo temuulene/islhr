@@ -68,13 +68,14 @@ coord_islh_map <- function(crs = 3005, datum = NA, expand = FALSE, ...) {
 #'   suppression = "Counts under 5 suppressed."
 #' )
 islh_caption <- function(
-    source,
-    extracted,
-    boundary = NULL,
-    standard_pop = NULL,
-    suppression = NULL,
-    governance = NULL,
-    width = 100) {
+  source,
+  extracted,
+  boundary = NULL,
+  standard_pop = NULL,
+  suppression = NULL,
+  governance = NULL,
+  width = 100
+) {
   if (!.islh_is_string(source) || !.islh_is_string(extracted)) {
     .islh_abort("{.arg source} and {.arg extracted} must each be one string.")
   }

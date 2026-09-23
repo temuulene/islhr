@@ -62,11 +62,13 @@ test_that("each format wires up its own table engine and output format", {
 test_that("_quarto.yml names the formats the extension contributes", {
   expect_true(any(grepl(
     "islh-report-html",
-    readLines(file.path(scaffold("html"), "_quarto.yml")), fixed = TRUE
+    readLines(file.path(scaffold("html"), "_quarto.yml")),
+    fixed = TRUE
   )))
   expect_true(any(grepl(
     "islh-report-docx",
-    readLines(file.path(scaffold("docx"), "_quarto.yml")), fixed = TRUE
+    readLines(file.path(scaffold("docx"), "_quarto.yml")),
+    fixed = TRUE
   )))
 
   both <- readLines(file.path(scaffold("both"), "_quarto.yml"))
@@ -104,7 +106,9 @@ test_that("scaffolding refuses to write over an existing project", {
 
   suppressMessages(islh_create_report(path, overwrite = TRUE))
   expect_true(any(grepl(
-    "library(islhr)", readLines(file.path(path, "report.qmd")), fixed = TRUE
+    "library(islhr)",
+    readLines(file.path(path, "report.qmd")),
+    fixed = TRUE
   )))
 })
 
@@ -131,7 +135,11 @@ test_that("the install helper never reaches for pak or a source build", {
 test_that("Word figure captions stay with their figures", {
   path <- scaffold("docx")
   extension_path <- file.path(
-    path, "_extensions", "islh", "islh-report", "_extension.yml"
+    path,
+    "_extensions",
+    "islh",
+    "islh-report",
+    "_extension.yml"
   )
   extension <- readLines(extension_path)
   docx <- which(trimws(extension) == "docx:")
@@ -144,7 +152,10 @@ test_that("Word figure captions stay with their figures", {
   )))
 
   reference <- file.path(
-    path, "_extensions", "islh", "islh-report",
+    path,
+    "_extensions",
+    "islh",
+    "islh-report",
     "islh-report-reference.docx"
   )
   extracted <- withr::local_tempdir()

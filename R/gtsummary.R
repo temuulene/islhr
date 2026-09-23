@@ -8,9 +8,10 @@
 #'
 #' @noRd
 .islh_gtsummary_theme <- function(
-    print_engine = c("flextable", "gt"),
-    set_theme = TRUE,
-    quiet = FALSE) {
+  print_engine = c("flextable", "gt"),
+  set_theme = TRUE,
+  quiet = FALSE
+) {
   .islh_require("gtsummary", "Island Health gtsummary tables")
   print_engine <- match.arg(print_engine)
 
@@ -18,12 +19,13 @@
     "pkgwide-str:theme_name" = "Island Health",
     "pkgwide-str:print_engine" = print_engine,
     "pkgwide-fn:pvalue_fun" = gtsummary::label_style_pvalue(digits = 2),
-    "pkgwide-fn:prependpvalue_fun" =
-      gtsummary::label_style_pvalue(digits = 2, prepend_p = TRUE),
+    "pkgwide-fn:prependpvalue_fun" = gtsummary::label_style_pvalue(
+      digits = 2,
+      prepend_p = TRUE
+    ),
     "style_number-arg:big.mark" = ",",
     "style_number-arg:decimal.mark" = ".",
-    "tbl_summary-fn:percent_fun" =
-      gtsummary::label_style_percent(digits = 1),
+    "tbl_summary-fn:percent_fun" = gtsummary::label_style_percent(digits = 1),
     "tbl_summary-arg:statistic" = list(
       gtsummary::all_continuous() ~ "{median} ({p25}, {p75})",
       gtsummary::all_categorical() ~ "{n} ({p}%)"
@@ -116,9 +118,10 @@ islh_gtsummary_flex <- function(x, ...) {
 #'
 #' @export
 islh_gtsummary_gt <- function(
-    x,
-    ...,
-    embed_fonts = getOption("islh.embed_fonts", TRUE)) {
+  x,
+  ...,
+  embed_fonts = getOption("islh.embed_fonts", TRUE)
+) {
   .islh_require("gtsummary", "gtsummary conversion")
 
   x |>

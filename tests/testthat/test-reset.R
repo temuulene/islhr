@@ -125,7 +125,10 @@ test_that("a plot's own colour scale is not replaced", {
   local_clean_session()
 
   plot <- suppressWarnings(with_islh(
-    ggplot2::ggplot(datasets::mtcars, ggplot2::aes(factor(cyl), fill = factor(am))) +
+    ggplot2::ggplot(
+      datasets::mtcars,
+      ggplot2::aes(factor(cyl), fill = factor(am))
+    ) +
       ggplot2::geom_bar() +
       ggplot2::scale_fill_manual(values = c("black", "orange")),
     format = "plots"

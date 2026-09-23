@@ -18,7 +18,8 @@ test_that("loading the package changes nothing", {
   result <- system2(
     file.path(R.home("bin"), "R"),
     c("--vanilla", "--slave", "-e", shQuote(script)),
-    stdout = TRUE, stderr = FALSE
+    stdout = TRUE,
+    stderr = FALSE
   )
   skip_if(length(result) == 0L, "could not start a fresh R session")
   expect_equal(trimws(paste(result, collapse = "")), "FALSE")
@@ -65,7 +66,9 @@ test_that("dependency checks are format-specific", {
   expect_false("gt" %in% docx$required)
 
   # Turning tables off drops the table packages from every format.
-  expect_false("gt" %in% islh_check("html", tables = FALSE, quiet = TRUE)$required)
+  expect_false(
+    "gt" %in% islh_check("html", tables = FALSE, quiet = TRUE)$required
+  )
 })
 
 test_that("the install command never reaches for pak or a source build", {
@@ -85,8 +88,13 @@ test_that("a package that is present but too old is reported as such", {
 
   fake <- structure(
     list(
-      ok = FALSE, format = "docx", tables = TRUE, embed_fonts = FALSE,
-      required = "ggplot2", missing = character(), outdated = "ggplot2",
+      ok = FALSE,
+      format = "docx",
+      tables = TRUE,
+      embed_fonts = FALSE,
+      required = "ggplot2",
+      missing = character(),
+      outdated = "ggplot2",
       install_command = 'install.packages(c("ggplot2"), type = "binary")'
     ),
     class = "islh_dependency_check"

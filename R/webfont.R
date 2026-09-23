@@ -1,6 +1,8 @@
 .islh_bc_sans_webfont_css <- function(refresh = FALSE) {
-  if (!isTRUE(refresh) &&
-      exists("webfont_css", envir = .islh_state, inherits = FALSE)) {
+  if (
+    !isTRUE(refresh) &&
+      exists("webfont_css", envir = .islh_state, inherits = FALSE)
+  ) {
     return(.islh_state$webfont_css)
   }
 
@@ -12,8 +14,10 @@
   installed <- systemfonts::system_fonts()
   faces <- data.frame(
     name = c(
-      "BCSans-Regular", "BCSans-Italic",
-      "BCSans-Bold", "BCSans-BoldItalic"
+      "BCSans-Regular",
+      "BCSans-Italic",
+      "BCSans-Bold",
+      "BCSans-BoldItalic"
     ),
     style = c("normal", "italic", "normal", "italic"),
     weight = c(400L, 400L, 700L, 700L)
@@ -29,18 +33,27 @@
     return("")
   }
 
-  css <- vapply(seq_len(nrow(faces)), function(i) {
-    encoded <- base64enc::base64encode(faces$path[[i]])
-    paste0(
-      "@font-face {\n",
-      "  font-family: \"BC Sans\";\n",
-      "  font-style: ", faces$style[[i]], ";\n",
-      "  font-weight: ", faces$weight[[i]], ";\n",
-      "  src: url(\"data:font/ttf;base64,", encoded,
-      "\") format(\"truetype\");\n",
-      "}"
-    )
-  }, character(1))
+  css <- vapply(
+    seq_len(nrow(faces)),
+    function(i) {
+      encoded <- base64enc::base64encode(faces$path[[i]])
+      paste0(
+        "@font-face {\n",
+        "  font-family: \"BC Sans\";\n",
+        "  font-style: ",
+        faces$style[[i]],
+        ";\n",
+        "  font-weight: ",
+        faces$weight[[i]],
+        ";\n",
+        "  src: url(\"data:font/ttf;base64,",
+        encoded,
+        "\") format(\"truetype\");\n",
+        "}"
+      )
+    },
+    character(1)
+  )
 
   license_notice <- paste0(
     "/* BC Sans: Copyright 2015 Google Inc. and 2023 Province of B.C.\n",
@@ -82,4 +95,3 @@
   knitr::knit_meta_add(list(dependency))
   TRUE
 }
-

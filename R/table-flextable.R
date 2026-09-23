@@ -98,8 +98,12 @@ islh_flextable <- function(
     x <- flextable::set_caption(x, caption = caption)
   }
 
-  x <- .islh_fix_widths(x, autofit = autofit, width = width,
-                        text_width = text_width)
+  x <- .islh_fix_widths(
+    x,
+    autofit = autofit,
+    width = width,
+    text_width = text_width
+  )
 
   x
 }
@@ -122,8 +126,12 @@ islh_flextable <- function(
       dim(flextable::autofit(x))$widths,
       error = function(condition) NULL
     )
-    if (is.null(measured) || length(measured) != columns ||
-        !all(is.finite(measured)) || sum(measured) <= 0) {
+    if (
+      is.null(measured) ||
+        length(measured) != columns ||
+        !all(is.finite(measured)) ||
+        sum(measured) <= 0
+    ) {
       rep(1 / columns, columns)
     } else {
       measured / sum(measured)

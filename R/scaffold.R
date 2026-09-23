@@ -322,8 +322,8 @@ islh_report_skeleton <- function(path, ...) {
     title = blank_to_null(dots$title) %||% "Island Health report",
     author = blank_to_null(dots$author),
     example_data = as_logical(dots$example_data),
-    rproj = FALSE,      # RStudio writes its own .Rproj for template projects
-    overwrite = TRUE    # RStudio creates the directory before calling us
+    rproj = FALSE, # RStudio writes its own .Rproj for template projects
+    overwrite = TRUE # RStudio creates the directory before calling us
   )
 }
 

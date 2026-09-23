@@ -77,7 +77,10 @@ islh_brand_yml <- function() {
 #' islh_reference_docx()
 islh_reference_docx <- function() {
   .islh_path(
-    "quarto", "_extensions", "islh", "islh-report",
+    "quarto",
+    "_extensions",
+    "islh",
+    "islh-report",
     "islh-report-reference.docx"
   )
 }

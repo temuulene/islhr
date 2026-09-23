@@ -1,4 +1,3 @@
-
 ## Discrete ggplot scales -----------------------------------------------------
 
 #' Island Health qualitative colour scale
@@ -22,9 +21,10 @@
 #'
 #' @export
 scale_colour_islh <- function(
-    reverse = FALSE,
-    ...,
-    na.value = .islh_unknown()) {
+  reverse = FALSE,
+  ...,
+  na.value = .islh_unknown()
+) {
   ggplot2::discrete_scale(
     aesthetics = "colour",
     palette = function(n) .islh_pal_qualitative(n, reverse = reverse),
@@ -58,9 +58,10 @@ scale_color_islh <- scale_colour_islh
 #'
 #' @export
 scale_fill_islh <- function(
-    reverse = FALSE,
-    ...,
-    na.value = .islh_unknown()) {
+  reverse = FALSE,
+  ...,
+  na.value = .islh_unknown()
+) {
   ggplot2::discrete_scale(
     aesthetics = "fill",
     palette = function(n) .islh_pal_qualitative(n, reverse = reverse),
@@ -80,10 +81,11 @@ scale_fill_islh <- function(
 #'
 #' @export
 scale_colour_islh_ordinal <- function(
-    family = "blue",
-    reverse = FALSE,
-    ...,
-    na.value = .islh_unknown()) {
+  family = "blue",
+  reverse = FALSE,
+  ...,
+  na.value = .islh_unknown()
+) {
   ggplot2::discrete_scale(
     aesthetics = "colour",
     palette = function(n) {
@@ -122,10 +124,11 @@ scale_color_islh_ordinal <- scale_colour_islh_ordinal
 #'
 #' @export
 scale_fill_islh_ordinal <- function(
-    family = "blue",
-    reverse = FALSE,
-    ...,
-    na.value = .islh_unknown()) {
+  family = "blue",
+  reverse = FALSE,
+  ...,
+  na.value = .islh_unknown()
+) {
   ggplot2::discrete_scale(
     aesthetics = "fill",
     palette = function(n) {
@@ -271,13 +274,14 @@ scale_fill_islh_signal <- function(..., na.value = .islh_unknown()) {
 #'
 #' @export
 scale_fill_islh_b <- function(
-    ...,
-    reverse = FALSE,
-    na.value = .islh_map_missing(),
-    n.breaks = 5,
-    labels = scales::label_number(scale_cut = scales::cut_short_scale()),
-    key_width = 10,
-    guide = .islh_guide_coloursteps(key_width = key_width)) {
+  ...,
+  reverse = FALSE,
+  na.value = .islh_map_missing(),
+  n.breaks = 5,
+  labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+  key_width = 10,
+  guide = .islh_guide_coloursteps(key_width = key_width)
+) {
   colours <- if (isTRUE(reverse)) rev(.islh_pal_map()) else .islh_pal_map()
 
   ggplot2::scale_fill_stepsn(

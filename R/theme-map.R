@@ -25,9 +25,10 @@
 #' ggplot2::ggplot() + theme_islh_map()
 #' ggplot2::ggplot() + theme_islh_map(legend = "inside")
 theme_islh_map <- function(
-    base_size = 12,
-    legend = c("bottom", "inside", "none"),
-    legend_inside = c(0.04, 0.16)) {
+  base_size = 12,
+  legend = c("bottom", "inside", "none"),
+  legend_inside = c(0.04, 0.16)
+) {
   legend <- match.arg(legend)
   base_size <- .islh_check_size(base_size)
   legend_inside <- .islh_check_position(legend_inside, "legend_inside")

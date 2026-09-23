@@ -21,12 +21,13 @@
 #'
 #' @export
 islh_gt <- function(
-    data,
-    title = NULL,
-    subtitle = NULL,
-    source_note = NULL,
-    width = 1,
-    embed_fonts = getOption("islh.embed_fonts", TRUE)) {
+  data,
+  title = NULL,
+  subtitle = NULL,
+  source_note = NULL,
+  width = 1,
+  embed_fonts = getOption("islh.embed_fonts", TRUE)
+) {
   .islh_require("gt", "Island Health HTML tables")
   width <- .islh_check_fraction(width, "width")
   embed_fonts <- .islh_check_flag(embed_fonts, "embed_fonts")
@@ -50,7 +51,10 @@ islh_gt <- function(
   data <- gt::tab_options(
     data,
     table.font.names = unique(c(
-      .islh_table_font(), .islh_fallback_font, "Arial", "sans-serif"
+      .islh_table_font(),
+      .islh_fallback_font,
+      "Arial",
+      "sans-serif"
     )),
     # Without an explicit width, gt shrinks the table to its contents and
     # centres it, which reads as an afterthought beside full-width prose.

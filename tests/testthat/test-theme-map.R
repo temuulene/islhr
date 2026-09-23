@@ -6,11 +6,16 @@ test_that("nothing but the data draws on a map", {
   # version blanked `axis.line` while `theme_islh()` set `axis.line.x`
   # directly, and a box and tick marks were drawn around every map.
   furniture <- c(
-    "axis.line.x", "axis.line.y",
-    "axis.ticks.x", "axis.ticks.y",
-    "axis.text.x", "axis.text.y",
-    "axis.title.x", "axis.title.y",
-    "panel.grid.major", "panel.grid.minor",
+    "axis.line.x",
+    "axis.line.y",
+    "axis.ticks.x",
+    "axis.ticks.y",
+    "axis.text.x",
+    "axis.text.y",
+    "axis.title.x",
+    "axis.title.y",
+    "panel.grid.major",
+    "panel.grid.minor",
     "panel.border"
   )
 

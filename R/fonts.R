@@ -73,4 +73,3 @@ islh_font_family <- function(refresh = FALSE, warn = TRUE) {
 .islh_table_font <- function() {
   if (nzchar(.islh_font())) .islh_font() else "Arial"
 }
-

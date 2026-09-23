@@ -19,7 +19,8 @@ expect_only_font_warnings <- function(expr) {
     !grepl("BC Sans|Noto Sans|font", warnings, ignore.case = TRUE)
   ]
   testthat::expect_equal(
-    unexpected, character(),
+    unexpected,
+    character(),
     label = "unexpected warnings"
   )
 

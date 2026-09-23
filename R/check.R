@@ -92,7 +92,8 @@ islh_check <- function(
   format <- .islh_resolve_format(format)
   tables <- .islh_check_flag(tables, "tables") && format != "plots"
   embed_fonts <- .islh_check_flag(embed_fonts, "embed_fonts") &&
-    format == "html" && tables
+    format == "html" &&
+    tables
   quiet <- .islh_check_flag(quiet, "quiet")
 
   required <- c("ggplot2", "cli", "scales", "systemfonts")
@@ -142,15 +143,27 @@ islh_check <- function(
 .islh_problem_bullets <- function(x) {
   bullets <- character()
   if (length(x$missing) > 0L) {
-    bullets <- c(bullets, "x" = paste0(
-      "Not installed: ", paste(x$missing, collapse = ", "), "."
-    ))
+    bullets <- c(
+      bullets,
+      "x" = paste0(
+        "Not installed: ",
+        paste(x$missing, collapse = ", "),
+        "."
+      )
+    )
   }
   for (pkg in x$outdated) {
-    bullets <- c(bullets, "x" = paste0(
-      pkg, " ", utils::packageVersion(pkg), " is too old; ",
-      .islh_min_versions[[pkg]], " or newer is required."
-    ))
+    bullets <- c(
+      bullets,
+      "x" = paste0(
+        pkg,
+        " ",
+        utils::packageVersion(pkg),
+        " is too old; ",
+        .islh_min_versions[[pkg]],
+        " or newer is required."
+      )
+    )
   }
   c(bullets, "i" = paste0("Install with {.code ", x$install_command, "}."))
 }
@@ -164,7 +177,8 @@ print.islh_dependency_check <- function(x, ...) {
     .islh_inform(c(
       "v" = paste0(
         "Island Health theme dependencies are ready for ",
-        .islh_format_label(x$format), "."
+        .islh_format_label(x$format),
+        "."
       )
     ))
     return(invisible(x))

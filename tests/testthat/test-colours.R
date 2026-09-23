@@ -57,7 +57,10 @@ test_that("categorical colours stand out from a white page", {
   # WCAG 2.1 asks 3:1 for graphical objects. The qualitative palette carries
   # meaning through colour, so every category has to clear it on white.
   ratios <- .islh_contrast_ratio(.islh_pal_qualitative(5), "#FFFFFF")
-  expect_true(all(ratios >= 3), label = paste(round(ratios, 2), collapse = ", "))
+  expect_true(
+    all(ratios >= 3),
+    label = paste(round(ratios, 2), collapse = ", ")
+  )
 })
 
 test_that("table header text is readable on the header band", {

@@ -56,7 +56,9 @@ islh_install_deps <- function(
 
   # Linux builds from source because CRAN publishes no Linux binaries; there,
   # asking for "binary" would fail outright.
-  type <- if (.Platform$OS.type == "windows" || Sys.info()[["sysname"]] == "Darwin") {
+  type <- if (
+    .Platform$OS.type == "windows" || Sys.info()[["sysname"]] == "Darwin"
+  ) {
     "binary"
   } else {
     getOption("pkgType")

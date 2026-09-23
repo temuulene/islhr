@@ -20,11 +20,15 @@ family_block <- function(family) {
   entry <- colours[[family]]
   pairs <- sprintf(
     '      "%s": %s',
-    names(entry), quote_string(toupper(unname(entry)))
+    names(entry),
+    quote_string(toupper(unname(entry)))
   )
   paste0(
-    '    ', quote_string(family), ': {\n',
-    paste(pairs, collapse = ',\n'), '\n    }'
+    '    ',
+    quote_string(family),
+    ': {\n',
+    paste(pairs, collapse = ',\n'),
+    '\n    }'
   )
 }
 
@@ -40,7 +44,9 @@ json <- paste0(
   '  "families": {\n',
   paste(vapply(names(colours), family_block, character(1)), collapse = ',\n'),
   '\n  },\n',
-  '  "named": {\n', named_block, '\n  }\n',
+  '  "named": {\n',
+  named_block,
+  '\n  }\n',
   '}\n'
 )
 

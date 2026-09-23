@@ -50,9 +50,15 @@ test_that("sizes, counts and positions are checked", {
   expect_error(.islh_check_count(2.5, "max_cases"), "whole number")
   expect_error(.islh_check_count(0, "max_cases"), "whole number")
 
-  expect_equal(.islh_check_position(c(0.04, 0.16), "legend_inside"), c(0.04, 0.16))
+  expect_equal(
+    .islh_check_position(c(0.04, 0.16), "legend_inside"),
+    c(0.04, 0.16)
+  )
   expect_error(.islh_check_position(0.5, "legend_inside"), "two fractions")
-  expect_error(.islh_check_position(c(0.5, 2), "legend_inside"), "two fractions")
+  expect_error(
+    .islh_check_position(c(0.5, 2), "legend_inside"),
+    "two fractions"
+  )
 })
 
 test_that("the public functions use the shared checks", {

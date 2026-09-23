@@ -13,11 +13,14 @@
   }
   ok <- dir.create(path, recursive = TRUE, showWarnings = FALSE)
   if (!ok || !dir.exists(path)) {
-    .islh_abort(c(
-      "Could not create {.file {path}}.",
-      i = "Check that you have permission to write there and that the path is
+    .islh_abort(
+      c(
+        "Could not create {.file {path}}.",
+        i = "Check that you have permission to write there and that the path is
            not too long."
-    ), call = call)
+      ),
+      call = call
+    )
   }
   invisible(path)
 }
@@ -26,11 +29,14 @@
   .islh_mkdir(dirname(to), call = call)
   ok <- file.copy(from, to, overwrite = TRUE)
   if (!ok || !file.exists(to)) {
-    .islh_abort(c(
-      "Could not write {.file {to}}.",
-      i = "The file may be open in another program, or the folder may be
+    .islh_abort(
+      c(
+        "Could not write {.file {to}}.",
+        i = "The file may be open in another program, or the folder may be
            read-only."
-    ), call = call)
+      ),
+      call = call
+    )
   }
   invisible(to)
 }
@@ -45,10 +51,13 @@
     error = function(condition) conditionMessage(condition)
   )
   if (!isTRUE(result) || !file.exists(path)) {
-    .islh_abort(c(
-      "Could not write {.file {path}}.",
-      x = if (isTRUE(result)) "The file is missing after writing." else result
-    ), call = call)
+    .islh_abort(
+      c(
+        "Could not write {.file {path}}.",
+        x = if (isTRUE(result)) "The file is missing after writing." else result
+      ),
+      call = call
+    )
   }
   invisible(path)
 }
@@ -131,7 +140,10 @@ islh_use_quarto <- function(dir = ".", overwrite = FALSE) {
   .islh_check_dir(dir)
   source <- .islh_path("quarto", "_extensions")
   result <- .islh_copy_into(
-    source, file.path(dir, "_extensions"), dir, overwrite
+    source,
+    file.path(dir, "_extensions"),
+    dir,
+    overwrite
   )
   .islh_report_copy(result, "the Island Health Quarto format", overwrite)
 }
@@ -194,8 +206,14 @@ islh_use_brand <- function(dir = ".", logos = TRUE, overwrite = FALSE) {
 .islh_brand_logo_files <- function() {
   fallback <- paste0(
     "islh-logo-",
-    c("stacked-full-colour", "stacked-dark-blue", "stacked-white",
-      "horizontal-full-colour", "horizontal-dark-blue", "horizontal-white"),
+    c(
+      "stacked-full-colour",
+      "stacked-dark-blue",
+      "stacked-white",
+      "horizontal-full-colour",
+      "horizontal-dark-blue",
+      "horizontal-white"
+    ),
     ".svg"
   )
 
@@ -216,10 +234,13 @@ islh_use_brand <- function(dir = ".", logos = TRUE, overwrite = FALSE) {
 
 .islh_check_dir <- function(dir, call = rlang::caller_env()) {
   if (!dir.exists(dir)) {
-    .islh_abort(c(
-      "{.file {dir}} does not exist.",
-      i = "Create it first, or use {.fn islh_create_report} to start a project."
-    ), call = call)
+    .islh_abort(
+      c(
+        "{.file {dir}} does not exist.",
+        i = "Create it first, or use {.fn islh_create_report} to start a project."
+      ),
+      call = call
+    )
   }
   invisible(TRUE)
 }

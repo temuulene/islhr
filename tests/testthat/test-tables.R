@@ -66,8 +66,7 @@ test_that("islh_flextable copes with awkward tables", {
   # One column.
   one <- quietly(islh_flextable(data.frame(x = 1:3)))
   expect_equal(flextable::ncol_keys(one), 1L)
-  expect_equal(sum(dim(one)$widths), islhr:::.islh_text_width,
-               tolerance = 1e-6)
+  expect_equal(sum(dim(one)$widths), islhr:::.islh_text_width, tolerance = 1e-6)
 
   # No rows: a table of nothing is still a table, not an error.
   empty <- quietly(islh_flextable(sample_counts()[0, ]))
@@ -78,8 +77,7 @@ test_that("islh_flextable copes with awkward tables", {
   wide <- as.data.frame(matrix(1:120, nrow = 20))
   big <- quietly(islh_flextable(wide))
   expect_equal(flextable::ncol_keys(big), 6L)
-  expect_equal(sum(dim(big)$widths), islhr:::.islh_text_width,
-               tolerance = 1e-6)
+  expect_equal(sum(dim(big)$widths), islhr:::.islh_text_width, tolerance = 1e-6)
 })
 
 test_that("islh_gt styles a data frame and renders", {
@@ -114,7 +112,8 @@ test_that("islh_gt copes with awkward tables", {
   expect_s3_class(quietly(islh_gt(data.frame(x = 1:3))), "gt_tbl")
   expect_s3_class(quietly(islh_gt(sample_counts()[0, ])), "gt_tbl")
   expect_s3_class(
-    quietly(islh_gt(as.data.frame(matrix(1:120, nrow = 20)))), "gt_tbl"
+    quietly(islh_gt(as.data.frame(matrix(1:120, nrow = 20)))),
+    "gt_tbl"
   )
 })
 

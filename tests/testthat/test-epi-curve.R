@@ -84,7 +84,10 @@ test_that("epi curve validates columns, dates and counts", {
   data <- data.frame(date = as.Date("2026-01-01"), count = 1.5)
   expect_error(islh_epi_curve(data, date, count), "whole counts")
   expect_error(islh_epi_curve(data, missing, count), "not found")
-  expect_error(islh_epi_curve(data, date, count, show_year_lines = NA), "TRUE or FALSE")
+  expect_error(
+    islh_epi_curve(data, date, count, show_year_lines = NA),
+    "TRUE or FALSE"
+  )
 })
 
 test_that("epi curve validates reference inputs", {
@@ -242,8 +245,13 @@ test_that("case tiles stack in the same order in every period", {
     source = c("A", "B", "B", "A"),
     count = c(1, 2, 2, 1)
   )
-  tiles <- islh_epi_curve(data, date, count, fill = source, style = "cases")$
-    layers[[1]]$data
+  tiles <- islh_epi_curve(
+    data,
+    date,
+    count,
+    fill = source,
+    style = "cases"
+  )$layers[[1]]$data
 
   # First level on top, as geom_col() stacks bars: B fills the lower tiles.
   lowest <- tapply(tiles$.islh_case_y, tiles$source, min)

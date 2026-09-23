@@ -10,9 +10,11 @@
   .islh_require("gt", "Island Health HTML tables")
 
   document_webfont <- FALSE
-  if (isTRUE(embed_fonts) &&
+  if (
+    isTRUE(embed_fonts) &&
       requireNamespace("knitr", quietly = TRUE) &&
-      isTRUE(knitr::is_html_output())) {
+      isTRUE(knitr::is_html_output())
+  ) {
     document_webfont <- .islh_register_webfont_dependency()
   }
 
@@ -80,12 +82,17 @@
   }
   .islh_warn(c(
     paste0(
-      "{.pkg gtsummary} ", utils::packageVersion("gtsummary"),
+      "{.pkg gtsummary} ",
+      utils::packageVersion("gtsummary"),
       " is too old for the Island Health table theme, so it was not set."
     ),
     i = paste0(
-      "Version ", .islh_min_versions[["gtsummary"]], " or newer is needed: ",
-      "{.code ", .islh_install_command("gtsummary"), "}."
+      "Version ",
+      .islh_min_versions[["gtsummary"]],
+      " or newer is needed: ",
+      "{.code ",
+      .islh_install_command("gtsummary"),
+      "}."
     )
   ))
   FALSE
@@ -127,13 +134,14 @@
 #'
 #' @export
 islh_setup <- function(
-    format = c("auto", "html", "docx", "plots"),
-    tables = TRUE,
-    embed_fonts = TRUE,
-    base_size = 12,
-    grid = c("y", "x", "both", "none"),
-    set_knitr = TRUE,
-    quiet = FALSE) {
+  format = c("auto", "html", "docx", "plots"),
+  tables = TRUE,
+  embed_fonts = TRUE,
+  base_size = 12,
+  grid = c("y", "x", "both", "none"),
+  set_knitr = TRUE,
+  quiet = FALSE
+) {
   grid <- match.arg(grid)
   base_size <- .islh_check_size(base_size)
   set_knitr <- .islh_check_flag(set_knitr, "set_knitr")
@@ -154,7 +162,8 @@ islh_setup <- function(
     .islh_abort(c(
       paste0(
         "Island Health theme setup cannot configure ",
-        .islh_format_label(check$format), "."
+        .islh_format_label(check$format),
+        "."
       ),
       .islh_problem_bullets(check)
     ))
@@ -206,8 +215,12 @@ islh_setup <- function(
     }
     .islh_inform(c(
       "v" = paste0(
-        "Island Health theme ", islh_version(), " is ready for ",
-        .islh_format_label(check$format), table_note, "."
+        "Island Health theme ",
+        islh_version(),
+        " is ready for ",
+        .islh_format_label(check$format),
+        table_note,
+        "."
       ),
       "i" = paste0("Font: ", result$font, "."),
       "i" = "Run {.code islh_help()} for the functions you need most."

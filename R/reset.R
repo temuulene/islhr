@@ -154,8 +154,10 @@
     )
   }
 
-  if (!is.null(state$flextable) &&
-      requireNamespace("flextable", quietly = TRUE)) {
+  if (
+    !is.null(state$flextable) &&
+      requireNamespace("flextable", quietly = TRUE)
+  ) {
     attempt(
       "the flextable defaults",
       tryCatch(
@@ -165,8 +167,10 @@
     )
   }
 
-  if (!is.null(state$gtsummary) &&
-      requireNamespace("gtsummary", quietly = TRUE)) {
+  if (
+    !is.null(state$gtsummary) &&
+      requireNamespace("gtsummary", quietly = TRUE)
+  ) {
     theme <- state$gtsummary$theme
     attempt(
       "the gtsummary theme",

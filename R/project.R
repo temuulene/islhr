@@ -44,8 +44,10 @@
   }
 
   # Drop a carriage return only where it is followed by a line feed.
-  crlf <- which(bytes[-length(bytes)] == carriage_return &
-    bytes[-1L] == as.raw(10L))
+  crlf <- which(
+    bytes[-length(bytes)] == carriage_return &
+      bytes[-1L] == as.raw(10L)
+  )
   normalized <- tempfile()
   on.exit(unlink(normalized), add = TRUE)
   writeBin(bytes[-crlf], normalized)
@@ -70,19 +72,29 @@
     stringsAsFactors = FALSE
   )
 
-  assets <- rbind(assets, data.frame(
-    path = "_brand.yml",
-    source = islh_brand_yml(),
-    stringsAsFactors = FALSE
-  ))
+  assets <- rbind(
+    assets,
+    data.frame(
+      path = "_brand.yml",
+      source = islh_brand_yml(),
+      stringsAsFactors = FALSE
+    )
+  )
 
   logos <- .islh_brand_logo_files()
   if (length(logos) > 0L) {
-    assets <- rbind(assets, data.frame(
-      path = file.path("logos", logos),
-      source = vapply(logos, function(x) .islh_path("logos", x), character(1)),
-      stringsAsFactors = FALSE
-    ))
+    assets <- rbind(
+      assets,
+      data.frame(
+        path = file.path("logos", logos),
+        source = vapply(
+          logos,
+          function(x) .islh_path("logos", x),
+          character(1)
+        ),
+        stringsAsFactors = FALSE
+      )
+    )
   }
 
   assets$package_hash <- .islh_hash(assets$source)
@@ -287,10 +299,15 @@ print.islh_project_check <- function(x, ...) {
 
   bullets <- .islh_status_bullets(x)
   if (!isTRUE(attr(x, "has_manifest"))) {
-    bullets <- c(bullets, "i" = paste0(
-      "This project has no {.file ", .islh_manifest_file, "}, so an edited ",
-      "file cannot be told from an old one."
-    ))
+    bullets <- c(
+      bullets,
+      "i" = paste0(
+        "This project has no {.file ",
+        .islh_manifest_file,
+        "}, so an edited ",
+        "file cannot be told from an old one."
+      )
+    )
   }
   bullets <- c(
     bullets,
@@ -351,8 +368,7 @@ islh_update_project <- function(
   assets <- attr(status, "assets")
 
   protected <- status$status %in% c("modified", "unverified")
-  replace <- status$status %in% c("outdated", "missing") |
-    (protected & force)
+  replace <- status$status %in% c("outdated", "missing") | (protected & force)
 
   action <- ifelse(
     replace,
@@ -418,23 +434,32 @@ islh_update_project <- function(
 
   bullets <- character()
   if (written > 0L) {
-    bullets <- c(bullets, stats::setNames(
-      paste0(
-        if (dry_run) "Would replace {" else "Replaced {",
-        written, "} file{?s}."
-      ),
-      "v"
-    ))
+    bullets <- c(
+      bullets,
+      stats::setNames(
+        paste0(
+          if (dry_run) "Would replace {" else "Replaced {",
+          written,
+          "} file{?s}."
+        ),
+        "v"
+      )
+    )
   }
   if (protected > 0L) {
-    bullets <- c(bullets, stats::setNames(
-      paste0(
-        "{", protected, "} file{?s} {?was/were} left alone because ",
-        "{?it differs/they differ} from this version and {?was/were} not ",
-        "installed by it."
-      ),
-      "!"
-    ))
+    bullets <- c(
+      bullets,
+      stats::setNames(
+        paste0(
+          "{",
+          protected,
+          "} file{?s} {?was/were} left alone because ",
+          "{?it differs/they differ} from this version and {?was/were} not ",
+          "installed by it."
+        ),
+        "!"
+      )
+    )
     if (!force) {
       bullets <- c(
         bullets,
@@ -443,10 +468,17 @@ islh_update_project <- function(
     }
   }
   if (length(backed_up) > 0L) {
-    bullets <- c(bullets, "i" = paste0(
-      "{cli::qty(", length(backed_up), ")}The previous file{?s} {?is/are} in ",
-      "{.file ", backup_dir, "}."
-    ))
+    bullets <- c(
+      bullets,
+      "i" = paste0(
+        "{cli::qty(",
+        length(backed_up),
+        ")}The previous file{?s} {?is/are} in ",
+        "{.file ",
+        backup_dir,
+        "}."
+      )
+    )
   }
   if (dry_run) {
     bullets <- c(

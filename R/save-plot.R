@@ -20,14 +20,15 @@
 #'
 #' @export
 islh_save_plot <- function(
-    filename,
-    plot = ggplot2::last_plot(),
-    preset = c("report", "slide", "half_width"),
-    width = NULL,
-    height = NULL,
-    dpi = NULL,
-    bg = "white",
-    ...) {
+  filename,
+  plot = ggplot2::last_plot(),
+  preset = c("report", "slide", "half_width"),
+  width = NULL,
+  height = NULL,
+  dpi = NULL,
+  bg = "white",
+  ...
+) {
   .islh_require("ragg", "saving standard Island Health plot files")
   preset <- match.arg(preset)
 
@@ -45,10 +46,12 @@ islh_save_plot <- function(
   )[[preset]]
 
   width <- .islh_check_dimension(
-    if (is.null(width)) settings[["width"]] else width, "width"
+    if (is.null(width)) settings[["width"]] else width,
+    "width"
   )
   height <- .islh_check_dimension(
-    if (is.null(height)) settings[["height"]] else height, "height"
+    if (is.null(height)) settings[["height"]] else height,
+    "height"
   )
   dpi <- .islh_check_dpi(if (is.null(dpi)) settings[["dpi"]] else dpi)
 

@@ -14,9 +14,9 @@
   if (n > length(values)) {
     .islh_abort(
       c(
-      "The Island Health qualitative palette supports at most 5 categories.",
-      i = "Collapse categories, use facets, or add a non-colour cue."
-    ),
+        "The Island Health qualitative palette supports at most 5 categories.",
+        i = "Collapse categories, use facets, or add a non-colour cue."
+      ),
       call = NULL
     )
   }
@@ -46,9 +46,9 @@
     "5" = c(15, 30, 45, 60, 70),
     .islh_abort(
       c(
-      "The Island Health ordinal palette supports at most 5 categories.",
-      i = "Collapse categories or use facets rather than interpolating colours."
-    ),
+        "The Island Health ordinal palette supports at most 5 categories.",
+        i = "Collapse categories or use facets rather than interpolating colours."
+      ),
       call = NULL
     )
   )

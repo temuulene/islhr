@@ -119,7 +119,9 @@ test_that("force replaces protected files and backs them up first", {
   expect_length(backups, 1L)
   expect_equal(readLines(backups), "a local change")
 
-  expect_true(all(islh_check_project(project, quiet = TRUE)$status == "current"))
+  expect_true(all(
+    islh_check_project(project, quiet = TRUE)$status == "current"
+  ))
 })
 
 test_that("backups can be turned off", {
@@ -141,15 +143,24 @@ test_that("a project needing nothing is left completely alone", {
 
 test_that("the scaffold ignores its own backup folder", {
   project <- new_project()
-  expect_true(any(grepl("_islh-backup", readLines(file.path(project, ".gitignore")))))
+  expect_true(any(grepl(
+    "_islh-backup",
+    readLines(file.path(project, ".gitignore"))
+  )))
 })
 
 test_that("project functions check their arguments", {
   project <- new_project()
 
   expect_error(islh_check_project(file.path(project, "nope")), "does not exist")
-  expect_error(islh_update_project(project, dry_run = NA), "single TRUE or FALSE")
-  expect_error(islh_update_project(project, force = "yes"), "single TRUE or FALSE")
+  expect_error(
+    islh_update_project(project, dry_run = NA),
+    "single TRUE or FALSE"
+  )
+  expect_error(
+    islh_update_project(project, force = "yes"),
+    "single TRUE or FALSE"
+  )
   expect_error(islh_check_project(project, quiet = 1), "single TRUE or FALSE")
 })
 

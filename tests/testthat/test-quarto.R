@@ -17,9 +17,14 @@ test_that("islh_use_quarto writes a complete, parseable extension", {
 
   # The reference doc is named relative to the extension directory; an absolute
   # or missing path silently drops the Island Health styling.
-  expect_equal(ext$contributes$formats$docx$`reference-doc`,
-               "islh-report-reference.docx")
-  expect_true(file.exists(file.path(base, ext$contributes$formats$docx$`reference-doc`)))
+  expect_equal(
+    ext$contributes$formats$docx$`reference-doc`,
+    "islh-report-reference.docx"
+  )
+  expect_true(file.exists(file.path(
+    base,
+    ext$contributes$formats$docx$`reference-doc`
+  )))
 
   # Likewise the SCSS layer.
   expect_true(
@@ -66,7 +71,11 @@ test_that("the extension version tracks the package version", {
   skip_if_not_installed("yaml")
   ext <- yaml::read_yaml(
     system.file(
-      "quarto", "_extensions", "islh", "islh-report", "_extension.yml",
+      "quarto",
+      "_extensions",
+      "islh",
+      "islh-report",
+      "_extension.yml",
       package = "islhr"
     )
   )

@@ -140,9 +140,10 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
 #'
 #' @noRd
 .islh_use_theme <- function(
-    base_size = 12,
-    grid = c("y", "x", "both", "none"),
-    set_knitr = TRUE) {
+  base_size = 12,
+  grid = c("y", "x", "both", "none"),
+  set_knitr = TRUE
+) {
   grid <- match.arg(grid)
   base_size <- .islh_check_size(base_size)
   set_knitr <- .islh_check_flag(set_knitr, "set_knitr")
@@ -202,10 +203,11 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
 #'
 #' @export
 scale_y_islh_count <- function(
-    ...,
-    breaks = .islh_count_breaks(),
-    labels = scales::label_comma(accuracy = 1),
-    expand = ggplot2::expansion(mult = c(0, 0.05))) {
+  ...,
+  breaks = .islh_count_breaks(),
+  labels = scales::label_comma(accuracy = 1),
+  expand = ggplot2::expansion(mult = c(0, 0.05))
+) {
   ggplot2::scale_y_continuous(
     ...,
     breaks = breaks,
