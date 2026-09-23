@@ -18,11 +18,38 @@
 
 .islh_manifest_path <- function(dir) file.path(dir, .islh_manifest_file)
 
+# Hashes ignore line endings in text files. Git on Windows commonly checks
+# text out with CRLF endings, so a project cloned there, or a package built on
+# a Windows runner, would otherwise read every text file as edited and the
+# update would never touch them. An LF file hashes exactly as it did before
+# this normalization, so existing manifests stay valid.
 .islh_hash <- function(paths) {
   if (length(paths) == 0L) {
     return(character())
   }
-  unname(tools::md5sum(normalizePath(paths, mustWork = FALSE)))
+  vapply(paths, .islh_hash_one, character(1), USE.NAMES = FALSE)
+}
+
+.islh_hash_one <- function(path) {
+  path <- normalizePath(path, mustWork = FALSE)
+  size <- file.size(path)
+  if (is.na(size)) {
+    return(NA_character_)
+  }
+  bytes <- readBin(path, "raw", n = size)
+  carriage_return <- as.raw(13L)
+  is_text <- !any(bytes == as.raw(0L))
+  if (!is_text || !any(bytes == carriage_return)) {
+    return(unname(tools::md5sum(path)))
+  }
+
+  # Drop a carriage return only where it is followed by a line feed.
+  crlf <- which(bytes[-length(bytes)] == carriage_return &
+    bytes[-1L] == as.raw(10L))
+  normalized <- tempfile()
+  on.exit(unlink(normalized), add = TRUE)
+  writeBin(bytes[-crlf], normalized)
+  unname(tools::md5sum(normalized))
 }
 
 # Every file this package installs into a project, and where it comes from

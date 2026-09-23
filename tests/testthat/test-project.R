@@ -152,3 +152,27 @@ test_that("project functions check their arguments", {
   expect_error(islh_update_project(project, force = "yes"), "single TRUE or FALSE")
   expect_error(islh_check_project(project, quiet = 1), "single TRUE or FALSE")
 })
+
+test_that("line endings do not count as an edit", {
+  # Git on Windows often checks text out with CRLF endings. A project cloned
+  # there must still read as current, or it can never be updated.
+  project <- new_project()
+  brand <- file.path(project, "_brand.yml")
+  lines <- readLines(brand)
+  writeBin(charToRaw(paste0(paste(lines, collapse = "\r\n"), "\r\n")), brand)
+
+  status <- islh_check_project(project, quiet = TRUE)
+  expect_equal(status$status[status$path == "_brand.yml"], "current")
+
+  # A real edit is still an edit.
+  writeLines(c(lines, "# local change"), brand)
+  status <- islh_check_project(project, quiet = TRUE)
+  expect_equal(status$status[status$path == "_brand.yml"], "modified")
+})
+
+test_that("binary files are hashed byte for byte", {
+  # The Word reference document is a zip archive; stripping bytes from it
+  # would hash a file that does not exist.
+  docx <- islh_reference_docx()
+  expect_equal(.islh_hash(docx), unname(tools::md5sum(docx)))
+})
