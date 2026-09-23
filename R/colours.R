@@ -75,10 +75,20 @@
 
 #' Look up an Island Health brand colour
 #'
-#' @param family One of the eight Island Health colour families.
-#' @param value Brand lightness value.
+#' Each of the eight colour families runs in twenty steps from 10 (darkest) to
+#' 98 (lightest). The step is a lightness value, so two colours whose steps
+#' differ by 30 or more contrast enough for graphics.
+#'
+#' @param family One of the eight Island Health colour families: `"blue"`,
+#'   `"grey"`, `"red"`, `"green"`, `"orange"`, `"cedar"`, `"thistle"` or
+#'   `"fern"`.
+#' @param value Brand lightness value, such as `50`. Several may be given.
 #'
 #' @return A character vector of hexadecimal colour values.
+#'
+#' @examples
+#' islh_hex("blue", 50)
+#' islh_hex("grey", c(30, 60, 90))
 #'
 #' @export
 islh_hex <- function(family, value) {
@@ -136,9 +146,19 @@ islh_hex <- function(family, value) {
 
 #' Look up a named Island Health brand colour
 #'
-#' @param name One or more names from `.islh_brand_colours`.
+#' The named colours are the representative values in `_brand.yml`. Use
+#' `"success"`, `"warning"` and `"danger"` only when a colour carries that
+#' meaning, and pair it with a label or shape.
+#'
+#' @param name One or more of `"primary"`, `"primary_dark"`,
+#'   `"primary_light"`, `"secondary"`, `"success"`, `"warning"`, `"danger"`,
+#'   `"thistle"`, `"fern"`, `"cedar"`, `"white"` and `"black"`.
 #'
 #' @return A character vector of hexadecimal colour values.
+#'
+#' @examples
+#' islh_brand("primary")
+#' islh_brand(c("success", "warning", "danger"))
 #'
 #' @export
 islh_brand <- function(name) {

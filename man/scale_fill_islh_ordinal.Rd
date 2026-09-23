@@ -26,3 +26,20 @@ A ggplot2 discrete scale.
 \description{
 Island Health ordinal fill scale
 }
+\examples{
+\dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
+severity <- data.frame(
+  level = factor(
+    c("Mild", "Moderate", "Severe"),
+    levels = c("Mild", "Moderate", "Severe")
+  ),
+  cases = c(120, 45, 12)
+)
+
+ggplot2::ggplot(severity, ggplot2::aes(level, cases, fill = level)) +
+  ggplot2::geom_col(show.legend = FALSE) +
+  scale_fill_islh_ordinal() +
+  scale_y_islh_count() +
+  theme_islh()
+
+}

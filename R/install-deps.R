@@ -42,7 +42,7 @@ islh_install_deps <- function(
       .islh_inform(c(
         "v" = paste0(
           "Nothing to install; ",
-          if (format == "both") "HTML and DOCX" else toupper(check$format),
+          .islh_format_label(if (format == "both") "both" else check$format),
           " output is ready to go."
         )
       ))

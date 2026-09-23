@@ -22,7 +22,7 @@
   "islh.document_webfont"
 )
 
-# Geom objects are exported under a capitalised name, so this reads their
+# Geom objects are exported under a capitalized name, so this reads their
 # defaults through ggplot2's public interface rather than its internals, and
 # keeps working across ggplot2 versions.
 .islh_geom_object <- function(geom) {

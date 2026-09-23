@@ -22,7 +22,7 @@ islh_caption(
 \item{boundary}{Geography and boundary vintage, for example
 \code{"Local health areas, 2024 boundaries"}.}
 
-\item{standard_pop}{Standard population behind an age-standardised rate.}
+\item{standard_pop}{Standard population behind an age-standardized rate.}
 
 \item{suppression}{Suppression rule applied before mapping.}
 

@@ -20,3 +20,14 @@ A styled gt table.
 \description{
 Convert a gtsummary table to a styled gt table
 }
+\examples{
+if (requireNamespace("gtsummary", quietly = TRUE) &&
+    requireNamespace("gt", quietly = TRUE)) {
+  summary <- gtsummary::tbl_summary(
+    gtsummary::trial,
+    include = c(age, grade)
+  )
+  islh_gtsummary_gt(summary, embed_fonts = FALSE)
+}
+
+}

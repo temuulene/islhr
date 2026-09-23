@@ -23,6 +23,17 @@
   "plots"
 }
 
+# How a format is named in messages: the words staff use, not the codes.
+.islh_format_label <- function(format) {
+  labels <- c(
+    html = "HTML",
+    docx = "Word",
+    plots = "plots",
+    both = "HTML and Word"
+  )
+  unname(labels[format])
+}
+
 # Minimum versions the package actually relies on. Each was found by running
 # the code against an older release, not by caution:
 #
@@ -153,7 +164,7 @@ print.islh_dependency_check <- function(x, ...) {
     .islh_inform(c(
       "v" = paste0(
         "Island Health theme dependencies are ready for ",
-        toupper(x$format), "."
+        .islh_format_label(x$format), "."
       )
     ))
     return(invisible(x))

@@ -47,11 +47,11 @@ scale_color_islh <- scale_colour_islh
 #' @examples
 #' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 #' counts <- data.frame(
-#'   programme = c("Community", "Hospital", "Primary care"),
+#'   program = c("Community", "Hospital", "Primary care"),
 #'   encounters = c(1860, 3210, 2440)
 #' )
 #'
-#' ggplot2::ggplot(counts, ggplot2::aes(programme, encounters, fill = programme)) +
+#' ggplot2::ggplot(counts, ggplot2::aes(program, encounters, fill = program)) +
 #'   ggplot2::geom_col(show.legend = FALSE) +
 #'   scale_fill_islh() +
 #'   theme_islh()
@@ -104,6 +104,22 @@ scale_color_islh_ordinal <- scale_colour_islh_ordinal
 #'
 #' @return A ggplot2 discrete scale.
 #'
+#' @examples
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
+#' severity <- data.frame(
+#'   level = factor(
+#'     c("Mild", "Moderate", "Severe"),
+#'     levels = c("Mild", "Moderate", "Severe")
+#'   ),
+#'   cases = c(120, 45, 12)
+#' )
+#'
+#' ggplot2::ggplot(severity, ggplot2::aes(level, cases, fill = level)) +
+#'   ggplot2::geom_col(show.legend = FALSE) +
+#'   scale_fill_islh_ordinal() +
+#'   scale_y_islh_count() +
+#'   theme_islh()
+#'
 #' @export
 scale_fill_islh_ordinal <- function(
     family = "blue",
@@ -146,6 +162,23 @@ scale_color_islh_signal <- scale_colour_islh_signal
 #' @param na.value Colour for missing values.
 #'
 #' @return A ggplot2 discrete scale.
+#'
+#' @examples
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
+#' status <- data.frame(
+#'   site = c("North", "Central", "South"),
+#'   percent = c(92, 78, 61),
+#'   status = c("success", "warning", "danger")
+#' )
+#'
+#' # Name the values so each status keeps its colour whatever the data holds.
+#' ggplot2::ggplot(status, ggplot2::aes(site, percent, fill = status)) +
+#'   ggplot2::geom_col() +
+#'   scale_fill_islh_signal(
+#'     breaks = c("success", "warning", "danger"),
+#'     labels = c("On target", "Watch", "Below target")
+#'   ) +
+#'   theme_islh()
 #'
 #' @export
 scale_fill_islh_signal <- function(..., na.value = .islh_unknown()) {

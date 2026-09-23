@@ -17,3 +17,15 @@ A styled flextable.
 \description{
 Convert a gtsummary table to a styled flextable
 }
+\examples{
+if (requireNamespace("gtsummary", quietly = TRUE) &&
+    requireNamespace("flextable", quietly = TRUE) &&
+    requireNamespace("officer", quietly = TRUE)) {
+  summary <- gtsummary::tbl_summary(
+    gtsummary::trial,
+    include = c(age, grade)
+  )
+  islh_gtsummary_flex(summary)
+}
+
+}

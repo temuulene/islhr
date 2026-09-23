@@ -75,6 +75,17 @@
 #'
 #' @return A styled flextable.
 #'
+#' @examples
+#' if (requireNamespace("gtsummary", quietly = TRUE) &&
+#'     requireNamespace("flextable", quietly = TRUE) &&
+#'     requireNamespace("officer", quietly = TRUE)) {
+#'   summary <- gtsummary::tbl_summary(
+#'     gtsummary::trial,
+#'     include = c(age, grade)
+#'   )
+#'   islh_gtsummary_flex(summary)
+#' }
+#'
 #' @export
 islh_gtsummary_flex <- function(x, ...) {
   .islh_require("gtsummary", "gtsummary conversion")
@@ -92,6 +103,16 @@ islh_gtsummary_flex <- function(x, ...) {
 #'   default is set by `islh_setup()`.
 #'
 #' @return A styled gt table.
+#'
+#' @examples
+#' if (requireNamespace("gtsummary", quietly = TRUE) &&
+#'     requireNamespace("gt", quietly = TRUE)) {
+#'   summary <- gtsummary::tbl_summary(
+#'     gtsummary::trial,
+#'     include = c(age, grade)
+#'   )
+#'   islh_gtsummary_gt(summary, embed_fonts = FALSE)
+#' }
 #'
 #' @export
 islh_gtsummary_gt <- function(

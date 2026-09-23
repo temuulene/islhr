@@ -7,11 +7,20 @@
 islh_brand(name)
 }
 \arguments{
-\item{name}{One or more names from \code{.islh_brand_colours}.}
+\item{name}{One or more of \code{"primary"}, \code{"primary_dark"},
+\code{"primary_light"}, \code{"secondary"}, \code{"success"}, \code{"warning"}, \code{"danger"},
+\code{"thistle"}, \code{"fern"}, \code{"cedar"}, \code{"white"} and \code{"black"}.}
 }
 \value{
 A character vector of hexadecimal colour values.
 }
 \description{
-Look up a named Island Health brand colour
+The named colours are the representative values in \verb{_brand.yml}. Use
+\code{"success"}, \code{"warning"} and \code{"danger"} only when a colour carries that
+meaning, and pair it with a label or shape.
+}
+\examples{
+islh_brand("primary")
+islh_brand(c("success", "warning", "danger"))
+
 }

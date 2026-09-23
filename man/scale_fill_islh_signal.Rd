@@ -17,3 +17,21 @@ A ggplot2 discrete scale.
 \description{
 Island Health signal fill scale
 }
+\examples{
+\dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
+status <- data.frame(
+  site = c("North", "Central", "South"),
+  percent = c(92, 78, 61),
+  status = c("success", "warning", "danger")
+)
+
+# Name the values so each status keeps its colour whatever the data holds.
+ggplot2::ggplot(status, ggplot2::aes(site, percent, fill = status)) +
+  ggplot2::geom_col() +
+  scale_fill_islh_signal(
+    breaks = c("success", "warning", "danger"),
+    labels = c("On target", "Watch", "Below target")
+  ) +
+  theme_islh()
+
+}

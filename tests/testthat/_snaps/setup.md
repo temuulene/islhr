@@ -54,13 +54,16 @@
         scale_fill_islh_b()           binned fill for a choropleth
         islh_caption(source, extracted)     source, date, suppression rule
       
-      COLOURS
+      COLOURS AND LOGOS
         islh_brand("primary")         the main Island Health blue
         islh_hex("blue", 40)          any step of any colour family
+        islh_logo("horizontal")       path to a logo file
       
       TABLES
         islh_gt(data)                 HTML
         islh_flextable(data)          Word
+        islh_gtsummary_gt(tbl)        a gtsummary table, for HTML
+        islh_gtsummary_flex(tbl)      a gtsummary table, for Word
         both fill the text width; use width = 0.6 for a narrower table
       
       SAVING A FIGURE
@@ -77,3 +80,4 @@
       
       SEE IT WORK
         islh_example_plot()                 a themed plot from simulated data
+

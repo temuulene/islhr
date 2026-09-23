@@ -22,11 +22,11 @@ Island Health qualitative fill scale
 \examples{
 \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
 counts <- data.frame(
-  programme = c("Community", "Hospital", "Primary care"),
+  program = c("Community", "Hospital", "Primary care"),
   encounters = c(1860, 3210, 2440)
 )
 
-ggplot2::ggplot(counts, ggplot2::aes(programme, encounters, fill = programme)) +
+ggplot2::ggplot(counts, ggplot2::aes(program, encounters, fill = program)) +
   ggplot2::geom_col(show.legend = FALSE) +
   scale_fill_islh() +
   theme_islh()

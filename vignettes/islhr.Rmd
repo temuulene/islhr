@@ -49,7 +49,7 @@ counts
 An ordinary ggplot becomes an Island Health figure by adding the appropriate
 scale. `islh_setup()` has already applied the theme.
 
-```{r example-figure, fig.alt="Bar chart showing encounters for three example Island Health programmes."}
+```{r example-figure, fig.alt="Bar chart showing encounters for three example Island Health programs."}
 library(ggplot2)
 
 encounter_plot <- ggplot(counts, aes(program, encounters, fill = program)) +
@@ -57,7 +57,7 @@ encounter_plot <- ggplot(counts, aes(program, encounters, fill = program)) +
   scale_fill_islh() +
   scale_y_islh_count() +
   labs(
-    title = "Encounters by programme",
+    title = "Encounters by program",
     subtitle = "Example data included with islhr",
     x = NULL,
     y = "Encounters"
@@ -73,7 +73,7 @@ theme.
 ```{r example-table}
 islh_gt(
   counts,
-  title = "Programme activity",
+  title = "Program activity",
   subtitle = "Illustrative values",
   source_note = "Source: simulated package data."
 )
@@ -161,7 +161,7 @@ Use the scale that matches the data:
 
 | Data meaning | Function | Typical use |
 |---|---|---|
-| Unordered categories | `scale_colour_islh()` or `scale_fill_islh()` | Programmes or regions |
+| Unordered categories | `scale_colour_islh()` or `scale_fill_islh()` | Programs or regions |
 | Ordered categories | `scale_*_islh_ordinal()` | Low, medium and high |
 | Status | `scale_*_islh_signal()` | Good, warning and bad |
 | Continuous values in bands | `scale_fill_islh_b()` | Choropleth maps |

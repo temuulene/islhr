@@ -2,7 +2,7 @@
 % Please edit documentation in R/assets.R
 \name{islh_example_data}
 \alias{islh_example_data}
-\title{Example programme counts}
+\title{Example program counts}
 \usage{
 islh_example_data()
 }

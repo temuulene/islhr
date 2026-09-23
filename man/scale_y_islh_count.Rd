@@ -29,3 +29,13 @@ Breaks fall on whole numbers only. Counts cannot be fractional, and the
 labels round to whole numbers, so a break at 2.5 would print as "2" beside
 the wrong gridline.
 }
+\examples{
+\dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
+counts <- islh_example_data()
+
+ggplot2::ggplot(counts, ggplot2::aes(program, encounters)) +
+  ggplot2::geom_col(fill = islh_brand("primary")) +
+  scale_y_islh_count() +
+  theme_islh()
+
+}

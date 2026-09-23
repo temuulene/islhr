@@ -1,8 +1,9 @@
 # _brand.yml for Island Health (ISLH)
 #
-# Sourced from the ISLH brand standards site (brand.islandhealth.ca), captured
-# in this repo under guidelines/colour.mhtml, guidelines/typography.mhtml, and
-# guidelines/logo-system.mhtml, plus the logo files under logos/.
+# Sourced from the ISLH brand standards site (brand.islandhealth.ca). The
+# captures guidelines/colour.mhtml, guidelines/typography.mhtml and
+# guidelines/logo-system.mhtml, and the logo sources, live in the
+# islh-brand-standard repository.
 #
 # Notes on sourcing:
 # - Blue is documented as the primary colour family; "Blue 50" (#007cc8) is
@@ -49,9 +50,9 @@ typography:
   fonts:
     - family: BC Sans
       source: system # Not distributed via Google/Bunny Fonts; BC Sans is
-      # licensed by the BC Government (gov.bc.ca). Download the official
-      # font files and switch this to `source: file` with local paths
-      # once they're added to this repo.
+      # licensed by the BC Government (gov.bc.ca) and installed on Island
+      # Health laptops. Elsewhere, install it from
+      # https://github.com/bcgov/bc-sans.
       weight: [300, 400, 700] # Light, Regular, Bold
       style: [normal, italic]
     - family: Noto Sans

@@ -87,7 +87,7 @@ test_that("islh_caption assembles only the parts it is given", {
   )
 
   expect_match(full, "^Source: BC Data Catalogue\\. Extracted 2026-03-31\\.")
-  expect_match(full, "Standardised to 2011 Canadian standard population\\.")
+  expect_match(full, "Standardized to 2011 Canadian standard population\\.")
   expect_match(full, "Counts under 5 suppressed\\.")
   expect_match(full, "OCAP\\.$")
 

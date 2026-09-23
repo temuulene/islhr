@@ -7,13 +7,22 @@
 islh_hex(family, value)
 }
 \arguments{
-\item{family}{One of the eight Island Health colour families.}
+\item{family}{One of the eight Island Health colour families: \code{"blue"},
+\code{"grey"}, \code{"red"}, \code{"green"}, \code{"orange"}, \code{"cedar"}, \code{"thistle"} or
+\code{"fern"}.}
 
-\item{value}{Brand lightness value.}
+\item{value}{Brand lightness value, such as \code{50}. Several may be given.}
 }
 \value{
 A character vector of hexadecimal colour values.
 }
 \description{
-Look up an Island Health brand colour
+Each of the eight colour families runs in twenty steps from 10 (darkest) to
+98 (lightest). The step is a lightness value, so two colours whose steps
+differ by 30 or more contrast enough for graphics.
+}
+\examples{
+islh_hex("blue", 50)
+islh_hex("grey", c(30, 60, 90))
+
 }

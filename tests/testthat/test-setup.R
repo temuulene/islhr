@@ -127,7 +127,7 @@ test_that("plot setup is repeatable and leaves the session as it found it", {
   expect_equal(first$font, second$font)
 })
 
-test_that("HTML setup never initialises the Word table engine", {
+test_that("HTML setup never initializes the Word table engine", {
   skip_if_not_installed("gt")
   withr::local_options(list(islh.output_format = NULL))
   old_theme <- ggplot2::theme_get()
@@ -136,7 +136,7 @@ test_that("HTML setup never initialises the Word table engine", {
   # If HTML setup touched flextable, this stub would abort the call.
   local_mocked_bindings(
     .islh_set_flextable_defaults = function(...) {
-      stop("HTML setup must not initialise flextable")
+      stop("HTML setup must not initialize flextable")
     }
   )
 

@@ -126,9 +126,9 @@
       c(
         "```{r}",
         "#| label: fig-encounters",
-        '#| fig-cap: "Encounters by programme"',
+        '#| fig-cap: "Encounters by program"',
         paste0(
-          '#| fig-alt: "Bar chart of encounters by programme. Primary care is ',
+          '#| fig-alt: "Bar chart of encounters by program. Primary care is ',
           'highest at 326, then mental health at 184, then public health at 79."'
         ),
         "#| fig-width: 6",
@@ -146,11 +146,11 @@
         '  ggplot2::labs(x = NULL, y = "Encounters")',
         "```",
         "",
-        "@fig-encounters shows the distribution across programmes.",
+        "@fig-encounters shows the distribution across programs.",
         "",
         "```{r}",
         "#| label: tbl-encounters",
-        '#| tbl-cap: "Encounters and median wait by programme"',
+        '#| tbl-cap: "Encounters and median wait by program"',
         "",
         "# The caption belongs in the chunk option above, not in the table",
         "# call. Setting both prints it twice, and only the chunk option can",
@@ -159,7 +159,7 @@
         "# Give columns the names a reader should see, not the ones your data",
         "# happens to use.",
         paste0(
-          "counts <- setNames(counts, c(\"Programme\", \"Encounters\", ",
+          "counts <- setNames(counts, c(\"Program\", \"Encounters\", ",
           "\"Median wait (minutes)\"))"
         ),
         "",

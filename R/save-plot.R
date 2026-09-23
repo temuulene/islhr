@@ -10,6 +10,14 @@
 #'
 #' @return The filename, invisibly.
 #'
+#' @examples
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
+#' if (requireNamespace("ragg", quietly = TRUE)) {
+#'   path <- tempfile(fileext = ".png")
+#'   islh_save_plot(path, islh_example_plot(), preset = "half_width")
+#'   file.exists(path)
+#' }
+#'
 #' @export
 islh_save_plot <- function(
     filename,

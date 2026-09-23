@@ -191,6 +191,15 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
 #'
 #' @return A ggplot2 continuous position scale.
 #'
+#' @examples
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
+#' counts <- islh_example_data()
+#'
+#' ggplot2::ggplot(counts, ggplot2::aes(program, encounters)) +
+#'   ggplot2::geom_col(fill = islh_brand("primary")) +
+#'   scale_y_islh_count() +
+#'   theme_islh()
+#'
 #' @export
 scale_y_islh_count <- function(
     ...,

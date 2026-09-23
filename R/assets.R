@@ -82,7 +82,7 @@ islh_reference_docx <- function() {
   )
 }
 
-#' Example programme counts
+#' Example program counts
 #'
 #' A three-row table used in the package examples and in the report scaffold,
 #' so a new report renders with something in it before you supply real data.

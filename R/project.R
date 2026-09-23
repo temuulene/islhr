@@ -6,7 +6,7 @@
 # reference document reaches nobody who scaffolded before it.
 #
 # Re-copying blindly is not the answer either. People edit `_brand.yml` for a
-# programme's own colours and add things to the extension, and overwriting that
+# program's own colours and add things to the extension, and overwriting that
 # without warning loses work with no way back.
 #
 # So the project records what was installed. Comparing three hashes — what the

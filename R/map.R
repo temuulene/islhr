@@ -50,7 +50,7 @@ coord_islh_map <- function(crs = 3005, datum = NA, expand = FALSE, ...) {
 #' @param extracted Extraction date, as a string or a `Date`.
 #' @param boundary Geography and boundary vintage, for example
 #'   `"Local health areas, 2024 boundaries"`.
-#' @param standard_pop Standard population behind an age-standardised rate.
+#' @param standard_pop Standard population behind an age-standardized rate.
 #' @param suppression Suppression rule applied before mapping.
 #' @param governance Data governance statement, where one applies.
 #' @param width Characters per line before wrapping. `Inf` leaves the caption
@@ -83,7 +83,7 @@ islh_caption <- function(
     paste0("Source: ", source, "."),
     paste0("Extracted ", format(extracted), "."),
     if (!is.null(boundary)) paste0(boundary, "."),
-    if (!is.null(standard_pop)) paste0("Standardised to ", standard_pop, "."),
+    if (!is.null(standard_pop)) paste0("Standardized to ", standard_pop, "."),
     if (!is.null(suppression)) .islh_sentence(suppression),
     if (!is.null(governance)) .islh_sentence(governance)
   )

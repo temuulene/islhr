@@ -54,7 +54,7 @@ test_that("islh_flextable accepts an existing flextable and a caption", {
 
   ft <- quietly(islh_flextable(
     flextable::flextable(sample_counts()),
-    caption = "Encounters by programme"
+    caption = "Encounters by program"
   ))
   expect_s3_class(ft, "flextable")
 })
@@ -99,12 +99,12 @@ test_that("islh_gt titles and source notes appear in the output", {
   html <- quietly(gt::as_raw_html(islh_gt(
     sample_counts(),
     title = "Encounters",
-    subtitle = "By programme",
+    subtitle = "By program",
     source_note = "Source: simulated data"
   )))
 
   expect_true(grepl("Encounters", html, fixed = TRUE))
-  expect_true(grepl("By programme", html, fixed = TRUE))
+  expect_true(grepl("By program", html, fixed = TRUE))
   expect_true(grepl("Source: simulated data", html, fixed = TRUE))
 })
 

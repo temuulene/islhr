@@ -9,6 +9,7 @@ Description: Applies Island Health brand colours, typography and layout to
     scaffolding for reproducible reports used by the PHASE team.
 License: file LICENSE
 Encoding: UTF-8
+Language: en-CA
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Depends:

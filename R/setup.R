@@ -154,7 +154,7 @@ islh_setup <- function(
     .islh_abort(c(
       paste0(
         "Island Health theme setup cannot configure ",
-        toupper(check$format), "."
+        .islh_format_label(check$format), "."
       ),
       .islh_problem_bullets(check)
     ))
@@ -207,7 +207,7 @@ islh_setup <- function(
     .islh_inform(c(
       "v" = paste0(
         "Island Health theme ", islh_version(), " is ready for ",
-        toupper(check$format), table_note, "."
+        .islh_format_label(check$format), table_note, "."
       ),
       "i" = paste0("Font: ", result$font, "."),
       "i" = "Run {.code islh_help()} for the functions you need most."

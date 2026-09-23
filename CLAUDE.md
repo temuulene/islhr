@@ -33,7 +33,7 @@ token on staff laptops.
 Rscript -e 'devtools::document()'   # regenerate man/ and NAMESPACE
 Rscript -e 'devtools::test()'       # run the test suite
 Rscript -e 'devtools::check()'      # full R CMD check
-air format .                        # format before committing
+air format .                        # format before committing (air >= 0.4)
 ```
 
 ## The constraint that drives the design
@@ -50,7 +50,7 @@ from a user library. Two consequences, both non-negotiable:
 ## Dependencies
 
 `Imports` holds only what every output format needs: `cli`, `ggplot2`,
-`scales`, `systemfonts`, and the base packages. Everything format-specific
+`rlang`, `scales`, `systemfonts`, and the base packages. Everything format-specific
 stays in `Suggests` behind `requireNamespace(..., quietly = TRUE)` guards.
 
 **Dependency checks are format-specific.** HTML setup must not require the Word
@@ -84,7 +84,10 @@ until 3.5.0.
   new, add it to `islh_help()` and to `_pkgdown.yml`; a test snapshots the
   export list.
 - Errors, warnings and messages route through `.islh_abort()`, `.islh_warn()`
-  and `.islh_inform()` so condition classes stay consistent.
+  and `.islh_inform()` so condition classes stay consistent. An internal
+  helper that can abort takes `call = rlang::caller_env()` and passes it to
+  `.islh_abort()`, so the error names the exported function the user called.
+  A test checks this.
 
 ## Style
 
