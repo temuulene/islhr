@@ -77,10 +77,14 @@ reference:
       - islh_example_plot
 
   - title: Maps
-    desc: Style choropleths of Island Health geographies and document their sources.
+    desc: >
+      Style choropleths of Island Health geographies, give each local health
+      area its own colour, and document the sources.
     contents:
       - theme_islh_map
       - coord_islh_map
+      - scale_fill_islh_area
+      - islh_areas
       - islh_caption
 
   - title: Colours and assets

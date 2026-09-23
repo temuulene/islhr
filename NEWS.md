@@ -1,3 +1,20 @@
+# islhr 0.8.0
+
+## New
+
+* `islh_areas()` returns a fixed brand colour for each of Island Health's 14
+  local health areas and 3 health service delivery areas, with their BC Data
+  Catalogue codes and names, each LHA's HSDA, and a label colour that reads on
+  each fill. The HSDA picks the colour family (Blue for South, Cedar for
+  Central, Thistle for North Vancouver Island), all low-signal families under
+  the brand standard, and the LHA picks the shade. Neighbouring LHAs differ by
+  at least 20 values within an HSDA, and the two families colour-blind readers
+  confuse most never share a border.
+* `scale_fill_islh_area()` and `scale_colour_islh_area()` apply those colours
+  by name or code, list the legend in code order, and warn about any value
+  that matches no area. The maps article shows the pattern for charts: one
+  panel per HSDA and a name at the end of each line.
+
 # islhr 0.7.0
 
 ## Visible change to epidemic curves

@@ -266,6 +266,97 @@ rectangle on the overview showing the inset extent either way.
 If the report is about people rather than land, consider a tile map or a
 population cartogram; a choropleth of rural areas is mostly a map of geography.
 
+## Give each local health area its own colour
+
+Some figures compare areas rather than map a value: which LHA is which on a
+reference map, or a line for each LHA over time. `islh_areas()` gives each of
+the 14 LHAs a fixed colour, the same in every report, and
+`scale_fill_islh_area()` and `scale_colour_islh_area()` apply them.
+
+No palette makes 14 areas identifiable by colour alone, so the colours work in
+two levels:
+
+* The health service delivery area picks the colour family: Blue for South,
+  Cedar for Central and Thistle for North Vancouver Island. These are the
+  brand's low-signal families, meant for organizing content. Red, Green and
+  Orange keep their signal meanings.
+* The LHA picks the shade within the family. Neighbouring LHAs differ by at
+  least 20 values within an HSDA, and South and North never touch, so the
+  families that colour-blind readers confuse most never meet on a map.
+
+```{r lha-colours}
+islh_areas()
+```
+
+The brand standard allows more than two colour families only when colour
+carries meaning, and then never as the only cue. So label the areas. On a
+chart, one panel per HSDA holds 4 to 6 lines of one family, and a name at the
+end of each line does the work a legend would:
+
+```{r lha-lines, fig.height = 7, fig.alt = "Three panels, one per health service delivery area, each showing simulated weekly rates for its local health areas as lines in shades of one colour family, named at the right-hand end."}
+weeks <- seq(as.Date("2026-01-04"), by = "week", length.out = 10)
+areas <- islh_areas()
+rates <- expand.grid(week = weeks, code = areas$code, stringsAsFactors = FALSE)
+rates <- merge(rates, areas[c("code", "name", "hsda")])
+rates$hsda <- factor(rates$hsda, levels = unique(areas$hsda))
+level <- 8 * as.numeric(substr(rates$code, 3, 3))
+rates$rate <- 10 + level + 6 * sin(as.numeric(rates$week - min(weeks)) / 20)
+last_week <- rates[rates$week == max(weeks), ]
+
+ggplot(rates, aes(week, rate, colour = name)) +
+  geom_line(linewidth = 0.9) +
+  geom_text(
+    data = last_week,
+    aes(label = name),
+    colour = islh_hex("grey", 25),
+    hjust = 0,
+    nudge_x = 2,
+    size = 3
+  ) +
+  facet_wrap(vars(hsda), ncol = 1) +
+  scale_x_date(expand = expansion(mult = c(0.02, 0.45))) +
+  scale_colour_islh_area(guide = "none") +
+  labs(
+    title = "Weekly rate by local health area",
+    subtitle = "Simulated values",
+    x = NULL,
+    y = "Rate per 100,000"
+  ) +
+  theme_islh()
+```
+
+Label text sits beside the line in dark grey, not in the line's colour: small
+text needs 70 values of contrast with the page, which the lighter shades do
+not have.
+
+On a map, write the code or name on each area in its `label_colour`, which is
+white or Grey 10, whichever the fill needs. That contrast holds for large
+labels only, about 14 pt and bold. Put smaller labels outside the shapes, and
+give the small South Island areas an inset, as above.
+
+```{r, eval=FALSE}
+lha <- merge(islh_bc_geography("lha"), islh_areas(), by.x = "geography_code",
+             by.y = "code")
+
+ggplot(lha) +
+  geom_sf(aes(fill = name), colour = "white", linewidth = 0.3) +
+  geom_sf_text(
+    aes(label = geography_code, colour = I(label_colour)),
+    size = 5,
+    fontface = "bold"
+  ) +
+  scale_fill_islh_area(name = NULL) +
+  coord_islh_map() +
+  labs(title = "Island Health local health areas") +
+  theme_islh_map(legend = "none")
+```
+
+The scales match the official names or the three-digit codes, so data from
+`islh_bc_geography()` works as it comes. A value that matches no LHA, such as
+a misspelled name, is drawn grey with a warning naming it.
+`scale_fill_islh_area("hsda")` does the same for the three HSDAs, in each
+family's representative colour.
+
 ## Colour and contrast
 
 The map palette is a single-hue blue ramp whose steps fall about ten points of

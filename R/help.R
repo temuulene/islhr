@@ -30,6 +30,8 @@ islh_help <- function() {
     '  theme_islh_map(legend = "inside")   legend in the open water',
     "  coord_islh_map()              BC Albers, no graticule",
     "  scale_fill_islh_b()           binned fill for a choropleth",
+    "  scale_fill_islh_area()        a fixed colour for each of the 14 LHAs",
+    '  islh_areas("lha")             LHA codes, names, HSDAs and colours',
     "  islh_caption(source, extracted)     source, date, suppression rule",
     "",
     "COLOURS AND LOGOS",
