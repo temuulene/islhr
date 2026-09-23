@@ -6,12 +6,16 @@
 \usage{
 scale_y_islh_count(
   ...,
+  breaks = .islh_count_breaks(),
   labels = scales::label_comma(accuracy = 1),
   expand = ggplot2::expansion(mult = c(0, 0.05))
 )
 }
 \arguments{
 \item{...}{Additional arguments passed to \code{ggplot2::scale_y_continuous()}.}
+
+\item{breaks}{Break positions or a function that returns them. The default
+keeps breaks on whole numbers.}
 
 \item{labels}{Label function.}
 
@@ -21,5 +25,7 @@ scale_y_islh_count(
 A ggplot2 continuous position scale.
 }
 \description{
-Count axis with Island Health defaults
+Breaks fall on whole numbers only. Counts cannot be fractional, and the
+labels round to whole numbers, so a break at 2.5 would print as "2" beside
+the wrong gridline.
 }

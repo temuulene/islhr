@@ -179,7 +179,13 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
 
 #' Count axis with Island Health defaults
 #'
+#' Breaks fall on whole numbers only. Counts cannot be fractional, and the
+#' labels round to whole numbers, so a break at 2.5 would print as "2" beside
+#' the wrong gridline.
+#'
 #' @param ... Additional arguments passed to `ggplot2::scale_y_continuous()`.
+#' @param breaks Break positions or a function that returns them. The default
+#'   keeps breaks on whole numbers.
 #' @param labels Label function.
 #' @param expand Scale expansion. The lower limit stays on the baseline.
 #'
@@ -188,11 +194,30 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
 #' @export
 scale_y_islh_count <- function(
     ...,
+    breaks = .islh_count_breaks(),
     labels = scales::label_comma(accuracy = 1),
     expand = ggplot2::expansion(mult = c(0, 0.05))) {
   ggplot2::scale_y_continuous(
     ...,
+    breaks = breaks,
     labels = labels,
     expand = expand
   )
+}
+
+# Whole-number breaks for a count axis. The steps leave out 2.5, which the
+# default algorithm prefers and which cannot label a count. A range too short
+# for two whole-number steps falls back to every whole number in it.
+.islh_count_breaks <- function(n = 5) {
+  extended <- scales::breaks_extended(n = n, Q = c(1, 5, 2, 4, 3))
+  function(limits) {
+    breaks <- extended(limits)
+    whole <- breaks[abs(breaks - round(breaks)) < 1e-8]
+    if (length(whole) >= 2L) {
+      return(whole)
+    }
+    low <- ceiling(min(limits))
+    high <- floor(max(limits))
+    if (low > high) whole else seq(low, high)
+  }
 }
