@@ -23,6 +23,9 @@ islh_save_plot <- function(
   .islh_require("ragg", "saving standard Island Health plot files")
   preset <- match.arg(preset)
 
+  if (!is.character(filename) || length(filename) != 1L || is.na(filename)) {
+    .islh_abort("{.arg filename} must be one file path.")
+  }
   if (tolower(tools::file_ext(filename)) != "png") {
     .islh_abort("{.arg filename} must end in {.file .png}.")
   }

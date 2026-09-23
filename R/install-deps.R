@@ -62,7 +62,12 @@ islh_install_deps <- function(
     getOption("pkgType")
   }
 
-  utils::install.packages(wanted, type = type)
+  .islh_install_packages(wanted, type = type)
+
+  # A package already loaded keeps running its old version until R restarts.
+  # islhr itself loads ggplot2, scales, systemfonts and cli, so an upgrade of
+  # any of those is not in effect yet.
+  loaded <- intersect(wanted, loadedNamespaces())
 
   if (!isTRUE(quiet)) {
     after <- if (format == "both") {
@@ -80,7 +85,22 @@ islh_install_deps <- function(
         .islh_problem_bullets(after)
       ))
     }
+    if (length(loaded) > 0L) {
+      .islh_inform(c(
+        "!" = "Restart R before you render: {.pkg {loaded}} {?was/were}
+               already loaded, so this session is still using the old
+               version{?s}.",
+        "i" = "In RStudio, use Session > Restart R."
+      ))
+    }
   }
 
   invisible(wanted)
+}
+
+# The one place packages are installed, so tests can replace it. Base R's
+# installer is the only one that works on a locked-down laptop; see
+# `islh_install_deps()`.
+.islh_install_packages <- function(packages, type) {
+  utils::install.packages(packages, type = type)
 }

@@ -112,8 +112,11 @@ test_that("the install helper never reaches for pak or a source build", {
   # Island Health laptops block programs run from a user library, which breaks
   # pak, and have no compiler. This is the constraint the whole install path
   # exists to respect.
+  # The installing itself sits in a small wrapper so tests can replace it;
+  # read both.
   source_text <- paste(
-    deparse(islh_install_deps), collapse = "\n"
+    c(deparse(islh_install_deps), deparse(.islh_install_packages)),
+    collapse = "\n"
   )
   expect_false(grepl("pak::", source_text, fixed = TRUE))
   expect_true(grepl("binary", source_text, fixed = TRUE))
@@ -156,4 +159,28 @@ test_that("Word figure captions stay with their figures", {
     styles,
     perl = TRUE
   ))
+})
+
+test_that("the RStudio project template builds a project", {
+  # RStudio creates the directory, then calls this with the widget values:
+  # strings for text and select inputs, TRUE or FALSE for the checkbox.
+  path <- file.path(withr::local_tempdir(), "from-rstudio")
+  dir.create(path)
+  suppressMessages(islh_report_skeleton(
+    path,
+    format = "html",
+    title = "Flu season",
+    author = "",
+    example_data = FALSE
+  ))
+
+  expect_true(file.exists(file.path(path, "report.qmd")))
+  expect_false(file.exists(file.path(path, "data")))
+  # RStudio writes its own .Rproj for a template project.
+  expect_length(list.files(path, pattern = "\\.Rproj$"), 0L)
+
+  report <- readLines(file.path(path, "report.qmd"))
+  expect_true(any(grepl('title: "Flu season"', report, fixed = TRUE)))
+  # A blank author box leaves the field out rather than writing it empty.
+  expect_false(any(grepl("^author:", report)))
 })
