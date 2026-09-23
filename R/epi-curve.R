@@ -314,12 +314,12 @@ islh_epi_curve <- function(
   plot
 }
 
-.islh_plot_column <- function(data, quo, arg, optional = FALSE) {
+.islh_plot_column <- function(data, quo, arg, optional = FALSE, call = rlang::caller_env()) {
   if (rlang::quo_is_null(quo)) {
     if (isTRUE(optional)) {
       return(NULL)
     }
-    .islh_abort("{.arg {arg}} must select one column.")
+    .islh_abort("{.arg {arg}} must select one column.", call = call)
   }
   expression <- rlang::get_expr(quo)
   name <- if (rlang::is_symbol(expression)) {
@@ -327,10 +327,10 @@ islh_epi_curve <- function(
   } else if (is.character(expression) && length(expression) == 1L) {
     expression
   } else {
-    .islh_abort("{.arg {arg}} must be a bare column name or one string.")
+    .islh_abort("{.arg {arg}} must be a bare column name or one string.", call = call)
   }
   if (!name %in% names(data)) {
-    .islh_abort("Column {.field {name}} selected by {.arg {arg}} was not found.")
+    .islh_abort("Column {.field {name}} selected by {.arg {arg}} was not found.", call = call)
   }
   name
 }
@@ -347,7 +347,8 @@ islh_epi_curve <- function(
     count_name,
     fill_name,
     facet_name,
-    aggregate) {
+    aggregate,
+  call = rlang::caller_env()) {
   keys <- c(date_name, fill_name, facet_name)
   repeated <- duplicated(data[keys])
   if (!any(repeated)) {
@@ -363,7 +364,7 @@ islh_epi_curve <- function(
            {.code islhepi::islh_count_events()}, which also fills in periods
            with no events, or pass {.code aggregate = TRUE} to add the
            duplicated rows together."
-    ))
+    ), call = call)
   }
 
   key <- do.call(
@@ -382,7 +383,7 @@ islh_epi_curve <- function(
   out
 }
 
-.islh_plot_dates <- function(x, arg) {
+.islh_plot_dates <- function(x, arg, call = rlang::caller_env()) {
   if (inherits(x, "Date")) {
     out <- as.Date(x)
   } else if (inherits(x, "POSIXt")) {
@@ -394,21 +395,21 @@ islh_epi_curve <- function(
     valid <- !is.na(out) & shape_ok & format(out, "%Y-%m-%d") == text
     out[!valid] <- as.Date(NA)
   } else {
-    .islh_abort("{.arg {arg}} must contain dates, not {.cls {class(x)[1]}}.")
+    .islh_abort("{.arg {arg}} must contain dates, not {.cls {class(x)[1]}}.", call = call)
   }
   if (anyNA(out)) {
     .islh_abort(c(
       "{.arg {arg}} must not contain missing or invalid dates.",
       i = "Use Date values or ISO dates written as YYYY-MM-DD."
-    ))
+    ), call = call)
   }
   out
 }
 
-.islh_plot_counts <- function(x, arg) {
+.islh_plot_counts <- function(x, arg, call = rlang::caller_env()) {
   if (is.factor(x) || !is.numeric(x) || anyNA(x) || any(!is.finite(x)) ||
       any(x < 0) || any(abs(x - round(x)) > .Machine$double.eps^0.5)) {
-    .islh_abort("{.arg {arg}} must contain non-negative finite whole counts.")
+    .islh_abort("{.arg {arg}} must contain non-negative finite whole counts.", call = call)
   }
   as.numeric(x)
 }
@@ -419,13 +420,14 @@ islh_epi_curve <- function(
     reference_date,
     lower,
     upper,
-    reference_mean) {
+    reference_mean,
+  call = rlang::caller_env()) {
   empty <- list(ribbon = NULL, line = NULL)
   if (is.null(reference)) {
     return(empty)
   }
   if (!is.data.frame(reference) || nrow(reference) == 0L) {
-    .islh_abort("{.arg reference} must be NULL or a non-empty data frame.")
+    .islh_abort("{.arg reference} must be NULL or a non-empty data frame.", call = call)
   }
   reference <- as.data.frame(reference)
   if (is.null(reference_date)) {
@@ -435,18 +437,16 @@ islh_epi_curve <- function(
       "period_start"
     } else {
       .islh_abort(
-        "Supply {.arg reference_date}; no matching date column was found."
-      )
+        "Supply {.arg reference_date}; no matching date column was found.", call = call)
     }
   }
   if (!is.character(reference_date) || length(reference_date) != 1L ||
       !reference_date %in% names(reference)) {
-    .islh_abort("{.arg reference_date} must name a column in {.arg reference}.")
+    .islh_abort("{.arg reference_date} must name a column in {.arg reference}.", call = call)
   }
   reference[[reference_date]] <- .islh_plot_dates(
     reference[[reference_date]],
-    "reference_date"
-  )
+    "reference_date", call = call)
 
   fields <- list(
     lower = lower,
@@ -457,7 +457,7 @@ islh_epi_curve <- function(
     value <- fields[[field]]
     if (!is.null(value) &&
         (!is.character(value) || length(value) != 1L || is.na(value))) {
-      .islh_abort("{.arg {field}} must be NULL or one column name.")
+      .islh_abort("{.arg {field}} must be NULL or one column name.", call = call)
     }
   }
 
@@ -466,13 +466,11 @@ islh_epi_curve <- function(
   has_mean <- !is.null(reference_mean) && reference_mean %in% names(reference)
   if (xor(has_lower, has_upper)) {
     .islh_abort(
-      "{.arg reference} must contain both lower and upper limits for a ribbon."
-    )
+      "{.arg reference} must contain both lower and upper limits for a ribbon.", call = call)
   }
   if (!has_lower && !has_upper && !has_mean) {
     .islh_abort(
-      "{.arg reference} contains no reference limits or mean column."
-    )
+      "{.arg reference} contains no reference limits or mean column.", call = call)
   }
 
   ribbon <- NULL
@@ -480,7 +478,7 @@ islh_epi_curve <- function(
     limits <- c(reference[[lower]], reference[[upper]])
     if (!is.numeric(limits) || anyNA(limits) || any(!is.finite(limits)) ||
         any(reference[[lower]] > reference[[upper]])) {
-      .islh_abort("Reference limits must be finite and lower must not exceed upper.")
+      .islh_abort("Reference limits must be finite and lower must not exceed upper.", call = call)
     }
     ribbon <- ggplot2::geom_ribbon(
       data = reference,
@@ -500,7 +498,7 @@ islh_epi_curve <- function(
     if (!is.numeric(reference[[reference_mean]]) ||
         anyNA(reference[[reference_mean]]) ||
         any(!is.finite(reference[[reference_mean]]))) {
-      .islh_abort("The reference mean must be finite and non-missing.")
+      .islh_abort("The reference mean must be finite and non-missing.", call = call)
     }
     line <- ggplot2::geom_line(
       data = reference,
@@ -524,13 +522,14 @@ islh_epi_curve <- function(
     date_name,
     count_name,
     facet_name,
-    max_cases) {
+    max_cases,
+  call = rlang::caller_env()) {
   total <- sum(data[[count_name]])
   if (total > max_cases) {
     .islh_abort(c(
       "{.code style = \"cases\"} would draw {total} rectangles.",
       i = "Use {.code style = \"bars\"} or increase {.arg max_cases} explicitly."
-    ))
+    ), call = call)
   }
 
   key_data <- data[date_name]

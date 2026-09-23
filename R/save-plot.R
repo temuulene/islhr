@@ -24,7 +24,7 @@ islh_save_plot <- function(
   preset <- match.arg(preset)
 
   if (tolower(tools::file_ext(filename)) != "png") {
-    cli::cli_abort("{.arg filename} must end in {.file .png}.")
+    .islh_abort("{.arg filename} must end in {.file .png}.")
   }
 
   settings <- list(

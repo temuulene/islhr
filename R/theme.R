@@ -207,7 +207,7 @@ theme_islh <- function(base_size = 12, grid = c("y", "x", "both", "none")) {
     if (requireNamespace("ragg", quietly = TRUE)) {
       knitr::opts_chunk$set(dev = "ragg_png")
     } else {
-      cli::cli_warn(c(
+      .islh_warn(c(
         "Package {.pkg ragg} is not installed.",
         i = "Quarto is using its existing graphics device."
       ))

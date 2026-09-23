@@ -146,7 +146,7 @@ islh_brand <- function(name) {
   hex <- .islh_brand_colours[name]
 
   if (anyNA(hex)) {
-    cli::cli_abort(c(
+    .islh_abort(c(
       "Unknown Island Health brand colour{?s}: {.val {name[is.na(hex)]}}.",
       i = "Available: {.val {names(.islh_brand_colours)}}."
     ))

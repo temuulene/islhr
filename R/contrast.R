@@ -97,7 +97,7 @@
   output_length <- max(lengths)
 
   if (any(!lengths %in% c(1L, output_length))) {
-    cli::cli_abort(
+    .islh_abort(
       "{.arg foreground} and {.arg background} must have compatible lengths."
     )
   }
@@ -109,7 +109,7 @@
     rgb <- tryCatch(
       grDevices::col2rgb(colour) / 255,
       error = function(cnd) {
-        cli::cli_abort(
+        .islh_abort(
           "Could not interpret one or more colours.",
           parent = cnd
         )

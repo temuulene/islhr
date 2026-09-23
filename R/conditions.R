@@ -4,6 +4,12 @@
 # and, for errors, names the user-facing function rather than the internal
 # helper that raised it.
 #
+# `call` does that naming. Its default is the frame that called
+# `.islh_abort()`, which is right for an exported function and wrong for a
+# shared helper such as `.islh_check_flag()`: the user never called that. So
+# every internal helper that can abort takes `call = rlang::caller_env()` and
+# passes it on, and the error reports the exported function that was called.
+#
 # `.envir` is the load-bearing argument. cli interpolates `{...}` in `.envir`,
 # which defaults to the calling frame — and the calling frame of
 # `cli::cli_abort()` here is this wrapper, where a caller's local variables do
@@ -12,8 +18,19 @@
 # message fails to build. `parent.frame()` in the default argument is evaluated
 # lazily inside the wrapper, so it resolves to whoever called it.
 
-.islh_abort <- function(message, call = parent.frame(), .envir = parent.frame()) {
-  cli::cli_abort(message, call = call, .envir = .envir)
+.islh_abort <- function(
+  message,
+  call = parent.frame(),
+  .envir = parent.frame(),
+  parent = NULL
+) {
+  cli::cli_abort(
+    message,
+    call = call,
+    .envir = .envir,
+    parent = parent,
+    class = "islh_error"
+  )
 }
 
 .islh_warn <- function(message, .envir = parent.frame()) {
@@ -38,15 +55,19 @@
   gsub("}", "}}", gsub("{", "{{", command, fixed = TRUE), fixed = TRUE)
 }
 
-.islh_require <- function(package, feature) {
+.islh_require <- function(package, feature, call = rlang::caller_env()) {
   if (!requireNamespace(package, quietly = TRUE)) {
-    .islh_abort(c(
-      "Package {.pkg {package}} is required for {feature}.",
-      i = paste0(
-        "Install it with {.code ", .islh_install_command(package),
-        "} and try again."
-      )
-    ))
+    .islh_abort(
+      c(
+        "Package {.pkg {package}} is required for {feature}.",
+        i = paste0(
+          "Install it with {.code ",
+          .islh_install_command(package),
+          "} and try again."
+        )
+      ),
+      call = call
+    )
   }
   invisible(TRUE)
 }

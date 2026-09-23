@@ -1,6 +1,6 @@
 .islh_pal_qualitative <- function(n, reverse = FALSE) {
   if (length(n) != 1L || is.na(n) || n < 1 || n != as.integer(n)) {
-    cli::cli_abort("{.arg n} must be one positive whole number.")
+    .islh_abort("{.arg n} must be one positive whole number.", call = NULL)
   }
 
   values <- c(
@@ -12,10 +12,13 @@
   )
 
   if (n > length(values)) {
-    cli::cli_abort(c(
+    .islh_abort(
+      c(
       "The Island Health qualitative palette supports at most 5 categories.",
       i = "Collapse categories, use facets, or add a non-colour cue."
-    ))
+    ),
+      call = NULL
+    )
   }
 
   colours <- values[seq_len(n)]
@@ -31,7 +34,7 @@
 # order. Values are kept at 70 or darker for graphic contrast on white.
 .islh_pal_ordinal <- function(n, family = "blue", reverse = FALSE) {
   if (length(n) != 1L || is.na(n) || n < 1 || n != as.integer(n)) {
-    cli::cli_abort("{.arg n} must be one positive whole number.")
+    .islh_abort("{.arg n} must be one positive whole number.", call = NULL)
   }
 
   values <- switch(
@@ -41,10 +44,13 @@
     "3" = c(20, 45, 70),
     "4" = c(20, 40, 55, 70),
     "5" = c(15, 30, 45, 60, 70),
-    cli::cli_abort(c(
+    .islh_abort(
+      c(
       "The Island Health ordinal palette supports at most 5 categories.",
       i = "Collapse categories or use facets rather than interpolating colours."
-    ))
+    ),
+      call = NULL
+    )
   )
 
   colours <- islh_hex(family, values)

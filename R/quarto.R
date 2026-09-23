@@ -7,7 +7,7 @@
 # file that was never written is the worst outcome, because the render then
 # fails somewhere else entirely.
 
-.islh_mkdir <- function(path) {
+.islh_mkdir <- function(path, call = rlang::caller_env()) {
   if (dir.exists(path)) {
     return(invisible(path))
   }
@@ -17,26 +17,26 @@
       "Could not create {.file {path}}.",
       i = "Check that you have permission to write there and that the path is
            not too long."
-    ))
+    ), call = call)
   }
   invisible(path)
 }
 
-.islh_copy <- function(from, to) {
-  .islh_mkdir(dirname(to))
+.islh_copy <- function(from, to, call = rlang::caller_env()) {
+  .islh_mkdir(dirname(to), call = call)
   ok <- file.copy(from, to, overwrite = TRUE)
   if (!ok || !file.exists(to)) {
     .islh_abort(c(
       "Could not write {.file {to}}.",
       i = "The file may be open in another program, or the folder may be
            read-only."
-    ))
+    ), call = call)
   }
   invisible(to)
 }
 
-.islh_write_lines <- function(lines, path) {
-  .islh_mkdir(dirname(path))
+.islh_write_lines <- function(lines, path, call = rlang::caller_env()) {
+  .islh_mkdir(dirname(path), call = call)
   result <- tryCatch(
     {
       writeLines(lines, path)
@@ -48,7 +48,7 @@
     .islh_abort(c(
       "Could not write {.file {path}}.",
       x = if (isTRUE(result)) "The file is missing after writing." else result
-    ))
+    ), call = call)
   }
   invisible(path)
 }
@@ -214,12 +214,12 @@ islh_use_brand <- function(dir = ".", logos = TRUE, overwrite = FALSE) {
   basename(unlist(images, use.names = FALSE))
 }
 
-.islh_check_dir <- function(dir) {
+.islh_check_dir <- function(dir, call = rlang::caller_env()) {
   if (!dir.exists(dir)) {
     .islh_abort(c(
       "{.file {dir}} does not exist.",
       i = "Create it first, or use {.fn islh_create_report} to start a project."
-    ))
+    ), call = call)
   }
   invisible(TRUE)
 }
