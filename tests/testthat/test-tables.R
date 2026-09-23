@@ -143,3 +143,26 @@ test_that("both table engines use the same brand colours", {
   band <- tolower(islh_hex("blue", 20))
   expect_true(grepl(band, tolower(html), fixed = TRUE))
 })
+
+test_that("gtsummary hooks work without library(islhr)", {
+  skip_if_not_installed("gtsummary")
+  # gtsummary evaluates these in its own environment, so an unqualified
+  # islh_gt() is found only when the report attached the package.
+  theme <- quietly(.islh_gtsummary_theme("gt", set_theme = FALSE, quiet = TRUE))
+  hooks <- c(
+    theme[["as_gt-lst:addl_cmds"]],
+    theme[["as_flex_table-lst:addl_cmds"]]
+  )
+  for (hook in hooks) {
+    expect_equal(rlang::call_ns(hook), "islhr")
+  }
+})
+
+test_that("an old gtsummary is skipped with a warning, not an error", {
+  skip_if_not_installed("gtsummary")
+  local_mocked_bindings(.islh_outdated = function(packages) packages)
+  expect_warning(
+    expect_false(.islh_gtsummary_usable()),
+    "too old"
+  )
+})

@@ -28,7 +28,7 @@ Suggests:
     base64enc,
     flextable (>= 0.9.10),
     gt,
-    gtsummary,
+    gtsummary (>= 2.0.0),
     htmltools,
     knitr,
     officer,

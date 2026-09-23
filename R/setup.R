@@ -22,7 +22,7 @@
     islh.document_webfont = document_webfont
   )
   gtsummary_theme <- NULL
-  if (requireNamespace("gtsummary", quietly = TRUE)) {
+  if (.islh_gtsummary_usable()) {
     gtsummary_theme <- .islh_gtsummary_theme(
       print_engine = "gt",
       quiet = quiet
@@ -55,7 +55,7 @@
   )
   previous_flextable <- .islh_set_flextable_defaults()
   gtsummary_theme <- NULL
-  if (requireNamespace("gtsummary", quietly = TRUE)) {
+  if (.islh_gtsummary_usable()) {
     gtsummary_theme <- .islh_gtsummary_theme(
       print_engine = "flextable",
       quiet = quiet
@@ -67,6 +67,28 @@
     flextable = previous_flextable,
     gtsummary = gtsummary_theme
   ))
+}
+
+# gtsummary is optional: configure it when it is installed and recent enough,
+# and say once why an older one was left alone rather than failing setup.
+.islh_gtsummary_usable <- function() {
+  if (!requireNamespace("gtsummary", quietly = TRUE)) {
+    return(FALSE)
+  }
+  if (length(.islh_outdated("gtsummary")) == 0L) {
+    return(TRUE)
+  }
+  .islh_warn(c(
+    paste0(
+      "{.pkg gtsummary} ", utils::packageVersion("gtsummary"),
+      " is too old for the Island Health table theme, so it was not set."
+    ),
+    i = paste0(
+      "Version ", .islh_min_versions[["gtsummary"]], " or newer is needed: ",
+      "{.code ", .islh_install_command("gtsummary"), "}."
+    )
+  ))
+  FALSE
 }
 
 #' Configure Island Health themes for the current project or document

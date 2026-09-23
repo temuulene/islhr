@@ -32,9 +32,12 @@
 # * flextable 0.9.10 added the `repeat_headers` Word option that
 #   `islh_flextable()` sets, so an older flextable errors with
 #   `unused argument (repeat_headers = TRUE)`.
+# * gtsummary 2.0.0 added the `label_style_*()` functions the table theme
+#   uses. gtsummary is optional, so an older one is skipped, not required.
 .islh_min_versions <- c(
   ggplot2 = "3.5.0",
-  flextable = "0.9.10"
+  flextable = "0.9.10",
+  gtsummary = "2.0.0"
 )
 
 # Which of `packages` are installed but older than the package needs?

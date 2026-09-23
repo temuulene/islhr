@@ -33,11 +33,14 @@
       gtsummary::all_categorical() ~ c(0, 1)
     ),
     "tbl_summary-arg:missing_text" = "Unknown",
+    # gtsummary evaluates these in its own environment, where islhr's
+    # functions are found only if the report attached the package. Qualify
+    # them so `islhr::islh_setup()` works without `library(islhr)`.
     "as_flex_table-lst:addl_cmds" = list(
-      autofit = rlang::expr(islh_flextable())
+      autofit = rlang::expr(islhr::islh_flextable())
     ),
     "as_gt-lst:addl_cmds" = list(
-      tab_spanner = rlang::expr(islh_gt())
+      tab_spanner = rlang::expr(islhr::islh_gt())
     )
   )
 
