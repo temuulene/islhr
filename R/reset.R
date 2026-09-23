@@ -56,7 +56,7 @@
 
 #' Record everything `islh_setup()` is about to change
 #'
-#' @return A restore record for [.islh_restore_state()].
+#' @return A restore record for `.islh_restore_state()`.
 #'
 #' @noRd
 .islh_capture_state <- function() {
@@ -108,7 +108,7 @@
 #' since the record was taken should leave one setting behind with a warning
 #' naming it, not abandon the rest of the reset half done.
 #'
-#' @param state A record from [.islh_capture_state()].
+#' @param state A record from `.islh_capture_state()`.
 #'
 #' @return `TRUE` invisibly.
 #'
@@ -253,6 +253,17 @@ islh_reset <- function(quiet = FALSE) {
 #' @return The value of `code`.
 #' @export
 #'
+#' @section Returned plots:
+#'
+#' ggplot2 applies the theme, the default colour scales and the geom colours
+#' when a plot is drawn, not when it is built. A ggplot returned from the
+#' block is therefore given its own copy of the Island Health theme, default
+#' discrete colour and fill scales, and geom colours before the session is
+#' restored, so it looks the same when printed afterwards. Anything the plot
+#' sets itself, such as its own scale or a `theme()` addition, still wins.
+#' Plots inside a plain list are handled too. Other objects are returned as
+#' they are.
+#'
 #' @examples
 #' before <- ggplot2::theme_get()
 #'
@@ -262,12 +273,73 @@ islh_reset <- function(quiet = FALSE) {
 #'   format = "plots"
 #' )
 #'
-#' # The theme travelled with the plot; the session did not keep it.
+#' # The plot keeps the Island Health styling; the session does not.
 #' identical(ggplot2::theme_get(), before)
 with_islh <- function(code, ..., quiet = TRUE) {
   state <- .islh_capture_state()
   on.exit(.islh_restore_state(state), add = TRUE)
 
   islh_setup(..., quiet = quiet)
-  force(code)
+  result <- withVisible(code)
+
+  # `on.exit()` restores the session after this line, so the plot has to take
+  # the settings with it now.
+  value <- .islh_freeze_plots(result$value)
+  if (result$visible) value else invisible(value)
+}
+
+# ggplot2 resolves the theme, the default discrete scales and the geom
+# defaults when a plot is drawn, not when it is built. A plot returned from
+# `with_islh()` and printed after the block would otherwise be drawn with
+# whatever the restored session has, which is usually no branding at all.
+#
+# Each plot, including plots inside a plain list, is given its own copy of
+# what is active now. Its own `theme()` additions and scales still win.
+.islh_freeze_plots <- function(value) {
+  if (inherits(value, "ggplot") && !inherits(value, "patchwork")) {
+    return(tryCatch(
+      .islh_freeze_plot(value),
+      error = function(condition) {
+        .islh_warn(c(
+          "Could not fix the Island Health styling to the returned plot.",
+          x = conditionMessage(condition),
+          i = "Draw or save the plot inside {.fn with_islh} instead."
+        ))
+        value
+      }
+    ))
+  }
+  if (is.list(value) && !is.object(value)) {
+    return(lapply(value, .islh_freeze_plots))
+  }
+  value
+}
+
+.islh_freeze_plot <- function(plot) {
+  # Scales first, from a build under the current settings: that is the only
+  # way to learn whether colour and fill ended up discrete.
+  built <- ggplot2::ggplot_build(plot)
+  for (aesthetic in c("colour", "fill")) {
+    scale <- built$plot$scales$get_scales(aesthetic)
+    if (
+      inherits(scale, "ScaleDiscrete") &&
+        !plot$scales$has_scale(aesthetic)
+    ) {
+      plot <- plot + scale$clone()
+    }
+  }
+
+  # A child of each geom that holds today's defaults as its own.
+  plot$layers <- lapply(plot$layers, function(layer) {
+    geom <- ggplot2::ggproto(
+      NULL,
+      layer$geom,
+      default_aes = layer$geom$default_aes
+    )
+    ggplot2::ggproto(NULL, layer, geom = geom)
+  })
+
+  # A complete theme replaces the plot's theme outright, so merge the plot's
+  # own additions on top of the session theme first.
+  plot + (ggplot2::theme_get() + plot$theme)
 }

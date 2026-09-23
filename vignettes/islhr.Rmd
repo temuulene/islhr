@@ -128,9 +128,13 @@ plot <- with_islh(
   format = "plots"
 )
 
-# The theme travelled with the plot; the session did not keep it.
+# The plot keeps the Island Health styling; the session does not.
 identical(ggplot2::theme_get(), before)
 ```
+
+A plot returned from the block takes its own copy of the theme, the default
+colour scales and the geom colours, so it looks the same when you print it
+later.
 
 Check optional dependencies before rendering a report:
 

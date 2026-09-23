@@ -29,6 +29,19 @@ so it nests correctly: a \code{with_islh()} block inside a session that has
 already run \code{\link[=islh_setup]{islh_setup()}} restores that setup on exit rather than removing
 it.
 }
+\section{Returned plots}{
+
+
+ggplot2 applies the theme, the default colour scales and the geom colours
+when a plot is drawn, not when it is built. A ggplot returned from the
+block is therefore given its own copy of the Island Health theme, default
+discrete colour and fill scales, and geom colours before the session is
+restored, so it looks the same when printed afterwards. Anything the plot
+sets itself, such as its own scale or a \code{theme()} addition, still wins.
+Plots inside a plain list are handled too. Other objects are returned as
+they are.
+}
+
 \examples{
 before <- ggplot2::theme_get()
 
@@ -38,6 +51,6 @@ plot <- with_islh(
   format = "plots"
 )
 
-# The theme travelled with the plot; the session did not keep it.
+# The plot keeps the Island Health styling; the session does not.
 identical(ggplot2::theme_get(), before)
 }

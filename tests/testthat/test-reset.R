@@ -80,6 +80,67 @@ test_that("with_islh applies the theme only inside the block", {
   expect_identical(ggplot2::theme_get(), before)
 })
 
+test_that("a plot returned from with_islh keeps its styling", {
+  local_clean_session()
+
+  # ggplot2 applies the theme, default scales and geom colours when a plot is
+  # drawn. Without freezing, a plot printed after the block is unbranded.
+  plots <- suppressWarnings(with_islh(
+    list(
+      mapped = ggplot2::ggplot(
+        datasets::mtcars,
+        ggplot2::aes(factor(cyl), fill = factor(gear))
+      ) +
+        ggplot2::geom_bar() +
+        ggplot2::theme(legend.position = "top"),
+      unmapped = ggplot2::ggplot(datasets::mtcars, ggplot2::aes(wt)) +
+        ggplot2::geom_histogram(bins = 5),
+      continuous = ggplot2::ggplot(
+        datasets::mtcars,
+        ggplot2::aes(wt, mpg, colour = hp)
+      ) +
+        ggplot2::geom_point()
+    ),
+    format = "plots"
+  ))
+
+  mapped <- ggplot2::ggplot_build(plots$mapped)$data[[1]]
+  expect_setequal(unique(mapped$fill), .islh_pal_qualitative(3))
+
+  unmapped <- ggplot2::ggplot_build(plots$unmapped)$data[[1]]
+  expect_equal(unique(unmapped$fill), islh_brand("primary"))
+
+  # A continuous mapping is left to its own scale, not forced to discrete.
+  expect_no_error(ggplot2::ggplot_build(plots$continuous))
+
+  # The plot's own theme addition wins over the frozen session theme.
+  expect_equal(ggplot2:::plot_theme(plots$mapped)$legend.position, "top")
+  expect_equal(
+    ggplot2:::plot_theme(plots$mapped)$plot.title$colour,
+    islh_hex("blue", 20)
+  )
+})
+
+test_that("a plot's own colour scale is not replaced", {
+  local_clean_session()
+
+  plot <- suppressWarnings(with_islh(
+    ggplot2::ggplot(datasets::mtcars, ggplot2::aes(factor(cyl), fill = factor(am))) +
+      ggplot2::geom_bar() +
+      ggplot2::scale_fill_manual(values = c("black", "orange")),
+    format = "plots"
+  ))
+
+  fills <- unique(ggplot2::ggplot_build(plot)$data[[1]]$fill)
+  expect_setequal(fills, c("black", "orange"))
+})
+
+test_that("with_islh keeps the visibility of its value", {
+  local_clean_session()
+  expect_invisible(suppressWarnings(with_islh(invisible(1), format = "plots")))
+  expect_visible(suppressWarnings(with_islh(1, format = "plots")))
+})
+
 test_that("with_islh restores the session when the block fails", {
   local_clean_session()
 
