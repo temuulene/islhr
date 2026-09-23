@@ -11,3 +11,4 @@ data-raw/.build-reference-docx.tmp/
 
 # Python bytecode from data-raw/build_reference_docx.py
 __pycache__/
+Rplots.pdf

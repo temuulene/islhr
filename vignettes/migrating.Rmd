@@ -8,7 +8,6 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-#| include: false
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(islhr)
 ```
