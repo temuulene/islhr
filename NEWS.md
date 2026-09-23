@@ -1,3 +1,49 @@
+# islhr 0.7.0
+
+## Visible change to epidemic curves
+
+* `islh_epi_curve()` now draws each bar across its period, from the date
+  forward, as epidemic curves usually are. Bars used to be centred on the
+  period's start date, so a weekly bar covered half of the week before and
+  crossed the year line one week early. Case tiles, total labels and the
+  reference band and line move with the bars. Existing figures will look
+  shifted by half a period.
+
+## Fixes
+
+* `islh_epi_curve()` converts date-times to dates in their own time zone. A
+  case recorded at 20:00 in Vancouver was counted on the next day, because
+  `as.Date()` reads a date-time in UTC.
+* `islh_epi_curve()` stacks case tiles in the same order in every period,
+  first fill level on top, as bars stack. The order used to follow the rows,
+  so colours could swap places between periods.
+* `islh_install_deps()` tells you to restart R after upgrading a package that
+  was already loaded, such as ggplot2, since the old version stays in use
+  until then.
+* `islh_save_plot()` rejects a filename that is not one path.
+* `islh_setup()` registers BC Sans with every HTML render. A second render in
+  the same R session used to get no font.
+* `islh_setup()` sets a gtsummary theme that works without
+  `library(islhr)`, and skips the theme with a warning, rather than failing,
+  when gtsummary is older than 2.0.0.
+* `islh_update_project()` and `islh_check_project()` ignore line endings, so
+  a project cloned on Windows with CRLF endings is no longer read as edited
+  throughout.
+* `scale_y_islh_count()` puts breaks on whole numbers only. An axis from 0 to
+  9 used to read "0, 2, 5, 8" with gridlines at 2.5 and 7.5.
+* `with_islh()` gives a returned plot its own copy of the theme, default
+  colour scales and geom colours, so it keeps the branding when printed after
+  the block.
+* Errors name the function you called rather than an internal helper, and
+  carry the class `islh_error`.
+
+## Documentation
+
+* Canadian spelling throughout, including "Standardized" in
+  `islh_caption()` output.
+* More examples in the reference, and `islh_help()` lists `islh_logo()` and
+  the gtsummary converters.
+
 # islhr 0.6.0
 
 ## Undoing setup
