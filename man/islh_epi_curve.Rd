@@ -61,8 +61,9 @@ and line. Missing optional columns are ignored.}
 
 \item{show_year_lines}{Draw a separator at the beginning of each new year.}
 
-\item{bar_width}{Width in days. When \code{NULL}, the function infers it from the
-distance between periods.}
+\item{bar_width}{Width in days, measured from each period's start. When
+\code{NULL}, the function uses nine tenths of the shortest distance between
+periods.}
 
 \item{date_breaks, date_labels}{Values passed to \code{ggplot2::scale_x_date()}.
 Useful defaults are selected when omitted.}
@@ -72,7 +73,7 @@ Useful defaults are selected when omitted.}
 
 \item{title, subtitle, caption, x, y}{Plot labels.}
 
-\item{facet_scales}{Scale behavior passed to \code{ggplot2::facet_wrap()}.}
+\item{facet_scales}{Scale behaviour passed to \code{ggplot2::facet_wrap()}.}
 
 \item{aggregate}{Sum counts that share a date, fill group and facet. With
 \code{FALSE}, the default, duplicated combinations are an error. See the input
@@ -87,6 +88,19 @@ the usual way.
 figure. It deliberately keeps counting separate from plotting: use
 \code{islhepi::islh_count_events()} first when starting from event-level data.
 }
+\section{Date alignment}{
+
+
+Each date is read as the start of its period, and each bar covers the
+period from that date forward, the usual convention for an epidemic curve.
+A week starting on Sunday 28 December is drawn from 28 December towards
+3 January, not centred on 28 December with half of it in the week before.
+Case tiles, total labels and the reference band and line follow the bars.
+
+Date-times are converted to dates in their own time zone, so a report
+timestamped in Pacific time is counted on the Pacific date.
+}
+
 \section{Input grain}{
 
 

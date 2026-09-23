@@ -178,3 +178,77 @@ test_that("aggregate is checked like any other switch", {
     "single TRUE or FALSE"
   )
 })
+
+test_that("each bar spans its period from the start date", {
+  # A weekly bar centred on its start date covers half of the week before and
+  # crosses the year line at the wrong week.
+  data <- data.frame(
+    week = seq(as.Date("2025-12-21"), by = "week", length.out = 3),
+    cases = c(2, 3, 1)
+  )
+  built <- ggplot2::ggplot_build(
+    islh_epi_curve(data, week, cases, show_year_lines = FALSE)
+  )$data[[1]]
+
+  expect_equal(built$xmin, as.numeric(data$week))
+  expect_equal(built$xmax - built$xmin, rep(0.9 * 7, 3))
+})
+
+test_that("case tiles, labels and reference follow the bars", {
+  data <- data.frame(
+    week = seq(as.Date("2026-01-04"), by = "week", length.out = 3),
+    cases = c(2, 3, 1)
+  )
+  reference <- data.frame(
+    week = data$week,
+    lower_limit = 0,
+    upper_limit = 4
+  )
+  middle <- as.numeric(data$week) + 0.9 * 7 / 2
+
+  tiles <- ggplot2::ggplot_build(
+    islh_epi_curve(data, week, cases, style = "cases")
+  )$data[[1]]
+  expect_equal(sort(unique(tiles$x)), middle)
+
+  plot <- expect_only_font_warnings(
+    islh_epi_curve(data, week, cases, labels = "total", reference = reference)
+  )
+  layers <- ggplot2::ggplot_build(plot)$data
+  expect_equal(layers[[1]]$x, middle)
+  expect_equal(layers[[length(layers)]]$x, middle)
+})
+
+test_that("date-times are counted on the date where they were recorded", {
+  # 20:00 in Vancouver is 04:00 the next day in UTC. Before R 4.3, as.Date()
+  # used UTC and moved these cases forward a day.
+  times <- as.POSIXct(
+    c("2026-01-05 20:00", "2026-01-06 09:00"),
+    tz = "America/Vancouver"
+  )
+  data <- data.frame(time = times, cases = c(1, 2))
+  plot <- islh_epi_curve(data, time, cases)
+
+  expect_equal(
+    plot$layers[[1]]$data$time,
+    as.Date(c("2026-01-05", "2026-01-06"))
+  )
+})
+
+test_that("case tiles stack in the same order in every period", {
+  # Rows in a different order on each date used to swap the colours round.
+  data <- data.frame(
+    date = as.Date(c("2026-01-01", "2026-01-01", "2026-01-02", "2026-01-02")),
+    source = c("A", "B", "B", "A"),
+    count = c(1, 2, 2, 1)
+  )
+  tiles <- islh_epi_curve(data, date, count, fill = source, style = "cases")$
+    layers[[1]]$data
+
+  # First level on top, as geom_col() stacks bars: B fills the lower tiles.
+  lowest <- tapply(tiles$.islh_case_y, tiles$source, min)
+  expect_equal(lowest[["B"]], 0.5)
+  expect_equal(lowest[["A"]], 2.5)
+  per_date <- split(tiles[c("source", ".islh_case_y")], tiles$date)
+  expect_equal(per_date[[1]], per_date[[2]], ignore_attr = TRUE)
+})

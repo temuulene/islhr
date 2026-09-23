@@ -23,17 +23,29 @@
 #' @param lower,upper,reference_mean Column names used for the reference ribbon
 #'   and line. Missing optional columns are ignored.
 #' @param show_year_lines Draw a separator at the beginning of each new year.
-#' @param bar_width Width in days. When `NULL`, the function infers it from the
-#'   distance between periods.
+#' @param bar_width Width in days, measured from each period's start. When
+#'   `NULL`, the function uses nine tenths of the shortest distance between
+#'   periods.
 #' @param date_breaks,date_labels Values passed to `ggplot2::scale_x_date()`.
 #'   Useful defaults are selected when omitted.
 #' @param max_cases Maximum number of rectangles allowed with
 #'   `style = "cases"`.
 #' @param title,subtitle,caption,x,y Plot labels.
-#' @param facet_scales Scale behavior passed to `ggplot2::facet_wrap()`.
+#' @param facet_scales Scale behaviour passed to `ggplot2::facet_wrap()`.
 #'
 #' @return A ggplot object. Additional ggplot2 layers and scales can be added in
 #'   the usual way.
+#'
+#' @section Date alignment:
+#'
+#' Each date is read as the start of its period, and each bar covers the
+#' period from that date forward, the usual convention for an epidemic curve.
+#' A week starting on Sunday 28 December is drawn from 28 December towards
+#' 3 January, not centred on 28 December with half of it in the week before.
+#' Case tiles, total labels and the reference band and line follow the bars.
+#'
+#' Date-times are converted to dates in their own time zone, so a report
+#' timestamped in Pacific time is counted on the Pacific date.
 #'
 #' @section Input grain:
 #'
@@ -150,6 +162,11 @@ islh_epi_curve <- function(
   }
   max_cases <- .islh_check_count(max_cases, "max_cases")
 
+  # Each bar spans its period rather than being centred on its start date, so
+  # everything that marks a period is drawn at the middle of its bar.
+  offset <- bar_width / 2
+  plot_data$.islh_x <- plot_data[[date_name]] + offset
+
   plot <- ggplot2::ggplot()
 
   reference_layers <- .islh_plot_reference(
@@ -158,7 +175,8 @@ islh_epi_curve <- function(
     reference_date = reference_date,
     lower = lower,
     upper = upper,
-    reference_mean = reference_mean
+    reference_mean = reference_mean,
+    offset = offset
   )
   if (!is.null(reference_layers$ribbon)) {
     plot <- plot + reference_layers$ribbon
@@ -174,7 +192,7 @@ islh_epi_curve <- function(
     if (last_year > first_year) {
       year_starts <- as.Date(paste0(seq.int(first_year + 1L, last_year), "-01-01"))
       plot <- plot + ggplot2::geom_vline(
-        xintercept = as.numeric(year_starts),
+        xintercept = year_starts,
         colour = islh_hex("grey", 40),
         linewidth = 0.35,
         linetype = "dashed"
@@ -183,10 +201,10 @@ islh_epi_curve <- function(
   }
 
   mapping <- if (is.null(fill_name)) {
-    ggplot2::aes(x = .data[[date_name]], y = .data[[count_name]])
+    ggplot2::aes(x = .data$.islh_x, y = .data[[count_name]])
   } else {
     ggplot2::aes(
-      x = .data[[date_name]],
+      x = .data$.islh_x,
       y = .data[[count_name]],
       fill = .data[[fill_name]]
     )
@@ -219,14 +237,15 @@ islh_epi_curve <- function(
       plot_data,
       date_name = date_name,
       count_name = count_name,
+      fill_name = fill_name,
       facet_name = facet_name,
       max_cases = max_cases
     )
     case_mapping <- if (is.null(fill_name)) {
-      ggplot2::aes(x = .data[[date_name]], y = .data$.islh_case_y)
+      ggplot2::aes(x = .data$.islh_x, y = .data$.islh_case_y)
     } else {
       ggplot2::aes(
-        x = .data[[date_name]],
+        x = .data$.islh_x,
         y = .data$.islh_case_y,
         fill = .data[[fill_name]]
       )
@@ -257,6 +276,7 @@ islh_epi_curve <- function(
       count_name = count_name,
       facet_name = facet_name
     )
+    totals$.islh_date <- totals$.islh_date + offset
     label_mapping <- ggplot2::aes(
       x = .data$.islh_date,
       y = .data$.islh_total,
@@ -268,7 +288,7 @@ islh_epi_curve <- function(
       inherit.aes = FALSE,
       vjust = -0.35,
       size = 3,
-      family = islh_font_family(),
+      family = .islh_font(),
       colour = islh_brand("black")
     )
   }
@@ -386,7 +406,14 @@ islh_epi_curve <- function(
 .islh_plot_dates <- function(x, arg, call = rlang::caller_env()) {
   if (inherits(x, "Date")) {
     out <- as.Date(x)
-  } else if (inherits(x, "POSIXt")) {
+  } else if (inherits(x, "POSIXct")) {
+    # `as.Date()` reads a POSIXct in UTC unless told otherwise, before R 4.3,
+    # which moves an evening in Pacific time onto the next day. Use the zone
+    # the times were recorded in; an empty zone means the session's own.
+    zone <- attr(x, "tzone")
+    zone <- if (is.null(zone) || !nzchar(zone[[1]])) "" else zone[[1]]
+    out <- as.Date(as.POSIXlt(x, tz = zone))
+  } else if (inherits(x, "POSIXlt")) {
     out <- as.Date(x)
   } else if (is.character(x) || is.factor(x)) {
     text <- trimws(as.character(x))
@@ -421,6 +448,7 @@ islh_epi_curve <- function(
     lower,
     upper,
     reference_mean,
+    offset = 0,
   call = rlang::caller_env()) {
   empty <- list(ribbon = NULL, line = NULL)
   if (is.null(reference)) {
@@ -447,6 +475,8 @@ islh_epi_curve <- function(
   reference[[reference_date]] <- .islh_plot_dates(
     reference[[reference_date]],
     "reference_date", call = call)
+  # Reference values describe a whole period, so they sit mid-bar.
+  reference[[reference_date]] <- reference[[reference_date]] + offset
 
   fields <- list(
     lower = lower,
@@ -521,6 +551,7 @@ islh_epi_curve <- function(
     data,
     date_name,
     count_name,
+    fill_name,
     facet_name,
     max_cases,
   call = rlang::caller_env()) {
@@ -530,6 +561,14 @@ islh_epi_curve <- function(
       "{.code style = \"cases\"} would draw {total} rectangles.",
       i = "Use {.code style = \"bars\"} or increase {.arg max_cases} explicitly."
     ), call = call)
+  }
+
+  # Stack the tiles the way `geom_col()` stacks bars, first fill level on top,
+  # whatever order the rows arrived in. Otherwise the colours swap places from
+  # one period to the next.
+  if (!is.null(fill_name)) {
+    level <- as.integer(addNA(as.factor(data[[fill_name]]), ifany = TRUE))
+    data <- data[order(-level), , drop = FALSE]
   }
 
   key_data <- data[date_name]
