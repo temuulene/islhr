@@ -28,11 +28,13 @@ Imports:
 Suggests:
     base64enc,
     flextable (>= 0.9.10),
+    ggnewscale,
     gt,
     gtsummary (>= 2.0.0),
     htmltools,
     knitr,
     officer,
+    patchwork,
     ragg,
     rmarkdown,
     sf,

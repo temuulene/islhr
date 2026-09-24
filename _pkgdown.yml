@@ -85,6 +85,7 @@ reference:
       - coord_islh_map
       - scale_fill_islh_area
       - islh_areas
+      - islh_example_lha
       - islh_caption
 
   - title: Colours and assets

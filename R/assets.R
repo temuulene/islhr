@@ -102,3 +102,48 @@ islh_example_data <- function() {
     stringsAsFactors = FALSE
   )
 }
+
+#' Example Island Health local health area map
+#'
+#' The boundaries of Island Health's 14 local health areas (LHAs) with their
+#' 2025 population, bundled so map examples run without a network connection.
+#' The columns match what `islhepi::islh_bc_geography()` and
+#' `islhepi::islh_bc_population()` return once joined, so code written against
+#' this object works on a current download.
+#'
+#' The boundaries are simplified for display: shared borders stay shared and
+#' small islands are kept, but areas are approximate. Retrieve current
+#' boundaries and denominators with `islhepi` for analysis.
+#'
+#' @return An `sf` object in BC Albers (EPSG:3005) with one row per LHA and
+#'   columns `geography_code`, `geography_name`, `hsda`, `population`, `year`
+#'   and `geometry`.
+#'
+#' @source Contains information licensed under the Open Government Licence -
+#'   British Columbia. Boundaries: Local Health Area Boundaries, BC Data
+#'   Catalogue,
+#'   <https://catalogue.data.gov.bc.ca/dataset/afd021d9-7722-4410-b506-d394c66e74fc>.
+#'   Population: BC Stats, BC Sub-Provincial Population Estimates and
+#'   Projections,
+#'   <https://catalogue.data.gov.bc.ca/dataset/86839277-986a-4a29-9f70-fa9b1166f6cb>.
+#'   Built by `data-raw/build_example_lha.R`.
+#'
+#' @seealso [islh_areas()] for each LHA's brand colour.
+#'
+#' @export
+#'
+#' @examples
+#' if (requireNamespace("sf", quietly = TRUE)) {
+#'   lha <- islh_example_lha()
+#'   lha[c("geography_code", "geography_name", "population")]
+#' }
+islh_example_lha <- function() {
+  .islh_require("sf", "the example local health area map")
+  lha <- sf::st_read(
+    .islh_path("extdata", "islh-lha.gpkg"),
+    quiet = TRUE,
+    stringsAsFactors = FALSE
+  )
+  sf::st_geometry(lha) <- "geometry"
+  lha
+}
