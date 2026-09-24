@@ -1,3 +1,22 @@
+# islhr 0.10.0
+
+## New
+
+* `islh_area_labels()` adds each local health area's code to an Island Health
+  map without overlaps. Codes sit inside the eight areas large enough to hold
+  them; the six small South and Central Island areas are labelled over the
+  Strait of Georgia with thin leader lines.
+* `islh_flextable()` gains `groupname_col`, which gathers rows under shaded
+  heading rows, such as sites under their HSDA.
+* `islh_gt()` gains `groupname_col` and `rowname_col`, passed to
+  `gt::gt()`, and `stubhead`. The row-label column keeps its name as a header
+  unless `stubhead` says otherwise.
+
+## Fixes
+
+* `islh_gt()` table titles are now bold. gt gave the title cell a
+  normal-weight class that overrode the bold set in its options.
+
 # islhr 0.9.0
 
 ## New
