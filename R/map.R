@@ -54,7 +54,9 @@ coord_islh_map <- function(crs = 3005, datum = NA, expand = FALSE, ...) {
 #' @param suppression Suppression rule applied before mapping.
 #' @param governance Data governance statement, where one applies.
 #' @param width Characters per line before wrapping. `Inf` leaves the caption
-#'   on one line.
+#'   on one line. A map draws narrower than its figure, because
+#'   [coord_islh_map()] fixes the aspect ratio, so use about 70 for a
+#'   full-Island map.
 #'
 #' @return A single string for `ggplot2::labs(caption = )`.
 #' @export

@@ -5,18 +5,20 @@
 #' hierarchy from [theme_islh()] and nothing else. Pair it with
 #' `ggplot2::geom_sf()`, [coord_islh_map()] and [scale_fill_islh_b()].
 #'
-#' Island Health runs northwest to southeast, which leaves open water off the
-#' west coast. `legend = "inside"` puts the legend there and gives the map
-#' roughly a fifth more room, which matters because `coord_sf()` fixes the
-#' aspect ratio and a wider figure cannot stretch the map to fill it.
+#' Island Health runs northwest to southeast, which leaves an empty corner at
+#' the top right of a full-Island map, over the mainland the map does not
+#' draw. `legend = "inside"` puts the legend there and gives the map roughly a
+#' fifth more room, which matters because `coord_sf()` fixes the aspect ratio
+#' and a wider figure cannot stretch the map to fill it.
 #'
 #' @param base_size Base font size in points.
 #' @param legend Legend placement: `"bottom"`, `"inside"` the panel, or
 #'   `"none"`. The bar stays horizontal either way, so its break labels have
 #'   room to sit side by side.
 #' @param legend_inside Legend position when `legend = "inside"`, as fractions
-#'   of the panel from the bottom left. The default sits in the Pacific, off
-#'   the west coast of Vancouver Island.
+#'   of the panel from the bottom left, placing the legend's bottom-left
+#'   corner. The default sits in the empty top-right corner of a full-Island
+#'   map. For a map of part of the Island, pick a corner that is clear.
 #'
 #' @return A ggplot2 theme object.
 #' @export
@@ -27,7 +29,7 @@
 theme_islh_map <- function(
   base_size = 12,
   legend = c("bottom", "inside", "none"),
-  legend_inside = c(0.04, 0.16)
+  legend_inside = c(0.62, 0.8)
 ) {
   legend <- match.arg(legend)
   base_size <- .islh_check_size(base_size)

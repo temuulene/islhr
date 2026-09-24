@@ -27,7 +27,7 @@ islh_help <- function() {
     "",
     "MAPS",
     "  theme_islh_map()              map theme with no chart furniture",
-    '  theme_islh_map(legend = "inside")   legend in the open water',
+    '  theme_islh_map(legend = "inside")   legend in the empty corner',
     "  coord_islh_map()              BC Albers, no graticule",
     "  scale_fill_islh_b()           binned fill for a choropleth",
     "  scale_fill_islh_area()        a fixed colour for each of the 14 LHAs",

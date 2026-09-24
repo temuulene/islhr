@@ -32,7 +32,7 @@
     Code
       islh_help()
     Output
-      Island Health theme 0.8.0
+      Island Health theme 0.9.0
       
       SETUP  once per document or session
         islh_setup()                  apply the theme; detects HTML or Word
@@ -51,7 +51,7 @@
       
       MAPS
         theme_islh_map()              map theme with no chart furniture
-        theme_islh_map(legend = "inside")   legend in the open water
+        theme_islh_map(legend = "inside")   legend in the empty corner
         coord_islh_map()              BC Albers, no graticule
         scale_fill_islh_b()           binned fill for a choropleth
         scale_fill_islh_area()        a fixed colour for each of the 14 LHAs

@@ -29,7 +29,9 @@ islh_caption(
 \item{governance}{Data governance statement, where one applies.}
 
 \item{width}{Characters per line before wrapping. \code{Inf} leaves the caption
-on one line.}
+on one line. A map draws narrower than its figure, because
+\code{\link[=coord_islh_map]{coord_islh_map()}} fixes the aspect ratio, so use about 70 for a
+full-Island map.}
 }
 \value{
 A single string for \code{ggplot2::labs(caption = )}.

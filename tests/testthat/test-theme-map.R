@@ -46,6 +46,18 @@ test_that("the map theme paints an opaque background", {
   expect_identical(background$fill, "white")
 })
 
+test_that("the inside legend defaults to the empty top-right corner", {
+  # The earlier default, c(0.04, 0.16), overlapped the west coast once real
+  # boundaries were drawn. The top right is empty on a full-Island map.
+  expect_equal(
+    ggplot2::calc_element(
+      "legend.position.inside",
+      theme_islh_map(legend = "inside")
+    ),
+    c(0.62, 0.8)
+  )
+})
+
 test_that("the legend can sit in the open water", {
   inside <- theme_islh_map(legend = "inside", legend_inside = c(0.1, 0.3))
 

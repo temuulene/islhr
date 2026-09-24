@@ -53,11 +53,9 @@
       c("*", "\u2020", "\u2021", "\u00a7")
   }
 
-  if (isTRUE(quiet)) {
-    suppressMessages(gtsummary::check_gtsummary_theme(theme))
-  } else {
-    gtsummary::check_gtsummary_theme(theme)
-  }
+  # The check reports "Looks good!" on success, which tells a report author
+  # nothing; it still errors on a bad theme.
+  suppressMessages(gtsummary::check_gtsummary_theme(theme))
 
   if (isTRUE(set_theme)) {
     if (isTRUE(quiet)) {

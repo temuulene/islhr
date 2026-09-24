@@ -7,7 +7,7 @@
 theme_islh_map(
   base_size = 12,
   legend = c("bottom", "inside", "none"),
-  legend_inside = c(0.04, 0.16)
+  legend_inside = c(0.62, 0.8)
 )
 }
 \arguments{
@@ -18,8 +18,9 @@ theme_islh_map(
 room to sit side by side.}
 
 \item{legend_inside}{Legend position when \code{legend = "inside"}, as fractions
-of the panel from the bottom left. The default sits in the Pacific, off
-the west coast of Vancouver Island.}
+of the panel from the bottom left, placing the legend's bottom-left
+corner. The default sits in the empty top-right corner of a full-Island
+map. For a map of part of the Island, pick a corner that is clear.}
 }
 \value{
 A ggplot2 theme object.
@@ -31,10 +32,11 @@ hierarchy from \code{\link[=theme_islh]{theme_islh()}} and nothing else. Pair it
 \code{ggplot2::geom_sf()}, \code{\link[=coord_islh_map]{coord_islh_map()}} and \code{\link[=scale_fill_islh_b]{scale_fill_islh_b()}}.
 }
 \details{
-Island Health runs northwest to southeast, which leaves open water off the
-west coast. \code{legend = "inside"} puts the legend there and gives the map
-roughly a fifth more room, which matters because \code{coord_sf()} fixes the
-aspect ratio and a wider figure cannot stretch the map to fill it.
+Island Health runs northwest to southeast, which leaves an empty corner at
+the top right of a full-Island map, over the mainland the map does not
+draw. \code{legend = "inside"} puts the legend there and gives the map roughly a
+fifth more room, which matters because \code{coord_sf()} fixes the aspect ratio
+and a wider figure cannot stretch the map to fill it.
 }
 \examples{
 ggplot2::ggplot() + theme_islh_map()
