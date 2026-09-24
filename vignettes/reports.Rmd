@@ -187,6 +187,49 @@ if (knitr::is_html_output()) {
 }
 ```
 
+## Grouped tables
+
+When rows fall under headings, such as sites under their health service
+delivery area, name the grouping column with `groupname_col`. In HTML,
+`rowname_col` also turns a column into row labels, set apart by a thin rule
+and keeping its name as a header:
+
+```{r grouped-table}
+sites <- data.frame(
+  HSDA = c("South", "South", "Central", "Central", "North"),
+  Site = c(
+    "Rock Bay Landing (Victoria)", "The Harbour (Victoria)",
+    "Cowichan (Duncan)", "Port Alberni", "Comox Valley"
+  ),
+  Opened = c(
+    "February 1, 2017", "June 18, 2018", "September 11, 2017",
+    "May 1, 2017", "September 1, 2020"
+  ),
+  Hours = c(
+    "7 AM - 10 PM", "8 AM - 7 PM", "8 AM - 8 PM", "8 AM - 8 PM",
+    "9:30 AM - 3:30 PM"
+  )
+)
+
+islh_gt(
+  sites,
+  groupname_col = "HSDA",
+  rowname_col = "Site",
+  title = "Site details"
+)
+```
+
+`islh_flextable()` takes the same `groupname_col`, with the same shaded
+heading rows, so a dual-format report groups its table in both outputs. Word
+tables have no separate row-label column, so keep that column first. This is
+the Word version of the same table:
+
+```{r grouped-word}
+islh_flextable(sites, groupname_col = "HSDA")
+```
+
+In a dual-format report, choose between the two as in the previous section.
+
 ## Word output
 
 The Word format uses a reference document built from the official Island

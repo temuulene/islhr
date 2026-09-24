@@ -165,3 +165,94 @@ test_that("an old gtsummary is skipped with a warning, not an error", {
     "too old"
   )
 })
+
+site_details <- function() {
+  data.frame(
+    hsda = c("South", "South", "Central", "North"),
+    site = c("Site A", "Site B", "Site C", "Site D"),
+    opened = c("2017-02-01", "2018-06-18", "2017-09-11", "2020-06-01")
+  )
+}
+
+test_that("islh_gt groups rows and keeps a header over the row labels", {
+  skip_if_not_installed("gt")
+  table <- islh_gt(
+    site_details(),
+    groupname_col = "hsda",
+    rowname_col = "site",
+    embed_fonts = FALSE
+  )
+  html <- quietly(gt::as_raw_html(table))
+
+  for (group in c("South", "Central", "North")) {
+    expect_match(html, paste0(">", group, "<"))
+  }
+  # The row label column keeps its name as a header.
+  expect_match(html, ">site<")
+
+  # An empty stubhead leaves the header cell blank.
+  blank <- quietly(gt::as_raw_html(islh_gt(
+    site_details(),
+    rowname_col = "site",
+    stubhead = "",
+    embed_fonts = FALSE
+  )))
+  expect_false(grepl(">site<", blank, fixed = TRUE))
+})
+
+test_that("islh_gt checks its grouping arguments", {
+  skip_if_not_installed("gt")
+  expect_error(
+    islh_gt(site_details(), groupname_col = "region", embed_fonts = FALSE),
+    class = "islh_error"
+  )
+  expect_error(
+    islh_gt(site_details(), rowname_col = c("a", "b"), embed_fonts = FALSE),
+    "one column name"
+  )
+  expect_error(
+    islh_gt(gt::gt(site_details()), groupname_col = "hsda"),
+    "need a data frame"
+  )
+})
+
+test_that("islh_gt titles are bold despite gt's own title class", {
+  skip_if_not_installed("gt")
+  html <- quietly(gt::as_raw_html(
+    islh_gt(site_details(), title = "Sites", embed_fonts = FALSE),
+    inline_css = TRUE
+  ))
+  expect_match(html, "font-weight: bold[^>]*>Sites<")
+})
+
+test_that("islh_flextable groups rows with the same shading as islh_gt", {
+  skip_if_not_installed("flextable")
+  skip_if_not_installed("officer")
+  table <- islh_flextable(site_details(), groupname_col = "hsda")
+
+  # Four sites and three group heading rows.
+  expect_equal(flextable::nrow_part(table, "body"), 7L)
+  expect_false("hsda" %in% table$col_keys)
+
+  fills <- table$body$styles$cells$background.color$data[, 1]
+  expect_equal(sum(fills == islh_hex("blue", 96)), 3L)
+
+  # Widths still fill the text width.
+  expect_equal(sum(dim(table)$widths), islhr:::.islh_text_width)
+})
+
+test_that("islh_flextable checks its grouping argument", {
+  skip_if_not_installed("flextable")
+  skip_if_not_installed("officer")
+  expect_error(
+    islh_flextable(site_details(), groupname_col = "region"),
+    class = "islh_error"
+  )
+  expect_error(
+    islh_flextable(
+      flextable::flextable(site_details()),
+      groupname_col = "hsda"
+    ),
+    "needs a data frame"
+  )
+})

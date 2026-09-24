@@ -5,7 +5,17 @@
 #' program opens it, so the same file lays out differently in Word and in
 #' LibreOffice, and differently again on a machine without BC Sans installed.
 #'
+#' @section Grouped rows:
+#'
+#' `groupname_col` gathers rows under a heading row for each value of that
+#' column, shaded like the group headings of [islh_gt()], so a report rendered
+#' to both HTML and Word shows the same grouped table. It applies when `x` is
+#' a data frame. Word tables have no separate row-label column; put the column
+#' that labels each row first.
+#'
 #' @param x A flextable or data frame.
+#' @param groupname_col Column whose values become group heading rows. Data
+#'   frames only.
 #' @param caption Optional caption.
 #' @param autofit Size columns in proportion to their contents. With `FALSE`,
 #'   every column gets an equal share.
@@ -22,11 +32,20 @@
 #'     head(islh_example_data()),
 #'     caption = "Example encounters"
 #'   )
+#'
+#'   # One heading row per HSDA.
+#'   sites <- data.frame(
+#'     hsda = c("South", "South", "Central", "North"),
+#'     site = c("Site A", "Site B", "Site C", "Site D"),
+#'     opened = c("2017-02-01", "2018-06-18", "2017-09-11", "2020-06-01")
+#'   )
+#'   islh_flextable(sites, groupname_col = "hsda")
 #' }
 #'
 #' @export
 islh_flextable <- function(
   x,
+  groupname_col = NULL,
   caption = NULL,
   autofit = TRUE,
   width = 1,
@@ -39,8 +58,23 @@ islh_flextable <- function(
   text_width <- .islh_check_dimension(text_width, "text_width")
 
   created_from_data <- !inherits(x, "flextable")
+  group_rows <- integer()
+  if (!created_from_data && !is.null(groupname_col)) {
+    .islh_abort(c(
+      "{.arg groupname_col} needs a data frame.",
+      i = "Pass the data frame to {.fn islh_flextable}, or group it in
+           {.fn flextable::as_grouped_data} where the table is built."
+    ))
+  }
   if (created_from_data) {
-    x <- flextable::flextable(x)
+    groupname_col <- .islh_check_column(groupname_col, x, "groupname_col")
+    if (is.null(groupname_col)) {
+      x <- flextable::flextable(x)
+    } else {
+      grouped <- flextable::as_grouped_data(x, groups = groupname_col)
+      group_rows <- which(!is.na(grouped[[groupname_col]]))
+      x <- flextable::as_flextable(grouped, hide_grouplabel = TRUE)
+    }
   }
 
   thin_rule <- officer::fp_border(
@@ -82,6 +116,14 @@ islh_flextable <- function(
     x <- x |>
       flextable::align_text_col(align = "left") |>
       flextable::align_nottext_col(align = "right")
+  }
+
+  # Group heading rows match islh_gt(): Blue 96 fill, bold, left aligned.
+  if (length(group_rows) > 0L) {
+    x <- x |>
+      flextable::bg(i = group_rows, bg = islh_hex("blue", 96), part = "body") |>
+      flextable::bold(i = group_rows, bold = TRUE, part = "body") |>
+      flextable::align(i = group_rows, align = "left", part = "body")
   }
 
   if (!is.null(caption)) {

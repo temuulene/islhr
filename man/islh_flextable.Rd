@@ -6,6 +6,7 @@
 \usage{
 islh_flextable(
   x,
+  groupname_col = NULL,
   caption = NULL,
   autofit = TRUE,
   width = 1,
@@ -14,6 +15,9 @@ islh_flextable(
 }
 \arguments{
 \item{x}{A flextable or data frame.}
+
+\item{groupname_col}{Column whose values become group heading rows. Data
+frames only.}
 
 \item{caption}{Optional caption.}
 
@@ -34,6 +38,16 @@ left for the renderer to work out. An "autofit" table is sized by whichever
 program opens it, so the same file lays out differently in Word and in
 LibreOffice, and differently again on a machine without BC Sans installed.
 }
+\section{Grouped rows}{
+
+
+\code{groupname_col} gathers rows under a heading row for each value of that
+column, shaded like the group headings of \code{\link[=islh_gt]{islh_gt()}}, so a report rendered
+to both HTML and Word shows the same grouped table. It applies when \code{x} is
+a data frame. Word tables have no separate row-label column; put the column
+that labels each row first.
+}
+
 \examples{
 if (requireNamespace("flextable", quietly = TRUE) &&
     requireNamespace("officer", quietly = TRUE)) {
@@ -41,6 +55,14 @@ if (requireNamespace("flextable", quietly = TRUE) &&
     head(islh_example_data()),
     caption = "Example encounters"
   )
+
+  # One heading row per HSDA.
+  sites <- data.frame(
+    hsda = c("South", "South", "Central", "North"),
+    site = c("Site A", "Site B", "Site C", "Site D"),
+    opened = c("2017-02-01", "2018-06-18", "2017-09-11", "2020-06-01")
+  )
+  islh_flextable(sites, groupname_col = "hsda")
 }
 
 }

@@ -158,3 +158,28 @@
   }
   as.numeric(x)
 }
+
+# An optional column named by a string, such as a table's group or row-label
+# column. A typo should name the argument, not surface later as an unlabelled
+# table.
+.islh_check_column <- function(x, data, arg, call = rlang::caller_env()) {
+  if (is.null(x)) {
+    return(NULL)
+  }
+  if (!is.character(x) || length(x) != 1L || is.na(x)) {
+    .islh_abort(
+      "{.arg {arg}} must be one column name, as a string.",
+      call = call
+    )
+  }
+  if (!x %in% names(data)) {
+    .islh_abort(
+      c(
+        "{.arg {arg}} names {.field {x}}, which is not a column in the data.",
+        i = "Columns: {.field {names(data)}}."
+      ),
+      call = call
+    )
+  }
+  x
+}
