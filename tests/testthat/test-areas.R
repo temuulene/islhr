@@ -164,3 +164,86 @@ test_that("the HSDA level works the same way", {
   )
   expect_error(scale_fill_islh_area("chsa"))
 })
+
+test_that("every LHA has one label position", {
+  labels <- .islh_lha_label_positions
+  expect_setequal(labels$code, islh_areas()$code)
+  expect_false(anyDuplicated(labels$code) > 0)
+  # Exactly the six small or narrow areas are called out.
+  expect_setequal(
+    labels$code[!is.na(labels$anchor_x)],
+    c("411", "413", "414", "421", "423", "425")
+  )
+})
+
+label_points <- function(x, y) {
+  sf::st_as_sf(data.frame(x = x, y = y), coords = c("x", "y"), crs = 3005)
+}
+
+test_that("labels sit inside their area, or clear of the Island", {
+  skip_if_not_installed("sf")
+  lha <- islh_example_lha()
+  labels <- .islh_lha_label_positions
+  own <- match(labels$code, lha$geography_code)
+  callout <- !is.na(labels$anchor_x)
+
+  # Codes that fit are drawn inside their own area.
+  inside <- label_points(labels$label_x, labels$label_y)[!callout, ]
+  expect_true(all(mapply(
+    function(i, j) sf::st_within(inside[i, ], lha[j, ], sparse = FALSE)[1, 1],
+    seq_len(nrow(inside)),
+    own[!callout]
+  )))
+
+  # Callout codes sit over water, touching no area.
+  outside <- label_points(labels$label_x, labels$label_y)[callout, ]
+  expect_false(any(sf::st_intersects(outside, lha, sparse = FALSE)))
+
+  # Each leader starts inside the area it names.
+  anchors <- label_points(labels$anchor_x[callout], labels$anchor_y[callout])
+  expect_true(all(mapply(
+    function(i, j) sf::st_within(anchors[i, ], lha[j, ], sparse = FALSE)[1, 1],
+    seq_len(nrow(anchors)),
+    own[callout]
+  )))
+})
+
+test_that("no two leader lines cross", {
+  skip_if_not_installed("sf")
+  labels <- .islh_lha_label_positions
+  labels <- labels[!is.na(labels$anchor_x), ]
+  leaders <- sf::st_sfc(
+    lapply(seq_len(nrow(labels)), function(i) {
+      sf::st_linestring(rbind(
+        c(labels$anchor_x[i], labels$anchor_y[i]),
+        c(labels$label_x[i], labels$label_y[i])
+      ))
+    }),
+    crs = 3005
+  )
+  crossings <- sf::st_intersects(leaders, sparse = FALSE)
+  diag(crossings) <- FALSE
+  expect_false(any(crossings))
+})
+
+test_that("islh_area_labels adds layers that draw on an LHA map", {
+  skip_if_not_installed("sf")
+  layers <- islh_area_labels()
+  expect_type(layers, "list")
+
+  plot <- ggplot2::ggplot(islh_example_lha()) +
+    ggplot2::geom_sf() +
+    layers +
+    coord_islh_map() +
+    theme_islh_map()
+  built <- ggplot2::ggplot_build(plot)
+  text <- do.call(
+    rbind,
+    lapply(built$data, function(d) {
+      if ("label" %in% names(d)) d[c("label", "colour")] else NULL
+    })
+  )
+  expect_setequal(text$label, islh_areas()$code)
+
+  expect_error(islh_area_labels(size = 0), class = "islh_error")
+})

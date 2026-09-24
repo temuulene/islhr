@@ -31,6 +31,7 @@ islh_help <- function() {
     "  coord_islh_map()              BC Albers, no graticule",
     "  scale_fill_islh_b()           binned fill for a choropleth",
     "  scale_fill_islh_area()        a fixed colour for each of the 14 LHAs",
+    "  islh_area_labels()            LHA codes on a map, without overlaps",
     '  islh_areas("lha")             LHA codes, names, HSDAs and colours',
     "  islh_example_lha()            the 14 LHAs with 2025 population, offline",
     "  islh_caption(source, extracted)     source, date, suppression rule",

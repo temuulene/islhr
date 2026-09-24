@@ -369,12 +369,14 @@ Label text sits beside the line in dark grey, not in the line's colour: small
 text needs 70 values of contrast with the page, which the lighter shades do
 not have.
 
-On a map, write the code or name on each area in its `label_colour`, which is
-white or Grey 10, whichever the fill needs. That contrast holds for large
-labels only, about 14 pt and bold. Put smaller labels outside the shapes, and
-give the small South Island areas an inset, as above.
+On a map, `islh_area_labels()` writes each area's code without overlaps.
+Eight areas are large enough to hold their code, which sits inside in the
+area's `label_colour`: white or Grey 10, whichever the fill needs. The six
+small South and Central Island areas are labelled in a column over the Strait
+of Georgia, each joined to its area by a thin line, so no code crosses a
+border:
 
-```{r lha-map, fig.height=6, fig.alt="Map of Island Health's 14 local health areas, each labelled with its code: South Island in shades of blue, Central Island in shades of cedar and North Island in shades of thistle."}
+```{r lha-map, fig.height=6, fig.alt="Map of Island Health's 14 local health areas, South Island in shades of blue, Central Island in shades of cedar and North Island in shades of thistle. Eight areas carry their code inside; the six small southern and central areas are labelled in a column to the east, each joined to its area by a thin line."}
 lha <- merge(
   islh_example_lha(),
   islh_areas(),
@@ -384,16 +386,15 @@ lha <- merge(
 
 ggplot(lha) +
   geom_sf(aes(fill = name), colour = "white", linewidth = 0.3) +
-  geom_sf_text(
-    aes(label = geography_code, colour = I(label_colour)),
-    size = 5,
-    fontface = "bold"
-  ) +
+  islh_area_labels() +
   scale_fill_islh_area(name = NULL) +
   coord_islh_map() +
   labs(title = "Island Health local health areas") +
   theme_islh_map(legend = "none")
 ```
+
+The label positions are fixed for the whole Island. On an inset or a map of
+part of it, label the areas yourself.
 
 The scales match the official names or the three-digit codes, so data from
 `islh_bc_geography()` works as it comes. A value that matches no LHA, such as

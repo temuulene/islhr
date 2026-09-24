@@ -3,29 +3,30 @@
     Code
       exports
     Output
-       [1] "coord_islh_map"            "islh_areas"               
-       [3] "islh_brand"                "islh_brand_yml"           
-       [5] "islh_caption"              "islh_check"               
-       [7] "islh_check_project"        "islh_create_report"       
-       [9] "islh_epi_curve"            "islh_example_data"        
-      [11] "islh_example_lha"          "islh_example_plot"        
-      [13] "islh_flextable"            "islh_font_family"         
-      [15] "islh_gt"                   "islh_gtsummary_flex"      
-      [17] "islh_gtsummary_gt"         "islh_help"                
-      [19] "islh_hex"                  "islh_install_deps"        
-      [21] "islh_logo"                 "islh_reference_docx"      
-      [23] "islh_reset"                "islh_save_plot"           
-      [25] "islh_setup"                "islh_update_project"      
-      [27] "islh_use_brand"            "islh_use_quarto"          
-      [29] "islh_version"              "scale_color_islh"         
-      [31] "scale_color_islh_area"     "scale_color_islh_ordinal" 
-      [33] "scale_color_islh_signal"   "scale_colour_islh"        
-      [35] "scale_colour_islh_area"    "scale_colour_islh_ordinal"
-      [37] "scale_colour_islh_signal"  "scale_fill_islh"          
-      [39] "scale_fill_islh_area"      "scale_fill_islh_b"        
-      [41] "scale_fill_islh_ordinal"   "scale_fill_islh_signal"   
-      [43] "scale_y_islh_count"        "theme_islh"               
-      [45] "theme_islh_map"            "with_islh"                
+       [1] "coord_islh_map"            "islh_area_labels"         
+       [3] "islh_areas"                "islh_brand"               
+       [5] "islh_brand_yml"            "islh_caption"             
+       [7] "islh_check"                "islh_check_project"       
+       [9] "islh_create_report"        "islh_epi_curve"           
+      [11] "islh_example_data"         "islh_example_lha"         
+      [13] "islh_example_plot"         "islh_flextable"           
+      [15] "islh_font_family"          "islh_gt"                  
+      [17] "islh_gtsummary_flex"       "islh_gtsummary_gt"        
+      [19] "islh_help"                 "islh_hex"                 
+      [21] "islh_install_deps"         "islh_logo"                
+      [23] "islh_reference_docx"       "islh_reset"               
+      [25] "islh_save_plot"            "islh_setup"               
+      [27] "islh_update_project"       "islh_use_brand"           
+      [29] "islh_use_quarto"           "islh_version"             
+      [31] "scale_color_islh"          "scale_color_islh_area"    
+      [33] "scale_color_islh_ordinal"  "scale_color_islh_signal"  
+      [35] "scale_colour_islh"         "scale_colour_islh_area"   
+      [37] "scale_colour_islh_ordinal" "scale_colour_islh_signal" 
+      [39] "scale_fill_islh"           "scale_fill_islh_area"     
+      [41] "scale_fill_islh_b"         "scale_fill_islh_ordinal"  
+      [43] "scale_fill_islh_signal"    "scale_y_islh_count"       
+      [45] "theme_islh"                "theme_islh_map"           
+      [47] "with_islh"                
 
 # islh_help prints a grouped quick reference
 
@@ -55,6 +56,7 @@
         coord_islh_map()              BC Albers, no graticule
         scale_fill_islh_b()           binned fill for a choropleth
         scale_fill_islh_area()        a fixed colour for each of the 14 LHAs
+        islh_area_labels()            LHA codes on a map, without overlaps
         islh_areas("lha")             LHA codes, names, HSDAs and colours
         islh_example_lha()            the 14 LHAs with 2025 population, offline
         islh_caption(source, extracted)     source, date, suppression rule

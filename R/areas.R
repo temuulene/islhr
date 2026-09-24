@@ -290,3 +290,218 @@ scale_colour_islh_area <- function(
 #' @rdname scale_fill_islh_area
 #' @export
 scale_color_islh_area <- scale_colour_islh_area
+
+# Where each LHA's code goes on a map in BC Albers (EPSG:3005), in metres.
+#
+# Eight areas hold their code: the label sits inside, at a point chosen by eye
+# from sf::st_point_on_surface() of the catalogue boundaries. Six are too small
+# or narrow (411, 413, 414, 421, 423, 425). Their codes sit in a column over
+# the Strait of Georgia, east of the Island, with a leader line from a point
+# inside each area. The column runs north to south in the same order as the
+# anchors, so no two leader lines cross. tests/testthat/test-areas.R checks
+# all of this against islh_example_lha().
+.islh_lha_label_positions <- data.frame(
+  code = c(
+    "411",
+    "412",
+    "413",
+    "414",
+    "421",
+    "422",
+    "423",
+    "424",
+    "425",
+    "426",
+    "431",
+    "432",
+    "433",
+    "434"
+  ),
+  label_x = c(
+    1228000,
+    1148000,
+    1228000,
+    1228000,
+    1228000,
+    1127000,
+    1228000,
+    1133000,
+    1228000,
+    1055000,
+    1060000,
+    1031000,
+    978000,
+    1000000
+  ),
+  label_y = c(
+    378000,
+    391000,
+    400000,
+    446000,
+    422000,
+    424000,
+    470000,
+    458000,
+    500000,
+    458000,
+    516000,
+    552000,
+    540000,
+    700000
+  ),
+  anchor_x = c(
+    1194162,
+    NA,
+    1190608,
+    1182970,
+    1167741,
+    NA,
+    1163000,
+    NA,
+    1115000,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA
+  ),
+  anchor_y = c(
+    386787,
+    NA,
+    400719,
+    426480,
+    413703,
+    NA,
+    438000,
+    NA,
+    478000,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA
+  ),
+  stringsAsFactors = FALSE
+)
+
+#' Label local health areas on a map without overlaps
+#'
+#' Adds each local health area's code to a map of Island Health in BC Albers,
+#' such as [islh_example_lha()] or a boundary download from islhepi. Eight
+#' areas are large enough to hold their code, which sits inside in the area's
+#' `label_colour` from [islh_areas()]. The other six (411 Greater Victoria,
+#' 413 Saanich Peninsula, 414 Southern Gulf Islands, 421 Cowichan Valley South,
+#' 423 Cowichan Valley North and 425 Oceanside) are labelled in a column over
+#' the Strait of Georgia, each joined to its area by a thin leader line, so no
+#' code overlaps another or crosses a border.
+#'
+#' The positions are fixed for the whole Island and suit figures 6 inches wide
+#' or more. On a map zoomed to part of it, such as an inset, label the areas
+#' yourself.
+#'
+#' @param size Text size in millimetres, as for [ggplot2::geom_text()]. Codes
+#'   inside a fill meet the brand's large-text contrast in bold at about 4 mm
+#'   (11 to 12 points) and above; the default is 4.
+#'
+#' @return A list of ggplot2 layers to add to a map with `+`.
+#'
+#' @seealso [scale_fill_islh_area()] for each LHA's colour.
+#'
+#' @examples
+#' \dontshow{assign("font", "", envir = getFromNamespace(".islh_state", "islhr"))}
+#' if (requireNamespace("sf", quietly = TRUE)) {
+#'   lha <- islh_example_lha()
+#'
+#'   ggplot2::ggplot(lha) +
+#'     ggplot2::geom_sf(
+#'       ggplot2::aes(fill = geography_name),
+#'       colour = "white",
+#'       linewidth = 0.3
+#'     ) +
+#'     islh_area_labels() +
+#'     scale_fill_islh_area(guide = "none") +
+#'     coord_islh_map() +
+#'     theme_islh_map()
+#' }
+#'
+#' @export
+islh_area_labels <- function(size = 4) {
+  size <- .islh_check_size(size, "size", maximum = 20)
+
+  labels <- merge(
+    .islh_lha_label_positions,
+    islh_areas()[c("code", "label_colour")],
+    by = "code",
+    sort = TRUE
+  )
+  callout <- !is.na(labels$anchor_x)
+  inside <- labels[!callout, , drop = FALSE]
+  outside <- labels[callout, , drop = FALSE]
+
+  # The leader stops short of the text so the two do not touch.
+  gap <- 3000
+  dark <- islh_hex("grey", 10)
+
+  # A text layer widens the map to where each callout starts, not to where its
+  # text ends, so reserve room for the code itself or it is cut off.
+  room <- data.frame(
+    x = max(outside$label_x) + 9500 * size,
+    y = range(outside$label_y) + c(-2500, 2500) * size
+  )
+
+  list(
+    ggplot2::geom_blank(
+      data = room,
+      mapping = ggplot2::aes(x = .data$x, y = .data$y),
+      inherit.aes = FALSE
+    ),
+    ggplot2::geom_segment(
+      data = outside,
+      mapping = ggplot2::aes(
+        x = .data$anchor_x,
+        y = .data$anchor_y,
+        xend = .data$label_x - gap,
+        yend = .data$label_y
+      ),
+      colour = islh_hex("grey", 40),
+      linewidth = 0.3,
+      inherit.aes = FALSE
+    ),
+    ggplot2::geom_point(
+      data = outside,
+      mapping = ggplot2::aes(x = .data$anchor_x, y = .data$anchor_y),
+      colour = dark,
+      size = 0.8,
+      inherit.aes = FALSE
+    ),
+    ggplot2::geom_text(
+      data = inside,
+      mapping = ggplot2::aes(
+        x = .data$label_x,
+        y = .data$label_y,
+        label = .data$code
+      ),
+      colour = inside$label_colour,
+      fontface = "bold",
+      size = size,
+      family = .islh_font(),
+      inherit.aes = FALSE
+    ),
+    # Callouts sit on the white page, where dark text meets the brand's
+    # small-text contrast at any size.
+    ggplot2::geom_text(
+      data = outside,
+      mapping = ggplot2::aes(
+        x = .data$label_x,
+        y = .data$label_y,
+        label = .data$code
+      ),
+      colour = dark,
+      hjust = 0,
+      fontface = "bold",
+      size = size,
+      family = .islh_font(),
+      inherit.aes = FALSE
+    )
+  )
+}

@@ -3,6 +3,7 @@
 S3method(print,islh_dependency_check)
 S3method(print,islh_project_check)
 export(coord_islh_map)
+export(islh_area_labels)
 export(islh_areas)
 export(islh_brand)
 export(islh_brand_yml)
