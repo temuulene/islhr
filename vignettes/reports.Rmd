@@ -224,7 +224,7 @@ heading rows, so a dual-format report groups its table in both outputs. Word
 tables have no separate row-label column, so keep that column first. This is
 the Word version of the same table:
 
-```{r grouped-word}
+```{r grouped-word, eval=requireNamespace("flextable", quietly = TRUE) && requireNamespace("officer", quietly = TRUE)}
 islh_flextable(sites, groupname_col = "HSDA")
 ```
 
