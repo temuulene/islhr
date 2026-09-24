@@ -1,3 +1,30 @@
+# islhr 0.9.0
+
+## New
+
+* `islh_example_lha()` returns Island Health's 14 local health areas with
+  their 2025 population, as a small map bundled with the package, so map
+  examples run without the BC Data Catalogue. Its columns match islhepi's
+  boundary and population downloads once joined. Contains information
+  licensed under the Open Government Licence - British Columbia.
+
+## Fixes
+
+* `islh_setup()` no longer passes on gtsummary's "Looks good!" message.
+* `theme_islh_map(legend = "inside")` now places the legend in the empty
+  top-right corner of a full-Island map. The old default overlapped the west
+  coast of Vancouver Island once real boundaries were drawn.
+
+## Documentation
+
+* The website articles now show what their code produces. The maps article
+  draws every map from `islh_example_lha()`: population, rates with fixed
+  breaks, suppressed areas, the Victoria inset and the LHA colours. The
+  reports article creates, checks and updates a real project, and the getting
+  started article saves a figure and shows the file.
+* `islh_caption()` documents a narrower `width` for maps, which draw narrower
+  than their figure.
+
 # islhr 0.8.0
 
 ## New
