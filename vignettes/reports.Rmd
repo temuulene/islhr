@@ -22,11 +22,19 @@ islh_setup(format = "html", quiet = TRUE)
 
 ## Start a project
 
-```{r create-project, eval=FALSE}
-islhr::islh_create_report("flu-season-2026", format = "docx")
+```{r create-project, message=TRUE}
+project <- file.path(tempdir(), "flu-season-2026")
+islhr::islh_create_report(project, format = "docx")
 ```
 
-That writes a Quarto project that renders as it stands. Open the `.Rproj`
+This article writes to a temporary folder so it can run anywhere; in practice,
+give the path where the project should live. The project holds:
+
+```{r project-files}
+list.files(project, recursive = TRUE)
+```
+
+That is a Quarto project that renders as it stands. Open the `.Rproj`
 file, run `islh_install_deps("docx")` once on that machine, then open
 `report.qmd` and click **Render**. Replace the example data with your own.
 
@@ -35,10 +43,15 @@ chooses its table engine at render time, so one file produces either output.
 
 ## Add the format to a project you already have
 
-```{r add-format, eval=FALSE}
-islhr::islh_use_quarto()
-islhr::islh_use_brand()
+```{r add-format, message=TRUE}
+existing <- file.path(tempdir(), "respiratory-summary")
+dir.create(existing)
+
+islhr::islh_use_quarto(existing)
+islhr::islh_use_brand(existing)
 ```
+
+Run from inside your project, both calls need no argument.
 
 The first copies the Island Health Quarto extension into `_extensions/`; the
 second copies `_brand.yml` alongside it. Quarto only looks for extensions
@@ -61,10 +74,18 @@ reaches your report only when the copy in your project is replaced. Re-copying
 blindly is not the answer either, since people edit `_brand.yml` for a
 program's own colours and lose that work without warning.
 
-`islh_check_project()` reports where a project stands. It reads only.
+`islh_check_project()` reports where a project stands. It reads only. To show
+what it finds, suppose someone added their program's colour to `_brand.yml` and
+deleted one of the logos:
 
-```{r check-project, eval=FALSE}
-islhr::islh_check_project()
+```{r edit-project}
+cat("# Program accent colour added locally\n",
+    file = file.path(project, "_brand.yml"), append = TRUE)
+file.remove(file.path(project, "logos", "islh-logo-stacked-white.svg"))
+```
+
+```{r check-project, message=TRUE}
+islhr::islh_check_project(project)
 ```
 
 Each file is up to date, out of date, missing, or edited here. A project
@@ -77,12 +98,14 @@ project.
 Anything you have edited is left alone, and whatever it replaces is copied
 into a timestamped folder under `_islh-backup` first.
 
-```{r update-project, eval=FALSE}
+```{r update-project, message=TRUE}
 # See what would change without changing anything.
-islhr::islh_update_project(dry_run = TRUE)
+islhr::islh_update_project(project, dry_run = TRUE)
 
-islhr::islh_update_project()
+islhr::islh_update_project(project)
 ```
+
+The missing logo is back, and the edited `_brand.yml` is untouched.
 
 If you meant to discard your own edits, `force = TRUE` replaces those files
 too. The backup is what makes that recoverable.
@@ -156,7 +179,7 @@ islh_gt(
 
 In a dual-format report, select the table engine from the output format:
 
-```{r dual-format-table, eval=FALSE}
+```{r dual-format-table}
 if (knitr::is_html_output()) {
   islh_gt(report_data)
 } else {

@@ -45,10 +45,13 @@ islh_setup()
 
 with:
 
-```{r new-setup, eval=FALSE}
+```{r new-setup, message=TRUE, warning=FALSE}
 library(islhr)
 islh_setup()
 ```
+
+In a rendered document, as here, setup detects HTML or Word and sets up the
+matching tables. At the console it configures plots only.
 
 **3. Delete the copied script**, and the `R/` folder if it holds nothing else.
 

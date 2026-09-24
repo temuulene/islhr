@@ -109,10 +109,15 @@ document. It is rarely what you want at the console.
 
 `islh_reset()` undoes it:
 
-```{r reset, eval=FALSE}
+```{r reset, message=TRUE}
 islh_setup()
 # ... make some figures ...
 islh_reset()
+```
+
+```{r reset-restore, include=FALSE}
+# Put this article's own setup back for the chunks that follow.
+islh_setup(format = "html", quiet = TRUE)
 ```
 
 `with_islh()` applies the theme around one block and restores the session
@@ -175,18 +180,32 @@ directly instead of asking colour alone to carry the distinction.
 `islh_save_plot()` applies standard report or slide dimensions and uses a
 high-quality raster device when available.
 
-```{r save-plot, eval=FALSE}
-islh_save_plot("encounters.png", encounter_plot, preset = "report")
+```{r save-plot}
+path <- file.path(tempdir(), "encounters.png")
+islh_save_plot(path, encounter_plot, preset = "report")
 ```
 
-The function writes a file, so the call is not run while this website builds.
-It returns the saved path invisibly.
+It returns the saved path invisibly. This is the file it wrote, 6.5 by 4.2
+inches at 300 dots per inch:
+
+```{r save-plot-show, echo=FALSE, out.width="100%", fig.alt="The saved report-size PNG of the encounters bar chart."}
+# Copy the saved file next to the article's own figures so the website
+# publishes it, then show it.
+shown <- knitr::fig_path(".png")
+dir.create(dirname(shown), recursive = TRUE, showWarnings = FALSE)
+invisible(file.copy(path, shown, overwrite = TRUE))
+knitr::include_graphics(shown)
+```
 
 ## Start a full report
 
-```{r create-report, eval=FALSE}
-islh_create_report("2026-flu-season", format = "both")
+```{r create-report, message=TRUE}
+project <- file.path(tempdir(), "2026-flu-season")
+islh_create_report(project, format = "both")
+list.files(project)
 ```
+
+Here the project goes to a temporary folder; give your own path in practice.
 
 The project contains a working report, the Island Health Quarto extension,
 brand configuration and example data. Open the generated `.Rproj`, replace the

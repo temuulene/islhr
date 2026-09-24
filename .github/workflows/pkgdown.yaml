@@ -59,13 +59,20 @@ jobs:
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
-      - name: Check rendered surveillance figures and BC Sans
+      # Articles should show what their code produces, not only the code.
+      # Each check names one output that only an evaluated chunk creates.
+      - name: Check rendered article output and BC Sans
         shell: bash
         run: |
           test -s docs/fonts/BCSans-Regular.woff2
           test -s docs/fonts/BC-Sans-LICENSE.txt
           grep -Fq 'fonts/BCSans-Regular.woff2' docs/extra.css
           grep -Fq 'weekly-curve-1.png' docs/articles/surveillance.html
+          grep -Fq 'choropleth-1.png' docs/articles/maps.html
+          grep -Fq 'lha-map-1.png' docs/articles/maps.html
+          grep -Fq 'save-plot-show-1.png' docs/articles/islhr.html
+          test -s docs/articles/islhr_files/figure-html/save-plot-show-1.png
+          grep -Fq 'Replaced 1 file' docs/articles/reports.html
 
       - name: Check reference index is complete
         run: pkgdown::check_pkgdown()
